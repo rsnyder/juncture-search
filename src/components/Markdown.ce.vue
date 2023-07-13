@@ -90,7 +90,7 @@
   // watch(content, () => console.log(toRaw(content.value)))
 
   onMounted(async () =>  {
-    markdown.value = await getMarkdown('https://raw.githubusercontent.com/rsnyder/vue3-netlify/main/static/pages/en/default.md')
+    markdown.value = await getMarkdown('https://raw.githubusercontent.com/juncture-digital/search/main/static/pages/en/default.md')
   })
 
   async function getMarkdown(path:string) {
