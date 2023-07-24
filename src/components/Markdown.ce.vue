@@ -101,7 +101,7 @@
   onMounted(async () =>  {
     let mdUrl = process.env.mode === 'development' 
       ? `pages/${language.value}/${props.page}.md` 
-      : `https://raw.githubusercontent.com/juncture-digital/search/main/static/pages/${language.value}/${props.page}.md`
+      : `https://raw.githubusercontent.com/juncture-digital/search/main/public/pages/${language.value}/${props.page}.md`
     console.log(`mode=${process.env.mode} mdUrl=${mdUrl}`)
     markdown.value = await getMarkdown(mdUrl)
   })
