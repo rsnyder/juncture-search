@@ -32,7 +32,7 @@
   import { storeToRefs } from 'pinia'
 
   const store = useEntitiesStore()
-  const { user, isLoggedIn } = storeToRefs(store)
+  const { isLoggedIn, user, userid } = storeToRefs(store)
 
   const root = ref<HTMLElement | null>(null)
 
@@ -53,6 +53,10 @@
     console.log('auth.user', toRaw(user.value))
     if (user.value) localStorage.setItem('user', JSON.stringify(user.value))
     else if (localStorage.getItem('user')) localStorage.removeItem('user')
+  })
+
+  watch(userid, () => {
+    console.log(`userid=${userid.value}`)
   })
 
   function login() {

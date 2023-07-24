@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { toRaw } from 'vue'
 import { findQids, langLabels } from '../utils'
 import { Md5 } from 'ts-md5'
+import { sha256 } from 'js-sha256'
 
 function tokenIsValid(expiration:number) {
   let isExpired = expiration <= Date.now()
@@ -34,7 +35,8 @@ export const useEntitiesStore = defineStore('entities', {
     urlformatters: {},
     urlformattersFetching: false,
     qid: null,
-    user: <any|null>null
+    user: <any|null>null,
+    userid: null
   }),
 
   getters: {
@@ -59,6 +61,9 @@ export const useEntitiesStore = defineStore('entities', {
     setUser(user:any) {
       this.user = user
       this.isLoggedIn = user !== null && tokenIsValid(user.tokenExpiration)
+      this.userid = user !== null 
+        ? sha256(user.email.toLowerCase().trim())
+        : null
     },
 
     async fetch(eid:any, addSummaryText:boolean = false) {
