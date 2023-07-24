@@ -6,7 +6,8 @@ export default defineConfig(({mode})=> {
     define: {
       'process.env': {
         version: process.env.npm_package_version, 
-        mode
+        mode,
+        misc: process.env
       }
     },
     plugins: [vue({

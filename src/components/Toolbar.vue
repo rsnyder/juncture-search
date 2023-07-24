@@ -42,6 +42,7 @@
   const version = ref(process.env.version)
   const mode = ref(process.env.mode)
 
+  console.log(process.env)
   console.log(`version=${version.value} mode=${mode.value}`)
 
 </script>

@@ -36,4 +36,4 @@
   </script>
   
   <style>
-  </style>
+  </style>../../src/store/entities

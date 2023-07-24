@@ -83,14 +83,27 @@
   import { computed, onMounted, ref, toRaw, watch } from 'vue'
   import { marked } from 'marked'
 
+  import { useEntitiesStore } from '../store/entities'
+  import { storeToRefs } from 'pinia'
+  const store = useEntitiesStore()
+  const { language } = storeToRefs(store)
+
   const markdown = ref()
   const html = computed(() => markdown.value && parseMarkdown(markdown.value))
   const content = computed(() => html.value && parseHtml(html.value))
 
+  const props = defineProps({
+    page: { type: String, default: 'default' }
+  })
+
   // watch(content, () => console.log(toRaw(content.value)))
 
   onMounted(async () =>  {
-    markdown.value = await getMarkdown('https://raw.githubusercontent.com/juncture-digital/search/main/static/pages/en/default.md')
+    let mdUrl = process.env.mode === 'development' 
+      ? `pages/${language.value}/${props.page}.md` 
+      : `https://raw.githubusercontent.com/juncture-digital/search/main/static/pages/${language.value}/${props.page}.md`
+    console.log(`mode=${process.env.mode} mdUrl=${mdUrl}`)
+    markdown.value = await getMarkdown(mdUrl)
   })
 
   async function getMarkdown(path:string) {
