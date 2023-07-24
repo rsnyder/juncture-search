@@ -37,7 +37,7 @@
             <ve-tagged label="Tagged Images" id="tagged"></ve-tagged>
           </sl-tab-panel>
           <sl-tab-panel name="bhl">
-            <ve-template label="Biodiversity Heritage Library" id="bhl"></ve-template>
+            <ve-bhl label="Biodiversity Heritage Library" id="bhl"></ve-bhl>
           </sl-tab-panel>
           <sl-tab-panel name="ov">
             <ve-openverse label="Openverse" id="ov"></ve-openverse>

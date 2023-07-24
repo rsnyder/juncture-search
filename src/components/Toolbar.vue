@@ -1,8 +1,11 @@
 <template>
 
   <div class="main">
-    <div @click="onclick">
-      Header
+    <div class="title" @click="onclick">
+      <img v-if="logo" :src="logo">
+      <span v-if="title" v-html="title"></span>
+      <span v-if="version">({{ version }})</span>
+      <span v-if="mode">{{ mode }}</span>
     </div>
     <ve-wikidata-search></ve-wikidata-search>
     <ve-language-selector></ve-language-selector>
@@ -13,9 +16,16 @@
 
 <script setup lang="ts">
 
+  import { ref } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useEntitiesStore } from '../store/entities'
   import { useRouter } from 'vue-router'
+  
+  const props = defineProps({
+    title: { type: String },
+    logo: { type: String }
+  })
+
   const router = useRouter()
 
   const store = useEntitiesStore()
@@ -28,6 +38,11 @@
     if (language.value !== 'en') options.query = { lang: language.value }
     router.push(options)
   }
+
+  const version = ref(process.env.version)
+  const mode = ref(process.env.mode)
+
+  console.log(`version=${version.value} mode=${mode.value}`)
 
 </script>
 
@@ -50,12 +65,24 @@
     border: 1px solid #444;
   }
 
+  .title {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 1.5rem;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
   ve-wikidata-search {
     margin-left: auto;
   }
 
+  /*
   .main > div {
     display: inline-block;
   }
+  */
 
 </style>
