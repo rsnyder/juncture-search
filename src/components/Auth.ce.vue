@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 
-  import { computed, onMounted, ref, toRaw, watch } from 'vue'
+  import { onMounted, ref, toRaw, watch } from 'vue'
 
   import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js'
 
@@ -32,40 +32,22 @@
   import { storeToRefs } from 'pinia'
 
   const store = useEntitiesStore()
-  const { user } = storeToRefs(store)
+  const { user, isLoggedIn } = storeToRefs(store)
 
   const root = ref<HTMLElement | null>(null)
 
   onMounted(async () => {
-    validate()
-    /*
-    let _user: any = localStorage.getItem('gotrue.user')
-    if (_user) {
-      store.$state.user = JSON.parse(_user)
-      if (user.value) console.log('auth.omMounted', user.value, new Date(user.value.expires_at))
-    }
-    */
-    netlifyIdentity.on('init', _user => {
-      console.log('init', _user)
-      if (_user && tokenIsValid(_user.token.expires_at)) store.$state.user = _user
-    })
-    netlifyIdentity.on('open', () => console.log('Widget opened'))
-    netlifyIdentity.on('close', () => console.log('Widget closed'))
+    netlifyIdentity.on('init', _user => store.setUser(_user))
+    // netlifyIdentity.on('open', () => console.log('Widget opened'))
+    // netlifyIdentity.on('close', () => console.log('Widget closed'))
     netlifyIdentity.on('error', err => console.error('Error', err))
-    netlifyIdentity.on('login', () => console.log('on.login'))
     netlifyIdentity.on('login', _user => {
-      console.log('logged in', _user)
-      store.$state.user = _user
+      store.setUser(_user)
       netlifyIdentity.close()
     })
-    netlifyIdentity.init({
-      APIUrl: "https://juncture-search.netlify.app/.netlify/identity",
-      logo: false
-    })
-
+    netlifyIdentity.init({ APIUrl: 'https://juncture-search.netlify.app/.netlify/identity'})
+    validate()
   })
-
-  const isLoggedIn = computed(() => user.value != null)
 
   watch(user, () => {
     console.log('auth.user', toRaw(user.value))
@@ -78,20 +60,14 @@
   }
 
   function logout() {
-    store.$state.user = null
+    store.setUser(null)
     netlifyIdentity.logout()
-  }
-
-  function tokenIsValid(expiration:number) {
-    let isExpired = expiration <= Date.now()
-    console.log(`tokenIsValid=${!isExpired}`)
-    return !isExpired
   }
 
   function validate() {
     let _user: any = localStorage.getItem('user') && JSON.parse(localStorage.getItem('user') || '{}' )
     if (!_user) return Promise.resolve(null)
-    if (!tokenIsValid(_user.token.expires_at)) {
+    if (!isLoggedIn.value) {
       // keep users logged in
       console.log('refreshing token')
       const formData = new FormData()
@@ -106,7 +82,7 @@
         _user.token.refresh_token=newToken.refresh_token
         _user.token.expires_at = (jwt_decode(newToken.access_token) as any).exp * 1000
         localStorage.setItem('user', JSON.stringify(_user))
-        store.$state.user = _user
+        store.setUser(_user)
       })
       return null
       }

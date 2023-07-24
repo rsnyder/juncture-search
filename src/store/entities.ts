@@ -3,6 +3,12 @@ import { toRaw } from 'vue'
 import { findQids, langLabels } from '../utils'
 import { Md5 } from 'ts-md5'
 
+function tokenIsValid(expiration:number) {
+  let isExpired = expiration <= Date.now()
+  console.log(`tokenIsValid=${!isExpired}`)
+  return !isExpired
+}
+
 type Entity = {
   id: string,
   label: string
@@ -13,15 +19,6 @@ type Entity = {
   sitelinks: any
 }
 
-type User = {
-  username: string
-  email: string
-  access_token: string
-  expires_at: number
-  refresh_token: number
-  token_type: string
-}
-
 export const useEntitiesStore = defineStore('entities', {
   
   state: () => ({
@@ -30,13 +27,14 @@ export const useEntitiesStore = defineStore('entities', {
     entity: <Entity>{},
     entityData: {},
     fetching: false,
+    isLoggedIn: false,
     labels: {},
     labelsFetching: false,
     language: 'en',
     urlformatters: {},
     urlformattersFetching: false,
     qid: null,
-    user: <User|null>null
+    user: <any|null>null
   }),
 
   getters: {
@@ -56,6 +54,11 @@ export const useEntitiesStore = defineStore('entities', {
       this.entityData = {...this.entityData, ...Object.fromEntries(entities.map(ent => [ent.id, ent]))}
       let after = Object.keys(this.entityData).length
       // console.log(`addEntities: ${before} -> ${after}`)
+    },
+
+    setUser(user:any) {
+      this.user = user
+      this.isLoggedIn = user !== null && tokenIsValid(user.tokenExpiration)
     },
 
     async fetch(eid:any, addSummaryText:boolean = false) {
