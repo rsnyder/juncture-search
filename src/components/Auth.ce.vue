@@ -60,6 +60,7 @@
   function login() {
     netlifyIdentity.open('login')
     netlifyIdentity.on('login', _user => {
+      console.log('logged in', _user)
       store.$state.user = _user
       netlifyIdentity.close()
     })
