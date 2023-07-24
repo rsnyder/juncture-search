@@ -4,8 +4,6 @@
     <div class="title" @click="onclick">
       <img v-if="logo" :src="logo">
       <span v-if="title" v-html="title"></span>
-      <span v-if="version">({{ version }})</span>
-      <span v-if="mode">{{ mode }}</span>
     </div>
     <ve-wikidata-search></ve-wikidata-search>
     <ve-language-selector></ve-language-selector>
