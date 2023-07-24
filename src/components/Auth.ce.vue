@@ -38,15 +38,22 @@
 
   onMounted(async () => {
     validate()
+    /*
     let _user: any = localStorage.getItem('gotrue.user')
     if (_user) {
       store.$state.user = JSON.parse(_user)
       if (user.value) console.log('auth.omMounted', user.value, new Date(user.value.expires_at))
     }
+    */
+    netlifyIdentity.on('init', user => console.log('init', user));
+    netlifyIdentity.on('open', () => console.log('Widget opened'))
+    netlifyIdentity.on('close', () => console.log('Widget closed'))
+    netlifyIdentity.on('error', err => console.error('Error', err))
     netlifyIdentity.init({
       APIUrl: "https://juncture-search.netlify.app/.netlify/identity",
       logo: false
     })
+
   })
 
   const isLoggedIn = computed(() => user.value != null)
