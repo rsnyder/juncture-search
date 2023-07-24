@@ -25,6 +25,7 @@
     "jsonld": "^8.1.1",
     "marked": "^5.0.1",
     "mongodb": "^5.6.0",
+    "netlify-identity-widget": "^1.9.2",
     "node-fetch-cookies": "^2.0.4",
     "pinia": "^2.0.33",
     "tippy.js": "^6.3.7",

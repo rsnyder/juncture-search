@@ -6,6 +6,7 @@ import { defineCustomElement } from 'vue'
 
 import './themes/juncture.css'
 
+import Auth from './components/Auth.ce.vue'
 import BHL from './components/BHL.ce.vue'
 import Claims from './components/Claims.ce.vue'
 import CommonsCategories from './components/CommonsCategories.ce.vue'
@@ -31,6 +32,7 @@ import WikimediaCommons from './components/WikimediaCommons.ce.vue'
 import WikidataImages from './components/WikidataImages.ce.vue'
 import WikidataSearch from './components/WikidataSearch.ce.vue'
 
+customElements.define('ve-auth', defineCustomElement(Auth))
 customElements.define('ve-bhl', defineCustomElement(BHL))
 customElements.define('ve-claims', defineCustomElement(Claims))
 customElements.define('ve-commons-categories', defineCustomElement(CommonsCategories))

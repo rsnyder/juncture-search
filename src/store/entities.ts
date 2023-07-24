@@ -13,20 +13,30 @@ type Entity = {
   sitelinks: any
 }
 
+type User = {
+  username: string
+  email: string
+  access_token: string
+  expires_at: number
+  refresh_token: number
+  token_type: string
+}
+
 export const useEntitiesStore = defineStore('entities', {
   
   state: () => ({
-    qid: null,
-    entityData: {},
-    language: 'en',
-    entity: <Entity>{},
+    active: '',
     allLabels: {},
-    labels: {},
-    urlformatters: {},
+    entity: <Entity>{},
+    entityData: {},
     fetching: false,
+    labels: {},
     labelsFetching: false,
+    language: 'en',
+    urlformatters: {},
     urlformattersFetching: false,
-    active: ''
+    qid: null,
+    user: <User|null>null
   }),
 
   getters: {

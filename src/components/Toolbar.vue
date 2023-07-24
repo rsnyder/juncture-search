@@ -7,6 +7,7 @@
     </div>
     <ve-wikidata-search></ve-wikidata-search>
     <ve-language-selector></ve-language-selector>
+    <ve-auth></ve-auth>
     <!--<ve-theme-selector></ve-theme-selector> -->
   </div>
   
