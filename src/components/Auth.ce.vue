@@ -53,7 +53,11 @@
     netlifyIdentity.on('close', () => console.log('Widget closed'))
     netlifyIdentity.on('error', err => console.error('Error', err))
     netlifyIdentity.on('login', () => console.log('on.login'))
-    netlifyIdentity.on('login', () => console.log('on.logout'))
+    netlifyIdentity.on('login', _user => {
+      console.log('logged in', _user)
+      store.$state.user = _user
+      netlifyIdentity.close()
+    })
     netlifyIdentity.init({
       APIUrl: "https://juncture-search.netlify.app/.netlify/identity",
       logo: false
@@ -71,11 +75,6 @@
 
   function login() {
     netlifyIdentity.open('login')
-    netlifyIdentity.on('login', _user => {
-      console.log('logged in', _user)
-      store.$state.user = _user
-      netlifyIdentity.close()
-    })
   }
 
   function logout() {
