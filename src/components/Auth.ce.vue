@@ -25,6 +25,10 @@
   const shadowRoot = computed(() => root?.value?.parentNode as HTMLElement)
 
   onMounted(async () => {
+    let _user = localStorage.getItem('gotrue.user')
+    if (_user) {
+      store.$state.user = JSON.parse(_user)
+    }
     console.log('auth.omMounted', user.value)
     netlifyIdentity.init({
       APIUrl: "https://juncture-search.netlify.app/.netlify/identity",
@@ -33,7 +37,7 @@
   })
 
   watch(user, () => {
-    console.log('auth.user', user.value)
+    console.log('auth.user', user.value, JSON.parse(localStorage.getItem('gotrue.user')))
   })
 
   function triggerNetlifyIdentityAction(action) {
@@ -60,7 +64,4 @@
 </script>
 
 <style>
-  .callOut {
-    visibility: hidden;
-  }
 </style>
