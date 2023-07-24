@@ -4,11 +4,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig(({mode})=> {
   return {    
     define: {
-      'process.env': {
-        version: process.env.npm_package_version, 
-        mode,
-        misc: process.env
-      }
+      'process.env': process.env
     },
     plugins: [vue({
       template: {

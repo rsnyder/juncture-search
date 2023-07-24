@@ -39,8 +39,8 @@
     router.push(options)
   }
 
-  const version = ref(process.env.version)
-  const mode = ref(process.env.mode)
+  const version = ref(process.env.npm_package_version)
+  const mode = ref(process.env.NODE_ENV)
 
   console.log(process.env)
   console.log(`version=${version.value} mode=${mode.value}`)
