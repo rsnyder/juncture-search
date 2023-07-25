@@ -15,6 +15,7 @@ interface Image {
   depicts?: Depicted[]
   description?: string
   detail_url?: string
+  file?: string
   foreign_landing_url?: string
   format?: string
   id: string

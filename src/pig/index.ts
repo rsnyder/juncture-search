@@ -486,7 +486,6 @@ export class Pig {
 
 }
 
-
 export class ProgressiveImage {
   existsOnPage: boolean;
   aspectRatio: number;
@@ -641,11 +640,15 @@ export class ProgressiveImage {
         let title = document.createElement('div')
         title.className = 'title'
         title.innerHTML = `<img src=${this.logo}> ${this.licenseHtml}`
+        title.innerHTML += '<sl-icon name="star"></sl-icon>'
+
         figcaption.appendChild(title)
 
         let size = document.createElement('div')
         size.className = 'size clamp'
-        size.innerHTML = `${this.width.toLocaleString()} x ${this.height.toLocaleString()} ${this.format?.split('/').pop()?.toUpperCase()}`
+        size.innerHTML = this.width
+          ? `${this.width.toLocaleString()} x ${this.height.toLocaleString()} ${this.format?.split('/').pop()?.toUpperCase()}`
+          : ''
         figcaption.appendChild(size)
 
         this.element.appendChild(figcaption)

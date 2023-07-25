@@ -6,6 +6,9 @@ import { defineCustomElement } from 'vue'
 
 import './themes/juncture.css'
 
+import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js'
+setBasePath('https://raw.githubusercontent.com//juncture-digital/search/main/src')
+
 import Auth from './components/Auth.ce.vue'
 import BHL from './components/BHL.ce.vue'
 import Claims from './components/Claims.ce.vue'

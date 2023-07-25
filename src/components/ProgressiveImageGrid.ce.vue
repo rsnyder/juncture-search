@@ -106,7 +106,7 @@
         found.width = result.width
         found.height = result.height
         found.aspect_ratio = result.aspect_ratio
-        found.mime = result.mime
+        found.format = result.format
       })
     }
   }
@@ -118,7 +118,8 @@
         let width = img.width < minWidth ? minWidth : img.width
         let height = img.width < minWidth ? img.height * minWidth/img.width : img.height
         let aspect_ratio = Number((width/height).toFixed(4))
-        resolve({...image, width, height, aspect_ratio, mime: 'image/jpeg'})
+        // resolve({...image, width, height, aspect_ratio, mime: 'image/jpeg'})
+        resolve({...image, aspect_ratio, format: 'image/jpeg'})
       }
       img.onerror = () => reject()
       img.src = image.thumbnail

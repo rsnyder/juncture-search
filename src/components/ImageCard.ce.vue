@@ -45,13 +45,18 @@
             <a :href="`https://commons.wikimedia.org/wiki/Special:EntityData/${image.id}.json`" v-html="image.id" target="_blank"></a>
           </div>
 
+          <div>
+            <span>Metadata</span>
+            <a :href="`https://commons.wikimedia.org/w/api.php?origin=*&format=json&action=query&prop=imageinfo&iiprop=extmetadata|size|mime&pageids=${image.pageid}`" v-html="image.pageid" target="_blank"></a>
+          </div>
+
           <div class="provider">
             <span>Provider</span>
             <img v-if="image.logo" :src="image.logo" :alt="image.logo" />
             <span v-html="image.provider"></span>
           </div>
 
-          <div>
+          <div v-if="image.width">
             <span>Size</span> {{ image.width?.toLocaleString() }} x {{ image.height?.toLocaleString() }}
           </div>
 
@@ -59,7 +64,7 @@
             <span>Aspect ratio</span> {{ image.aspect_ratio?.toFixed(2) }}
           </div>
 
-          <div>
+          <div v-if="image.format">
             <span>Format</span> <span v-html="image.format?.split('/').pop()?.toUpperCase()"></span>
           </div>
 
@@ -74,6 +79,10 @@
           <div>
             <span>License</span>
             <a :href="image.license" v-html="licenses[image.license].code || image.license" target="_blank"></a>
+          </div>
+
+          <div v-if="image.attribution">
+            <span>Attribution</span> <span v-html="image.attribution"></span>
           </div>
 
           <div v-if="image.createdBy">
@@ -99,8 +108,6 @@
 
   </sl-tab-group>
 
-
-
 </template>
   
 <script setup lang="ts">
@@ -111,6 +118,7 @@
   import type { Image } from '../images'
   import { storeToRefs } from 'pinia'
 
+  import '@shoelace-style/shoelace/dist/components/icon/icon.js'
   import '@shoelace-style/shoelace/dist/components/tab/tab.js'
   import '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js'
   import '@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js'
@@ -138,6 +146,26 @@
 
   const image = computed(() => props.image as Image)
 
+  watch(image, () => {
+    if (image.value?.pageid && !image.value?.attribution) getImageInfo()
+  })
+
+  function getImageInfo() {
+    let pageid = image.value.pageid || ''
+    if (pageid) {
+      fetch(`https://commons.wikimedia.org/w/api.php?origin=*&format=json&action=query&prop=imageinfo&iiprop=extmetadata|size|mime&pageids=${pageid}`)
+      .then(response => response.json())
+      .then(data => data.query.pages[pageid]?.imageinfo[0])
+      .then(imageinfo => {
+        if (imageinfo.extmetadata.Attribution) {
+          image.value.attribution = imageinfo.extmetadata.Attribution.value
+        } else if (imageinfo.extmetadata.Artist) {
+          image.value.attribution = `<em>${image.value.file}</em> from <a href="${image.value.url}" target="_blank">Wikimedia Commons</a> by ${imageinfo.extmetadata.Artist.value}, ${imageinfo.extmetadata.LicenseShortName.value}`
+        }
+      })
+    }
+  }
+
 </script>
 
 <style>
@@ -164,6 +192,11 @@
     height: 2.5rem;
   }
 
+  .provider {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+  }
 
   .provider img {
     height: 1.5rem;

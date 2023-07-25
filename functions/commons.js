@@ -75,6 +75,7 @@ export async function handler(event) {
       if (!data[id]) data[id] = {
         api: 'commons',
         id,
+        pageid: id.slice(1),
         file,
         source: `https://commons.wikimedia.org/wiki/File:${file.replace(/ /g, '_').replace(/\?/g,'%3F')}`,
         provider: 'Wikimedia Commons',

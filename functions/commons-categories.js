@@ -92,6 +92,7 @@ export async function handler(event) {
       if (!data[id]) data[id] = {
         api: 'commons-categories',
         id,
+        pageid: id.slice(1),
         source: `https://commons.wikimedia.org/wiki/File:${file.replace(/ /g, '_').replace(/\?/g,'%3F')}`,
         provider: 'Wikimedia Commons',
         logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png',

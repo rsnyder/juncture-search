@@ -136,6 +136,27 @@
       }
     }`
 
+  const sparql2 = `
+    SELECT ?siteLabel ?idLabel ?url ?countryLabel ?countryChar WHERE {
+      VALUES (?item) {(wd:Q171497)}
+      ?item ?a ?id .   
+      ?prop wikibase:propertyType wikibase:ExternalId ;
+            wikibase:directClaim ?a ; 
+            wdt:P1629 ?site ;
+            wdt:P1630 ?formatterurl .
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" } 
+      BIND(IRI(REPLACE(?id, '^(.+)$', ?formatterurl)) AS ?url).
+      
+      OPTIONAL {
+        ?prop p:P17 ?co .
+        ?co ps:P17 ?country .
+        ?country rdfs:label ?countryLabel .
+        FILTER (LANG(?countryLabel) = "en") .
+        OPTIONAL { ?country wdt:P487 ?countryChar . }
+      }
+    }
+  `
+
   const externalIdClaims = computed(() => 
     Object.values(entity.value?.claims || [])
       .filter((claimVals: any) => claimVals[0].mainsnak.datatype === 'external-id')

@@ -1,6 +1,6 @@
 const licenses = {
   
-  'https://creativecommons.org/publicdomain/zero/1.0/': {
+  'https://creativecommons.org/publicdomain/zero/1.0': {
     code: 'CC0',
     label: 'CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
     qid: 'Q6938433',
@@ -11,7 +11,7 @@ const licenses = {
     ]
   },
     
-  'https://creativecommons.org/licenses/by/1.0/' : {
+  'https://creativecommons.org/licenses/by/1.0' : {
     code: 'CC BY 1.0', 
     label: 'Attribution 1.0 Generic (CC BY 1.0)', 
     qid :'Q30942811',
@@ -22,7 +22,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by/2.0/': {
+  'https://creativecommons.org/licenses/by/2.0': {
     code: 'CC BY 2.0',
     label: 'Attribution 2.0 Generic (CC BY 2.0)',
     qid :'Q19125117',
@@ -33,7 +33,7 @@ const licenses = {
     ]
   },
   
-  'https://creativecommons.org/licenses/by/2.5/' : {
+  'https://creativecommons.org/licenses/by/2.5' : {
     code: 'CC BY 2.5',
     label: 'Attribution 2.5 Generic (CC BY 2.5)',
     qid :'Q18810333',
@@ -44,7 +44,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by/3.0/' : {
+  'https://creativecommons.org/licenses/by/3.0' : {
     code: 'CC BY 3.0',
     label: 'Attribution 3.0 Unported (CC BY 3.0)',
     qid :'Q14947546',
@@ -55,7 +55,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by/3.0/br/': {
+  'https://creativecommons.org/licenses/by/3.0/br': {
     code: 'CC BY 3.0 BR',
     label: 'Atribuição 3.0 Brasil (CC BY 3.0 BR)',
     qid :'Q75770766',
@@ -66,7 +66,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by/3.0/us/': {
+  'https://creativecommons.org/licenses/by/3.0/us': {
     code: 'CC BY 3.0 US',
     label: 'Attribution 3.0 United States (CC BY 3.0 US)',
     qid :'Q18810143',
@@ -77,7 +77,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by/4.0/': {
+  'https://creativecommons.org/licenses/by/4.0': {
     code: 'CC BY 4.0',
     label: 'Attribution 4.0 International (CC BY 4.0)',
     qid :'Q20007257',
@@ -88,7 +88,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by-sa/1.0/' : {
+  'https://creativecommons.org/licenses/by-sa/1.0' : {
     code: 'CC BY-SA 1.0',
     label: 'Attribution-ShareAlike 1.0 Generic (CC BY-SA 1.0)',
     qid :'Q47001652',
@@ -100,7 +100,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by-sa/2.0/': {
+  'https://creativecommons.org/licenses/by-sa/2.0': {
     code: 'CC BY-SA 2.0',
     label: 'Attribution-ShareAlike 2.0 Generic (CC BY-SA 2.0)',
     qid :'Q19068220',
@@ -112,7 +112,7 @@ const licenses = {
     ]  
   },
 
-  'https://creativecommons.org/licenses/by-sa/2.0/de/': {
+  'https://creativecommons.org/licenses/by-sa/2.0/de': {
     code: 'CC BY-SA 2.0 DE',
     label: 'Namensnennung - Weitergabe unter gleichen Bedingungen 2.0 Deutschland (CC BY-SA 2.0 DE)',
     qid :'Q77143083',
@@ -124,7 +124,7 @@ const licenses = {
     ]  
   },
 
-  'https://creativecommons.org/licenses/by-sa/2.5/': {
+  'https://creativecommons.org/licenses/by-sa/2.5': {
     code: 'CC BY-SA 2.5',
     label: 'Attribution-ShareAlike 2.5 Generic (CC BY-SA 2.5)',
     qid :'Q19113751',
@@ -136,7 +136,7 @@ const licenses = {
     ]  
   },
 
-  'https://creativecommons.org/licenses/by-sa/3.0/': {
+  'https://creativecommons.org/licenses/by-sa/3.0': {
     code: 'CC BY-SA 3.0',
     label: 'Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)',
     qid :'Q14946043',
@@ -148,7 +148,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by-sa/3.0/at/': {
+  'https://creativecommons.org/licenses/by-sa/3.0/at': {
     code: 'CC BY-SA 3.0 AT',
     label: 'Namensnennung - Weitergabe unter gleichen Bedingungen 3.0 Österreich (CC BY-SA 3.0 AT)',
     qid :'Q80837139',
@@ -160,7 +160,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by-sa/3.0/de/': {
+  'https://creativecommons.org/licenses/by-sa/3.0/de': {
     code: 'CC BY-SA 3.0 DE',
     label: 'Namensnennung - Weitergabe unter gleichen Bedingungen 3.0 Deutschland (CC BY-SA 3.0 DE)',
     qid :'Q42716613',
@@ -172,7 +172,7 @@ const licenses = {
     ]
   },
 
-  'https://creativecommons.org/licenses/by-sa/4.0/': {
+  'https://creativecommons.org/licenses/by-sa/4.0': {
     code: 'CC BY-SA 4.0',
     label: 'Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)',
     qid :'Q18199165',
@@ -200,7 +200,7 @@ const licenses = {
     ]
   },
 
-  'https://artlibre.org/': {
+  'https://artlibre.org': {
     code: 'FAL',
     label: 'Licence Art Libre',
     qid :'Q152332',
@@ -209,7 +209,7 @@ const licenses = {
     ]
   },
 
-  'https://rightsstatements.org/page/NKC/1.0/?language=en/': {
+  'https://rightsstatements.org/page/NKC/1.0/?language=en': {
     code: 'NKC 1.0',
     label: 'No Known Copyright',
     qid :'Q99263261',
@@ -225,7 +225,7 @@ const licenses = {
     ]
   },
 
-  'https://commons.wikimedia.org/wiki/Template:Attribution_only_license/': {
+  'https://commons.wikimedia.org/wiki/Template:Attribution_only_license': {
     code: 'Attribution only license',
     label: 'Attribution only license',
     qid :'Q98923445',
@@ -233,7 +233,7 @@ const licenses = {
     ]
   },
 
-  'https://en.wikipedia.org/wiki/Wikipedia:Granting_work_into_the_public_domain/': {
+  'https://en.wikipedia.org/wiki/Wikipedia:Granting_work_into_the_public_domain': {
     code: 'PD',
     label: 'Released into the public domain by the copyright holder',
     qid: 'Q98592850',
@@ -248,7 +248,7 @@ let licensesByQID = Object.fromEntries(Object.entries(licenses).map(([url, value
 licensesByQID['Q26921686'] = {
   code: 'GFDL-1.2-only',
   label: '',
-  url :'https://www.gnu.org/licenses/old-licenses/fdl-1.2.html/', 
+  url :'https://www.gnu.org/licenses/old-licenses/fdl-1.2.html', 
   badges: []
 }
 

@@ -126,6 +126,7 @@
   const filteredAndSorted = ref<Image[]>([])
   watch (filteredAndSorted, () => {
     console.log(`filteredAndSorted=${filteredAndSorted.value.length}`)
+    console.log(filteredAndSorted.value.slice(0, 10))
     let depicted = {}
     filteredAndSorted.value.forEach((img:Image) => {
       if (img.depicts && Object.keys(img.depicts).length > 0) {
