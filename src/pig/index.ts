@@ -1,97 +1,89 @@
-import { toRaw } from 'vue'
-import { licenses } from '../lib/licenses'
-
 type CallbackFunction = () => void;
 
 let optimizedResize = (() => {
-  const callbacks: CallbackFunction[] = [];
+  const callbacks: CallbackFunction[] = []
   let running = false;
 
   function resize() {
     if (!running) {
       running = true;
-      if (window.requestAnimationFrame) {
-        window.requestAnimationFrame(runCallbacks);
-      } else {
-        setTimeout(runCallbacks, 66);
-      }
+      if (window.requestAnimationFrame) window.requestAnimationFrame(runCallbacks)
+      else setTimeout(runCallbacks, 66)
     }
   }
 
   function runCallbacks() {
-    callbacks.forEach((callback) => callback());
-    running = false;
+    callbacks.forEach((callback) => callback())
+    running = false
   }
 
   return {
     add(callback: CallbackFunction) {
       if (!callbacks.length) {
-        window.addEventListener('resize', resize);
+        window.addEventListener('resize', resize)
       }
-      callbacks.push(callback);
+      callbacks.push(callback)
     },
 
     disable() {
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('resize', resize)
     },
 
     reEnable() {
-      window.addEventListener('resize', resize);
+      window.addEventListener('resize', resize)
     }
   };
-})();
+})()
 
 function _extend(obj1: any, obj2: any) {
-    for (const i in obj2) {
-        if (obj2.hasOwnProperty(i)) {
-            obj1[i] = obj2[i];
-        }
-    }
+  for (const i in obj2) {
+    if (obj2.hasOwnProperty(i)) obj1[i] = obj2[i];
+  }
 }
 
 function _getOffsetTop(elem: any) {
-    let offsetTop = 0;
-    do {
-      if (!isNaN(elem.offsetTop)){
-        offsetTop += elem.offsetTop;
-      }
-      elem = elem.offsetParent;
-    } while(elem);
-    return offsetTop;
+  let offsetTop = 0
+  do {
+    if (!isNaN(elem.offsetTop)){
+      offsetTop += elem.offsetTop
+    }
+    elem = elem.offsetParent
+  } while(elem)
+  return offsetTop
 }
 
 export class Pig {
     // define class properties
     
-    inRAF: boolean;
-    isTransitioning: boolean;
-    minAspectRatioRequiresTransition: boolean;
-    minAspectRatio: number | null;
-    latestYOffset: number;
-    previousYOffset: number;
-    lastWindowWidth: number;
-    scrollDirection: string;
-    visibleImages: any[];
-    settings: any;
+    inRAF: boolean
+    isTransitioning: boolean
+    minAspectRatioRequiresTransition: boolean
+    minAspectRatio: number | null
+    latestYOffset: number
+    previousYOffset: number
+    lastWindowWidth: number
+    scrollDirection: string
+    visibleImages: any[]
+    settings: any
 
-    scroller: any;
-    onScroll: any;
-    container: any;
-    totalHeight: number;
-    images: any[];
-    loadMoreCallback: any;
+    scroller: any
+    onScroll: any
+    container: any
+    totalHeight: number
+    images: any[]
+    loadMoreCallback: any
 
     constructor(imageData: any[], options?: any) {
-      this.inRAF = false;
-      this.isTransitioning = false;
-      this.minAspectRatioRequiresTransition = false;
-      this.minAspectRatio = null;
-      this.latestYOffset = 0;
-      this.lastWindowWidth = window.innerWidth;
-      this.scrollDirection = 'down';
+      this.inRAF = false
+      this.isTransitioning = false
+      this.minAspectRatioRequiresTransition = false
+      this.minAspectRatio = null
+      this.latestYOffset = 0
+      this.lastWindowWidth = window.innerWidth
+      this.scrollDirection = 'down'
   
       // List of images that are loading or completely loaded on screen.
-      this.visibleImages = [];
+      this.visibleImages = []
   
       // These are the default settings, which may be overridden.
       this.settings = {
@@ -352,7 +344,7 @@ export class Pig {
               translateX: translateX,
               translateY: translateY,
               transition: transition
-            };
+            }
 
             // The next image is this.settings.spaceBetweenImages pixels to the
             // right of this image.
@@ -375,30 +367,30 @@ export class Pig {
 
     _doLayout() {
       // Set the container height
-      this.container.style.height = this.totalHeight + 'px';
+      this.container.style.height = this.totalHeight + 'px'
 
       // Get the top and bottom buffers heights.
-      const bufferTop =
-        (this.scrollDirection === 'up') ?
-          this.settings.primaryImageBufferHeight :
-          this.settings.secondaryImageBufferHeight;
-      const bufferBottom =
-        (this.scrollDirection === 'down') ?
-          this.settings.secondaryImageBufferHeight :
-          this.settings.primaryImageBufferHeight;
+      const bufferTop = this.scrollDirection === 'up'
+        ? this.settings.primaryImageBufferHeight
+        : this.settings.secondaryImageBufferHeight
+      
+        const bufferBottom = this.scrollDirection === 'down'
+          ? this.settings.secondaryImageBufferHeight
+          : this.settings.primaryImageBufferHeight
 
       // Now we compute the location of the top and bottom buffers:
-      const containerOffset = _getOffsetTop(this.container);
-      const scrollerHeight = this.scroller === window ? window.innerHeight : this.scroller.offsetHeight;
-      // console.log(`doLayout: containerOffset=${containerOffset}, scrollerHeight=${scrollerHeight}, bufferTop=${bufferTop}, bufferBottom=${bufferBottom}`)
+      const containerOffset = _getOffsetTop(this.container)
+      const scrollerHeight = this.scroller === window
+        ? window.innerHeight
+        : this.scroller.offsetHeight
 
       // This is the top of the top buffer. If the bottom of an image is above
       // this line, it will be removed.
-      const minTranslateYPlusHeight = this.latestYOffset - containerOffset - bufferTop;
+      const minTranslateYPlusHeight = this.latestYOffset - containerOffset - bufferTop
 
       // This is the bottom of the bottom buffer.  If the top of an image is
       // below this line, it will be removed.
-      const maxTranslateY = this.latestYOffset - containerOffset + scrollerHeight + bufferBottom;
+      const maxTranslateY = this.latestYOffset - containerOffset + scrollerHeight + bufferBottom
 
       let last = 0
 
@@ -407,17 +399,13 @@ export class Pig {
       this.images.forEach(function(image, idx) {
         if (image.style.translateY + image.style.height < minTranslateYPlusHeight ||
           image.style.translateY > maxTranslateY) {
-          // Hide Image
-          image.hide();
+          image.hide()
         } else {
-          // Load Image
-          image.load();
+          image.load()
           last = idx
         }
       }.bind(this));
-      // console.log(`images=${this.images.length} last=${last} scroll=${this.scrollDirection}`)
       if (this.images.length && last >= this.images.length - 10 && this.scrollDirection === 'down') {
-        // console.log('load more')
         if (this.loadMoreCallback) this.loadMoreCallback()
       }
     }
@@ -425,22 +413,20 @@ export class Pig {
     addImages(imageData: any[]) {
       this.images = this.images.concat(this._parseImageData(imageData, this.images.length))
       this._computeLayout()
-      this._doLayout();
-      console.log(`addImages: ${imageData.length} => ${this.images.length}`)
+      this._doLayout()
     }
 
     update(imageData: any[]) {
-      console.log(`update: ${imageData.length}`)
       this.container.querySelectorAll('.pig-figure').forEach((el) => el.remove() )
       this.images = this._parseImageData(imageData)
       this._computeLayout()
-      this._doLayout();
+      this._doLayout()
 
     }
 
     enable() {
-      let time = Date.now();
-      const wait = 100;
+      let time = Date.now()
+      const wait = 100
       const _this = this
       function throttledScrollHandler() {
         if ((time + wait - Date.now()) < 0) {
@@ -462,214 +448,99 @@ export class Pig {
           time = Date.now()
         }
       }
-      this.scroller.addEventListener('scroll', throttledScrollHandler);
+      this.scroller.addEventListener('scroll', throttledScrollHandler)
   
       // this.onScroll();
-      this._computeLayout();
-      this._doLayout();
+      this._computeLayout()
+      this._doLayout()
   
       optimizedResize.add(function() {
-        this.lastWindowWidth = this.scroller === window ? window.innerWidth : this.scroller.offsetWidth;
-        this._computeLayout();
-        this._doLayout();
-      }.bind(this));
+        this.lastWindowWidth = this.scroller === window ? window.innerWidth : this.scroller.offsetWidth
+        this._computeLayout()
+        this._doLayout()
+      }.bind(this))
   
       return this;
     }
 
     disable() {
       this.scroller.removeEventListener('scroll', this.onScroll);
-      optimizedResize.disable();
+      optimizedResize.disable()
       this.container.querySelectorAll('.pig-figure').forEach((el) => el.remove() )
-      return this;
+      return this
     }
 
 }
 
 export class ProgressiveImage {
-  existsOnPage: boolean;
-  aspectRatio: number;
-  filename: string;
-  index: number;
-  logo: string;
-  width: number;
-  height: number;
-  format: string;
-  pig: any;
-  classNames: any;
-  thumbnail: any;
-  fullImage: any;
-  licenseUrl: string;
-  licenseCode: string;
-  licenseBadges: string[]
-  licenseHtml: string
-  element: any;
-  style: any;
 
-  thumbnailSrc: string;
+  aspectRatio: number
+  classNames: any;
+  element: any;
+  existsOnPage: boolean
+  id: string
+  index: number;
+  pig: any;
+  style: any;
 
   // Constructor to initialize the progressive image
   constructor(singleImageData: any, index: number, pig: any) {
-    // console.log(singleImageData)
+
     // True if the element exists on the page
     this.existsOnPage = false;
 
     // Instance information
-    this.width = singleImageData.width;
-    this.height = singleImageData.height;
-    this.format = singleImageData.format;
+    this.id = singleImageData.id;
     this.aspectRatio = singleImageData.aspect_ratio;
-    this.filename = singleImageData.file;
-    this.thumbnailSrc = singleImageData.thumbnail;
-    this.logo = singleImageData.logo;
-    this.licenseUrl = singleImageData.license;
-    this.licenseCode = licenses[singleImageData.license]?.code || singleImageData.license;
-    this.licenseBadges = licenses[singleImageData.license]?.badges || [];
-    if (this.licenseBadges.length > 1) {
-      this.licenseHtml = `<a class="license" href="${this.licenseUrl}" target="_blank" title="${this.licenseCode}">`
-      for (let i = 1; i < this.licenseBadges.length; i++) {
-        this.licenseHtml += `<img src="${this.licenseBadges[i]}" alt="${this.licenseCode}">`
-      }
-      this.licenseHtml += `</a>`
-    } else {
-      this.licenseHtml = `<a class="license" href="${this.licenseUrl}" target="_blank" title="${this.licenseCode}">${this.licenseCode}</a>`
-    }
     this.index = index;
 
     // The Pig instance
-    this.pig = pig;
+    this.pig = pig
 
     // Class names for different elements
     this.classNames = {
       figure: pig.settings.classPrefix + '-figure',
       thumbnail: pig.settings.classPrefix + '-thumbnail',
       loaded: pig.settings.classPrefix + '-loaded'
-    };
+    }
   }
 
-  // Method to load the progressive image
   load() {
-    // Making image available on the page and updating styles
-    this.existsOnPage = true;
-    this._updateStyles();
-    // Append the image to the container
+    this.existsOnPage = true
+    this._updateStyles()
     this.pig.container.appendChild(this.getElement());
-
-    setTimeout(() => {
-      // Check if image is still on page
-      if (!this.existsOnPage) {
-        return;
-      }
-      // Add thumbnail to the element if not present already
-      /*
-      if (!this.thumbnail) {
-        this.thumbnail = new Image();
-        // this.thumbnail.src = this.pig.settings.urlForSize(this.filename, this.pig.settings.thumbnailSize);
-        this.thumbnail.src = this.thumbnailSrc;
-        this.thumbnail.className = this.classNames.thumbnail;
-        this.thumbnail.onload = () => {
-          if (this.thumbnail) {
-            this.thumbnail.className += ' ' + this.classNames.loaded;
-          }
-        };
-        this.getElement().appendChild(this.thumbnail);
-      }
-      */
-
-      // Add full image to the element if not present already
-      
-      if (!this.fullImage) {
-        this.fullImage = new Image();
-        // this.fullImage.src = this.pig.settings.urlForSize(this.filename, this.pig.settings.getImageSize(this.pig.lastWindowWidth));
-        this.fullImage.src = this.thumbnailSrc;
-        this.fullImage.onload = () => {
-          if (this.fullImage) {
-            this.fullImage.className += ' ' + this.classNames.loaded;
-          }
-        };
-        // this.getElement().appendChild(this.fullImage);
-        let el = this.getElement()
-        el.insertBefore(this.fullImage, el.firstChild);      }
-
-    }, 100);
   }
 
-  // Method to hide the image
   hide() {
-    if (this.getElement()) {
-      if (this.thumbnail) {
-        this.thumbnail.src = '';
-        this.getElement().removeChild(this.thumbnail);
-        delete this.thumbnail;
-      }
-
-      if (this.fullImage) {
-        this.fullImage.src = '';
-        this.getElement().removeChild(this.fullImage);
-        delete this.fullImage;
-      }
-    }
-
-    if (this.existsOnPage) {
-      this.pig.container.removeChild(this.getElement());
-    }
-
+    if (this.existsOnPage) this.pig.container.removeChild(this.getElement());
     this.existsOnPage = false;
   }
 
-  // Method to get the element
   getElement() {
     if (!this.element) {
-      this.element = document.createElement('div');
-      this.element.className = this.classNames.figure;
-      // let figure = document.createElement(this.pig.settings.figureTagName);
-      // this.element.appendChild(figure);
-      // figure.className = this.classNames.figure;
-      this.fullImage = new Image();
-        // this.fullImage.src = this.pig.settings.urlForSize(this.filename, this.pig.settings.getImageSize(this.pig.lastWindowWidth));
-        this.fullImage.src = this.thumbnailSrc;
-        this.fullImage.onload = () => {
-          if (this.fullImage) {
-            this.fullImage.className += ' ' + this.classNames.loaded;
-          }
-        };
-        this.getElement().appendChild(this.fullImage)
-        let figcaption = document.createElement('div')
-        figcaption.className = 'caption'
-        
-        let title = document.createElement('div')
-        title.className = 'title'
-        title.innerHTML = `<img src=${this.logo}> ${this.licenseHtml}`
-        title.innerHTML += '<sl-icon name="star"></sl-icon>'
+      this.element = document.createElement('ve-pig-card');
+      this.element.className = this.classNames.figure
+      this.element.setAttribute('id', this.id)
 
-        figcaption.appendChild(title)
-
-        let size = document.createElement('div')
-        size.className = 'size clamp'
-        size.innerHTML = this.width
-          ? `${this.width.toLocaleString()} x ${this.height.toLocaleString()} ${this.format?.split('/').pop()?.toUpperCase()}`
-          : ''
-        figcaption.appendChild(size)
-
-        this.element.appendChild(figcaption)
-        if (this.pig.settings.onClickHandler !== null) {
-          this.element.addEventListener('click', () => {
-            this.pig.settings.onClickHandler(this.index);
-          });
-        }
-        this._updateStyles();
+      /*
+      if (this.pig.settings.onClickHandler !== null) {
+        this.element.addEventListener('click', () => {
+          this.pig.settings.onClickHandler(this.index);
+        })
       }
+      */
 
-    return this.element;
+      this._updateStyles()
+    }
+    return this.element
   }
 
-  // Method to update styles
   _updateStyles() {
-    this.getElement().style.transition = this.style.transition;
-    this.getElement().style.width = this.style.width + 'px';
-    this.getElement().style.height = this.style.height + 50 + 'px';
-    this.getElement().style.transform = (
-      'translate3d(' + this.style.translateX + 'px,' +
-      this.style.translateY + 'px, 0)');
+    let el = this.getElement()
+    if (!el) return
+    el.style.transition = this.style.transition
+    el.style.width = this.style.width + 'px'
+    el.style.height = this.style.height + 50 + 'px'
+    el.style.transform = `translate3d(${this.style.translateX}px, ${this.style.translateY}px, 0)`
   }
 }

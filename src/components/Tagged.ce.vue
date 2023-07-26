@@ -52,7 +52,9 @@
   import type SlSelect from '@shoelace-style/shoelace/dist/components/select/select.js'
 
   const store = useEntitiesStore()
-  const { active, labels, qid } = storeToRefs(store)
+  const { active, imagesMap, labels, qid } = storeToRefs(store)
+
+  // watch(imagesMap, () => { console.log(toRaw(imagesMap.value)) })
 
   const props = defineProps({
     label: { type: String },
@@ -74,7 +76,7 @@
 
   const depictsFilter = ref<string[]>([])
   watch(depictsFilter, () => {
-    console.log('depictsFilter', depictsFilter.value)
+    // console.log('depictsFilter', depictsFilter.value)
     if (depictsFilter.value.length) filteredAndSorted.value = [...images.value.filter((i: any) => depictsFilter.value.every((d: string) => i.depicts[d]))]
     else filteredAndSorted.value = [...images.value]
   })
@@ -117,6 +119,7 @@
 
   const images = ref<Image[]>([])
   watch(images, () => {
+    store.$state.imagesMap = {...imagesMap.value, ...Object.fromEntries(images.value.map((i:Image) => [i.id, i])) }
     showStats()
     // console.log(`tagged.images.length=${images.value.length}`)
     filteredAndSorted.value = [...images.value]
@@ -125,8 +128,8 @@
 
   const filteredAndSorted = ref<Image[]>([])
   watch (filteredAndSorted, () => {
-    console.log(`filteredAndSorted=${filteredAndSorted.value.length}`)
-    console.log(filteredAndSorted.value.slice(0, 10))
+    // console.log(`filteredAndSorted=${filteredAndSorted.value.length}`)
+    // console.log(filteredAndSorted.value.slice(0, 10))
     let depicted = {}
     filteredAndSorted.value.forEach((img:Image) => {
       if (img.depicts && Object.keys(img.depicts).length > 0) {
@@ -228,7 +231,7 @@
     })
     // console.log(sources)
     // console.log(licenses)
-    console.log(misc)
+    // console.log(misc)
     // console.log(depicted)
   }
   

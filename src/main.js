@@ -6,6 +6,18 @@ import { defineCustomElement } from 'vue'
 
 import './themes/juncture.css'
 
+import { registerIconLibrary } from '@shoelace-style/shoelace/dist/utilities/icon-library.js';
+registerIconLibrary('fa', {
+    resolver: name => {
+      const filename = name.replace(/^fa[rbs]-/, '');
+      let folder = 'regular';
+      if (name.substring(0, 4) === 'fas-') folder = 'solid';
+      if (name.substring(0, 4) === 'fab-') folder = 'brands';
+      return `https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/svgs/${folder}/${filename}.svg`;
+    },
+    mutator: svg => svg.setAttribute('fill', 'currentColor')
+  })
+
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js'
 setBasePath('https://raw.githubusercontent.com//juncture-digital/search/main/src')
 
@@ -23,6 +35,7 @@ import LanguageSelector from './components/LanguageSelector.ce.vue'
 import Markdown from './components/Markdown.ce.vue'
 import Modal from './components/Modal.ce.vue'
 import Openverse from './components/Openverse.ce.vue'
+import PigCard from './components/PigCard.ce.vue'
 import ProgressiveImageGrid from './components/ProgressiveImageGrid.ce.vue'
 import Referencing from './components/Referencing.ce.vue'
 import Sites from './components/Sites.ce.vue'
@@ -50,6 +63,7 @@ customElements.define('ve-markdown', defineCustomElement(Markdown))
 customElements.define('ve-modal', defineCustomElement(Modal))
 customElements.define('ve-openverse', defineCustomElement(Openverse))
 customElements.define('ve-pig', defineCustomElement(ProgressiveImageGrid))
+customElements.define('ve-pig-card', defineCustomElement(PigCard))
 customElements.define('ve-referencing', defineCustomElement(Referencing))
 customElements.define('ve-sites', defineCustomElement(Sites))
 customElements.define('ve-statements', defineCustomElement(Statements))

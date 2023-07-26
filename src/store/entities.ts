@@ -28,6 +28,7 @@ export const useEntitiesStore = defineStore('entities', {
     entity: <Entity>{},
     entityData: {},
     fetching: false,
+    imagesMap: {},
     isLoggedIn: false,
     labels: {},
     labelsFetching: false,

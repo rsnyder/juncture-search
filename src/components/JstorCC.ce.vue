@@ -178,9 +178,9 @@
     if (item.ps_source) doc.attribution = item.ps_source.join(' ')
     if (item.primary_agents?.length > 0) doc.creator = item.primary_agents.join('; ')
     if (item.cc_reuse_license && item.cc_reuse_license.length == 1) {
-      if (item.cc_reuse_license[0] === 'Creative Commons: Free Reuse (CC0)') doc.license = 'https://creativecommons.org/publicdomain/zero/1.0/'
-      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution') doc.license = 'https://creativecommons.org/licenses/by/4.0/'
-      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution') doc.license = 'https://creativecommons.org/licenses/by-sa/4.0/'
+      if (item.cc_reuse_license[0] === 'Creative Commons: Free Reuse (CC0)') doc.license = 'https://creativecommons.org/publicdomain/zero/1.0'
+      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution') doc.license = 'https://creativecommons.org/licenses/by/4.0'
+      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution') doc.license = 'https://creativecommons.org/licenses/by-sa/4.0'
       else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution-NonCommercial') doc.license = 'CC BY-NC'
       else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution-NoDerivs') doc.license = 'CC BY-ND'
       else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution-NonCommercial-ShareAlike') doc.license = 'CC BY-NC-SA'

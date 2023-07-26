@@ -60,7 +60,6 @@
   })
 
   onMounted(async () => {
-    console.log('bhl.omMounted')
     dialog = shadowRoot.value?.querySelector('.dialog')
     dialog.addEventListener('sl-hide', (evt:CustomEvent) => { if (evt.target === dialog) metadata.value = undefined })
     if (isActive && qid.value) entity.value = await store.fetch(qid.value)  
@@ -83,7 +82,7 @@
 
   const total = ref(0)
   const images = ref<ImageData[]>([])
-  watch(images, () => { console.log(toRaw(images.value)) })
+  // watch(images, () => { console.log(toRaw(images.value)) })
 
   const metadata = ref()
   watch(metadata, () => { showDialog.value = metadata.value !== undefined })
@@ -115,7 +114,6 @@
   }
 
   function transformItem(item: any): any {
-    console.log(item)
     let doc: any = {id: item.id, source: 'openverse', images:{}}
     doc.url = item.detail_url
     if (item.title) doc.label = item.title

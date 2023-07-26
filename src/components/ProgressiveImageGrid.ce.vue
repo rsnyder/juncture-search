@@ -1,6 +1,26 @@
 <template>
 
-  <div ref="root" id="image-grid"></div>
+  <div ref="root" id="image-grid">
+
+    <div v-for="img, idx in imageData"
+      class="pig-figure"
+      :id="imageData.id"
+      :style="layout[idx]"
+    >
+      <img onload="this.style.opacity = 1" :src="imageData[idx].thumbnail" @click="imageSelected(idx)">
+      <div class="caption">
+        <div class="icons">
+          <img v-if="imageData[idx].logo" class="provider-logo" :src="imageData[idx].logo" alt="Provider Logo">
+          <div class="license">
+            <a :href="imageData[idx].license" target="_blank">{{ licenses[imageData[idx].license]?.code || imageData[idx].license }}</a>
+          </div>
+        </div>
+        <div class="size">
+          <span v-if="imageData[idx].width">{{ imageData[idx].width.toLocaleString() }} x {{ imageData[idx].height.toLocaleString() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <sl-dialog class="dialog" :style="{'--width':dialogWidth}">
     <div>
@@ -15,8 +35,9 @@
 
   import { computed, nextTick, onMounted, ref, toRaw, watch } from 'vue'
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
-  import { Pig } from '../pig'
   import type { Image } from '../images'
+  import { licenses } from '../lib/licenses'
+
   const emit = defineEmits(['item-selected', 'get-next'])
  
   const props = defineProps({
@@ -39,58 +60,123 @@
   const selectedImage = ref<Image | null>(null)
   watch(selectedImage, () => showDialog.value = selectedImage.value !== null )
 
+  let doLayoutDebounceTimer:any
+
+  const width = ref(0)
+  watch(width, () => { 
+    clearTimeout(doLayoutDebounceTimer)
+    doLayoutDebounceTimer = setTimeout(() => doLayout(), 50)
+  })
+
   let dialog: any
   const dialogWidth = ref('80vw')
   const showDialog = ref(false)
   watch(showDialog, () => { dialog.open = showDialog.value })
 
-  let pig
-  function initPig() {
-    if (pig) return
-    pig = new Pig(imageData.value, {
-      container: shadowRoot.value?.querySelector('#image-grid') as HTMLElement,
-      loadMoreCallback: () => { emit('get-next') },
-      onClickHandler: imageSelected
-    }).enable()
-  }
-
   const imageData = <any>ref(props.items)
   watch(imageData, async (current, prior) => {
-    console.log(`ProgressiveImageGrid.watch.imageData: size=${current.length}`)
-    // console.log(toRaw(imageData.value))
-    
-    if (imageData.value.length === 0) {
-      if (pig) pig.disable()
-      pig = null
-      return
-    }
-    
+    // if (current.length) console.log(`ProgressiveImageGrid.imageData: size=${current.length}`)
     let added = imageData.value.slice(prior?.length || 0, imageData.value.length)
     await checkImagesSizes(added)
-
-    if (pig) {
-      // console.log(`ProgressiveImageGrid.watch.imageData: added=${added.length}`)
-      if (added.length) pig.addImages(added)
-      else pig.update(imageData.value)
-    } else {
-      initPig()
-    }
+    doLayout()
   })
 
+  function doLayout() {
+    if (imageData.value.length === 0) return []
+
+    let numImages = imageData.value.length
+    const minAspectRatio = width.value <= 640 ? 2
+                         : width.value <= 1280 ? 4
+                         : width.value <= 1920 ? 5
+                         : 6
+
+    // console.log(`doLayout: images=${numImages} width=${width.value} minAspectRatio=${minAspectRatio}`)
+
+    let _layout:any[] = []
+
+    let spaceBetweenImages = 10
+
+    let row:any[] = []
+    let translateX = 0
+    let translateY = 0
+    let rowAspectRatio = 0
+
+    // Loop through all our images, building them up into rows and computing
+    // the working rowAspectRatio.
+    imageData.value.forEach((image, index) => {
+      rowAspectRatio += image.aspect_ratio
+      row.push(image)
+
+      if (rowAspectRatio >= minAspectRatio || index + 1 === numImages) {
+
+        rowAspectRatio = Math.max(rowAspectRatio, minAspectRatio)
+
+        // Compute this row's height.
+        const totalDesiredWidthOfImages = width.value - spaceBetweenImages * (row.length - 1)
+        const rowHeight = totalDesiredWidthOfImages / rowAspectRatio
+
+        row.forEach(img => {
+          const imageWidth: number = rowHeight * img.aspect_ratio
+          _layout.push( {
+            width: `${Math.round(imageWidth)}px`,
+            height: `${Math.round(rowHeight + 50)}px`,
+            transform: `translate3d(${Math.round(translateX)}px, ${Math.round(translateY)}px, 0)`,
+          })
+          translateX += imageWidth + spaceBetweenImages
+        })
+
+        // Reset our state variables for next row.
+        row = []
+        rowAspectRatio = 0
+        translateY += rowHeight + spaceBetweenImages + 50
+        translateX = 0
+      }
+    })
+
+    if (root.value) root.value.style.height = `${translateY - spaceBetweenImages}px`
+    layout.value = _layout
+  }
+
+  const layout = ref<any[]>([])
+
   function imageSelected(index:number) {
-    console.log(`ProgressiveImageGrid.imageSelected: index=${index}`, toRaw(imageData.value[index]))
+    // console.log(`imageSelected: index=${index}`, toRaw(imageData.value[index]))
     selectedImage.value = imageData.value[index] as Image
   }
 
   onMounted(() => { 
-    // console.log(`ProgressiveImageGrid.onMounted: isActive=${isActive.value} images=${imageData.value.length}`)
     dialog = shadowRoot.value?.querySelector('.dialog')
     dialog.addEventListener('sl-hide', (evt:CustomEvent) => showDialog.value = false )
-    if (isActive.value && imageData.value.length > 0) initPig()
+    
+    let priorScrollY = 0
+    let checkGetMore = () => {
+      if (isActive.value) {
+        let scrollDirection = window.scrollY > priorScrollY ? 'down' : 'up'
+        priorScrollY = window.scrollY
+        if (scrollDirection === 'down' && window.innerHeight + window.scrollY >= document.body.offsetHeight - 2000) emit('get-next')
+      }
+    }
+
+    let debouncedScrollHandler = (func, timeout) => {
+      let timer:any
+      return () => {
+        clearTimeout(timer)
+        timer = setTimeout(() => { func() }, timeout)
+      }    
+    }
+
+    window.addEventListener('scroll', debouncedScrollHandler(checkGetMore, 50))
   })
 
-  watch(isActive, () => {
-    // console.log(`ProgressiveImageGrid.watch.isActive: isActive=${isActive.value} images=${imageData.value.length}`)
+  watch(root, () => {
+    if (root.value) {
+      width.value = root.value?.clientWidth || 0
+      const resizeObserver = new ResizeObserver(() => {
+        if (root.value?.clientWidth && root.value?.clientWidth !== width.value)
+          width.value = root.value?.clientWidth
+      })
+      resizeObserver.observe(root.value)
+    }
   })
 
   async function checkImagesSizes(images:Image[]) {
@@ -138,58 +224,55 @@
   }
 
   .pig-figure {
+    position: absolute;
     display: flex;
     flex-direction: column;
-    background-color: #D5D5D5;
     overflow: hidden;
-    left: 0;
-    position: absolute;
-    top: 0;
-    margin: 0;
+    width: 100px;
+    box-shadow: 2px 2px 4px 0 #ccc;
   }
 
   .pig-figure:hover {
-    cursor: pointer;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
   }
 
-  .pig-figure img {
+  .pig-figure > img {
     left: 0;
-    /* position: absolute; */
     top: 0;
-    /* height: 100%; */
     width: 100%;
     opacity: 0;
-    transition: 0.5s ease opacity;
-    -webkit-transition: 0.5s ease opacity;
+    background-color: #D5D5D5;
   }
 
-  .pig-figure img.pig-thumbnail {
-    -webkit-filter: blur(30px);
-    filter: blur(30px);
-    left: auto;
-    position: relative;
-    width: auto;
+  .pig-figure > img:hover {
+    cursor: pointer;
   }
 
-  .pig-figure img.pig-loaded {
-    opacity: 1;
-  }
-
-  .pig-figure .caption {
-    height: 50px;
-    background-color: white;
+  .caption {
+    height: 100%;
+    width: 100%;
     z-index: 1;
     padding: 6px 3px 3px 3px;
   }
 
-  .pig-figure .caption {
+  .icons {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    height: 50px;
-    background-color: white;
-    z-index: 1;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .size {
+    width: 100%;
+    font-size: 0.8em;
+  }
+
+  .provider-logo {
+    height: 20px;
+  }
+
+  .license {
+    cursor: pointer;
+    display: inline-block;
   }
 
   .image-card {
@@ -210,9 +293,6 @@
     opacity: 1;
   }
 
-  .size {
-    font-size: 0.8em;
-  }
   .clamp {
     display: -webkit-box;
     -webkit-line-clamp: 1;
@@ -243,6 +323,10 @@
     color: black;
     text-decoration: none;
     font-size: 0.9rem;
+  }
+
+  sl-icon {
+    font-size: 1.2rem;
   }
 
 </style>
