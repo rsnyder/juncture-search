@@ -12,7 +12,7 @@ interface Image {
   createdBy?: string // QID
   creator?: string
   creator_url?: string
-  depicts?: Depicted[]
+  depicts?: any
   description?: string
   detail_url?: string
   file?: string
@@ -21,6 +21,7 @@ interface Image {
   id: string
   iiif: string  // IIIF manifest URL
   imageQualityAssessment?: string
+  isFavorite?: boolean
   height?: number
   license: string // URL
   logo?: string   // provider logo

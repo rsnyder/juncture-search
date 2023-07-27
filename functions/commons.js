@@ -88,7 +88,7 @@ export async function handler(event) {
         aspect_ratio,
         format: b.mime.value,
         size: parseInt(b.width.value) * parseInt(b.height.value),
-        depicts: {},
+        depicts: [],
         raw: b
       }
 

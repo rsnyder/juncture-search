@@ -1,7 +1,7 @@
 <template>
 
   <div>
-    <toolbar></toolbar>
+    <toolbar logo="/images/vue.svg" title="Juncture Search"></toolbar>
     <div>
       <ve-entity-header></ve-entity-header>
     </div>

@@ -14,6 +14,8 @@
           <div class="license">
             <a :href="imageData[idx].license" target="_blank">{{ licenses[imageData[idx].license]?.code || imageData[idx].license }}</a>
           </div>
+          <sl-icon class="push" library="fa" :name="`${depictsEntity(imageData[idx]) ? 'fas' : 'far'}-thumbs-up`" @click="toggleDepicts(imageData[idx])"></sl-icon>
+          <sl-icon library="fa" :name="`${imageData[idx].isFavorite ? 'fas' : 'far'}-star`" @click="toggleFavorite(imageData[idx])"></sl-icon>
         </div>
         <div class="size">
           <span v-if="imageData[idx].width">{{ imageData[idx].width.toLocaleString() }} x {{ imageData[idx].height.toLocaleString() }}</span>
@@ -34,12 +36,18 @@
 <script setup lang="ts">
 
   import { computed, nextTick, onMounted, ref, toRaw, watch } from 'vue'
+  import { useEntitiesStore } from '../store/entities'
+  import { storeToRefs } from 'pinia'
+
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
   import type { Image } from '../images'
   import { licenses } from '../lib/licenses'
 
   const emit = defineEmits(['item-selected', 'get-next'])
  
+  const store = useEntitiesStore()
+  const { qid } = storeToRefs(store)
+
   const props = defineProps({
     total: { type: Number, default: 0 },
     items: { type: Array, default: () => [] },
@@ -212,6 +220,21 @@
     })
   }
 
+  function toggleFavorite(image:Image) {
+    image.isFavorite = !image.isFavorite
+  }
+
+  function depictsEntity(image:Image) {
+    return qid.value && image.depicts[qid.value] !== undefined
+  }
+
+  function toggleDepicts(image:Image) {
+    if (qid.value) {
+      if (image.depicts[qid.value]) delete image.depicts[qid.value]
+      else image.depicts[qid.value] = {id: qid.value}
+    }
+  }
+
 </script>
 
 <style>
@@ -258,12 +281,13 @@
   .icons {
     display: flex;
     align-items: center;
-    margin-bottom: 6px;
+    gap: 6px;
   }
 
   .size {
     width: 100%;
     font-size: 0.8em;
+    margin-top: 3px;
   }
 
   .provider-logo {
@@ -327,6 +351,10 @@
 
   sl-icon {
     font-size: 1.2rem;
+  }
+
+  .push {
+    margin-left: auto;
   }
 
 </style>
