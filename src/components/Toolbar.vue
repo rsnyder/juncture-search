@@ -2,7 +2,7 @@
 
   <div class="main">
     <div class="title" @click="onclick">
-      <img v-if="logo" :src="logo">
+      <img v-if="logo" class="logo" :src="logo">
       <span v-if="title" v-html="title"></span>
     </div>
     <ve-wikidata-search></ve-wikidata-search>
@@ -55,23 +55,30 @@
 
   .main {
     display: flex;
-    gap: 6px;
+    gap: 12px;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     padding: 6px;
-    background-color: var(--sl-color-primary-600);
+    /* background-color: var(--sl-color-primary-600); */
+    background-color: #5A162E;
     border: 1px solid #444;
   }
 
   .title {
     display: flex;
-    gap: 6px;
+    gap: 18px;
     align-items: center;
-    font-size: 1.5rem;
+    font-size: 2.0rem;
     color: white;
     font-weight: bold;
     cursor: pointer;
+  }
+
+  .logo {
+    width: 48px;
+    height: 48px;
+    background-color: white;
   }
 
   ve-wikidata-search {

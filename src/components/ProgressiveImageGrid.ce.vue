@@ -7,15 +7,22 @@
       :id="imageData.id"
       :style="layout[idx]"
     >
-      <img onload="this.style.opacity = 1" :src="imageData[idx].thumbnail" @click="imageSelected(idx)">
+      <sl-tooltip :content="imageData[idx].label || imageData[idx].file" hoist style="--sl-tooltip-arrow-size: 0;" placement="bottom">
+        <img class="image" onload="this.style.opacity = 1" :src="imageData[idx].thumbnail" @click="imageSelected(idx)">
+      </sl-tooltip>
+
       <div class="caption">
         <div class="icons">
           <img v-if="imageData[idx].logo" class="provider-logo" :src="imageData[idx].logo" alt="Provider Logo">
           <div class="license">
-            <a :href="imageData[idx].license" target="_blank">{{ licenses[imageData[idx].license]?.code || imageData[idx].license }}</a>
+            <sl-tooltip :content="`License: ${licenses[imageData[idx].license]?.label}`" hoist placement="top">
+              <a :href="imageData[idx].license" target="_blank">{{ licenses[imageData[idx].license]?.shortcode || imageData[idx].license }}</a>
+            </sl-tooltip>
           </div>
           <sl-icon class="push" library="fa" :name="`${depictsEntity(imageData[idx]) ? 'fas' : 'far'}-thumbs-up`" @click="toggleDepicts(imageData[idx])"></sl-icon>
-          <sl-icon library="fa" :name="`${imageData[idx].isFavorite ? 'fas' : 'far'}-star`" @click="toggleFavorite(imageData[idx])"></sl-icon>
+          <sl-tooltip content="Favorite" hoist placement="left">
+            <sl-icon library="fa" :name="`${imageData[idx].isFavorite ? 'fas' : 'far'}-star`" @click="toggleFavorite(imageData[idx])"></sl-icon>
+          </sl-tooltip>
         </div>
         <div class="size">
           <span v-if="imageData[idx].width">{{ imageData[idx].width.toLocaleString() }} x {{ imageData[idx].height.toLocaleString() }}</span>
@@ -40,6 +47,8 @@
   import { storeToRefs } from 'pinia'
 
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
+  import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js'
+
   import type { Image } from '../images'
   import { licenses } from '../lib/licenses'
 
@@ -56,6 +65,7 @@
   })
 
   watch(props, () => {
+    console.log('watch:props')
     isActive.value = props.active
     imageData.value = props.items as Image[] || []
   })
@@ -66,12 +76,15 @@
   const isActive = ref(props.active)
 
   const selectedImage = ref<Image | null>(null)
-  watch(selectedImage, () => showDialog.value = selectedImage.value !== null )
+  watch(selectedImage, () => {
+    showDialog.value = selectedImage.value !== null 
+  })
 
   let doLayoutDebounceTimer:any
 
   const width = ref(0)
   watch(width, () => { 
+    console.log('watch:width')
     clearTimeout(doLayoutDebounceTimer)
     doLayoutDebounceTimer = setTimeout(() => doLayout(), 50)
   })
@@ -83,6 +96,7 @@
 
   const imageData = <any>ref(props.items)
   watch(imageData, async (current, prior) => {
+    console.log('watch:imageData')
     // if (current.length) console.log(`ProgressiveImageGrid.imageData: size=${current.length}`)
     let added = imageData.value.slice(prior?.length || 0, imageData.value.length)
     await checkImagesSizes(added)
@@ -148,7 +162,7 @@
   const layout = ref<any[]>([])
 
   function imageSelected(index:number) {
-    // console.log(`imageSelected: index=${index}`, toRaw(imageData.value[index]))
+    emit('item-selected', imageData.value[index])
     selectedImage.value = imageData.value[index] as Image
   }
 
@@ -177,6 +191,7 @@
   })
 
   watch(root, () => {
+    console.log('watch:root')
     if (root.value) {
       width.value = root.value?.clientWidth || 0
       const resizeObserver = new ResizeObserver(() => {
@@ -225,7 +240,7 @@
   }
 
   function depictsEntity(image:Image) {
-    return qid.value && image.depicts[qid.value] !== undefined
+    return qid.value && image.depicts && image.depicts[qid.value] !== undefined
   }
 
   function toggleDepicts(image:Image) {
@@ -250,7 +265,7 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    /* overflow: hidden; */
     width: 100px;
     box-shadow: 2px 2px 4px 0 #ccc;
   }
@@ -259,7 +274,7 @@
     box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
   }
 
-  .pig-figure > img {
+  .image {
     left: 0;
     top: 0;
     width: 100%;
@@ -267,7 +282,7 @@
     background-color: #D5D5D5;
   }
 
-  .pig-figure > img:hover {
+  .image:hover {
     cursor: pointer;
   }
 

@@ -1,6 +1,5 @@
 import fetch from 'node-fetch'
 
-console.log(process.env.OPENVERSE_CLIENT_ID, process.env.OPENVERSE_CLIENT_SECRET)
 let access_token
 async function get_access_token() {
   let resp = await fetch('https://api.openverse.engineering/v1/auth_tokens/token/', {

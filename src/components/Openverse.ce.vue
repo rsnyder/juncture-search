@@ -2,16 +2,6 @@
 
   <div ref="root">
     <span v-html="props.label" class="title"></span> <span v-if="images" class="count">({{ total.toLocaleString() }})</span>
-    <!--
-    <ve-image-grid 
-      id="openverse" 
-      :active="isActive"
-      :total="total" 
-      :items="images" 
-      @get-next="doQuery()" 
-      @item-selected="itemSelected" 
-    ></ve-image-grid>
-    -->
     <ve-pig 
       id="openverse"
       :active="isActive"
@@ -36,6 +26,7 @@
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
+  import { licenseUrl } from '../lib/licenses'
 
   const store = useEntitiesStore()
   const { active, qid } = storeToRefs(store)
@@ -117,10 +108,10 @@
     let doc: any = {id: item.id, source: 'openverse', images:{}}
     doc.url = item.detail_url
     if (item.title) doc.label = item.title
-    if (item.license) doc.license = item.license
+    if (item.license) doc.license = licenseUrl(item.license)
     doc.thumbnail = item.thumbnail
-    doc.width = item.width
-    doc.height = item.height
+    // doc.width = item.width
+    // doc.height = item.height
     doc.aspect_ratio = Number((item.width/item.height).toFixed(4)),
 
     doc.details = {}

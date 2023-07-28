@@ -16,8 +16,8 @@
       id="bhl"
       :active="isActive"
       :items="images" 
-      @get-next="doQuery()" 
-      @item-selected="itemSelected" 
+      @get-next="doQuery()"
+      @item-selected="itemSelected"
     ></ve-pig>
   </div>
 
@@ -36,9 +36,11 @@
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
+  import { licenseUrl } from '../lib/licenses'
+  import type { Image } from '../images'
 
   const store = useEntitiesStore()
-  const { active, qid } = storeToRefs(store)
+  const { active, imagesMap, qid } = storeToRefs(store)
 
   const props = defineProps({
     label: { type: String },
@@ -70,19 +72,11 @@
   const showDialog = ref(false)
   watch(showDialog, () => { dialog.open = showDialog.value })
 
-  interface ImageData {
-    id: string;
-    thumb: string;
-    alt: string;
-    width: number;
-    height: number;
-    createdBy: boolean;
-    depicts: any[];
-  }
-
   const total = ref(0)
-  const images = ref<ImageData[]>([])
-  // watch(images, () => { console.log(toRaw(images.value)) })
+  const images = ref<Image[]>([])
+  watch(images, () => {
+    store.$state.imagesMap = {...imagesMap.value, ...Object.fromEntries(images.value.map((i:Image) => [i.id, i])) }
+ })
 
   const metadata = ref()
   watch(metadata, () => { showDialog.value = metadata.value !== undefined })
@@ -114,13 +108,17 @@
   }
 
   function transformItem(item: any): any {
+    // console.log(item)
     let doc: any = {id: item.id, source: 'openverse', images:{}}
-    doc.url = item.detail_url
+    doc.attribution = item.attribution
+    doc.creator = item.creator_url
+    doc.url = item.url
     if (item.title) doc.label = item.title
-    if (item.license) doc.license = item.license
+    if (item.license) doc.license = licenseUrl(item.license)
+    doc.source = item.foreign_landing_url
+    doc.provider = 'Biodiversity Heritage Library'
+    doc.logo = 'https://www.biodiversitylibrary.org/favicon.ico'
     doc.thumbnail = item.thumbnail
-    doc.width = item.width
-    doc.height = item.height
     doc.aspect_ratio = Number((item.width/item.height).toFixed(4)),
 
     doc.details = {}
@@ -131,8 +129,49 @@
     return await store.fetch(id)
   }
 
+  function updateImage(id: string, image: Image) {
+    let idx = images.value.findIndex((i:Image) => i.id === id)
+    if (idx > -1) {
+      let updated = [...images.value]
+      updated[idx] = image
+      images.value = updated
+      store.$state.imagesMap = {...Object.fromEntries(updated.map((i:Image) => [i.id, i])) }
+      // console.log('updated', toRaw(imagesMap.value[id]))
+      // console.log('updated', toRaw(image))
+    }
+  }
+
   async function itemSelected(evt: CustomEvent) {
-    metadata.value = await getMetadata(evt.detail[0].id)
+    let id = evt.detail[0].id
+    let image = imagesMap.value[id]
+    let flickrId = image.source.split('/').pop()
+    
+    fetch (`/api/flickr/getInfo/${flickrId}`)
+      .then(response => response.json())
+      .then(data => data.photo)
+      .then(photo => {
+        // console.log(photo)
+        if (photo.description) {
+          image.description = photo.description._content
+          updateImage(id, image)
+        }
+      })
+    
+      fetch (`/api/flickr/getSizes/${flickrId}`)
+      .then(response => response.json())
+      .then(data => data.sizes)
+      .then(sizes => {
+        let original = sizes.size.find((s:any) => s.label === 'Original')
+        if (original) {
+          image.url = original.source
+          image.width = original.width
+          image.height = original.height
+          updateImage(id, image)
+        }
+      })
+
+
+    // metadata.value = await getMetadata(evt.detail[0].id)
   }
 
 </script>

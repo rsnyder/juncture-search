@@ -13,7 +13,7 @@
         
         <div id="metadata">
           
-          <h2 v-html="image.title || image.file.replace(/_/g, ' ').replace(/\.png|\.jpg|\.jpeg$/i,'')"></h2>
+          <h2 v-html="image.title || image.file?.replace(/_/g, ' ').replace(/\.png|\.jpg|\.jpeg$/i,'')"></h2>
           
           <div v-if="image.description">
             <span>Description</span>
@@ -85,8 +85,10 @@
             <span>Attribution</span> <span v-html="image.attribution"></span>
           </div>
 
-          <div v-if="image.createdBy">
-            <span>Created by</span> <span v-html="labels[image.createdBy]"></span>
+          <div v-if="image.createdBy || image.creator">
+            <span>Created by</span>
+            <span v-if="image.createdBy" v-html="labels[image.createdBy]"></span>
+            <span v-if="image.creator" v-html="image.creator"></span>
           </div>
 
           <div v-if="image.depicts">
