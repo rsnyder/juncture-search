@@ -204,12 +204,14 @@
     return doc
   }
   
-  async function getMetadata(id: string) {
-    return await store.fetch(id)
-  }
-
   async function itemSelected(evt: CustomEvent) {
-    metadata.value = await getMetadata(evt.detail[0].id)
+    let id = evt.detail[0].id
+    console.log(`itemSelected`, id)
+    let resp:any = await fetch(`/api/jstor/${id}`)
+    if (resp.ok) {
+      let imageInfo = await resp.json()
+      console.log(imageInfo)  
+    }
   }
 
 </script>
