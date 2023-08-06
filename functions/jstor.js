@@ -13,7 +13,9 @@ async function getMetadata(id) {
 async function getImageInfo(iiifFragment) {
   let infoJsonUrl = `https://www.jstor.org/iiif/${iiifFragment}/info.json`
   console.log(infoJsonUrl)
-  return fetch(infoJsonUrl)
+  return fetch(infoJsonUrl, {
+    headers: { Cookie: `UUID=e4ec7105-fd1a-4737-a207-0f678a22521b;` }
+  })
 }
 
 export async function handler(event, context, callback) {
