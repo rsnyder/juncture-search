@@ -35,7 +35,7 @@ export const useEntitiesStore = defineStore('entities', {
     language: 'en',
     urlformatters: {},
     urlformattersFetching: false,
-    qid: null,
+    qid: '',
     user: <any|null>null,
     userid: null
   }),

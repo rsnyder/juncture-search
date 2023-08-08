@@ -27,17 +27,19 @@
       <sl-tab-panel name="images">
         <sl-tab-group placement="start">
           <sl-tab slot="nav" panel="tagged" :active="activeViewer === 'tagged' ? '' : null">Tagged</sl-tab>
-          <sl-tab slot="nav" panel="bhl" :active="activeViewer === 'bhl' ? '' : null">BHL</sl-tab>
+          <sl-tab slot="nav" panel="bhl" :active="activeViewer === 'bhl' ? '' : null">Biodiversity Heritage Library</sl-tab>
+          <sl-tab slot="nav" panel="flickr" :active="activeViewer === 'ov' ? '' : null">Flickr</sl-tab>
           <sl-tab slot="nav" panel="ov" :active="activeViewer === 'ov' ? '' : null">Openverse</sl-tab>
           <sl-tab slot="nav" panel="jstor-cc" :active="activeViewer === 'jstor-cc' ? '' : null">JSTOR</sl-tab>
-          <sl-tab slot="nav" panel="wd-images" :active="activeViewer === 'wd-images' ? '' : null">Wikidata</sl-tab>
           <sl-tab slot="nav" panel="wc" :active="activeViewer === 'wc' ? '' : null">Wikimedia Commons</sl-tab>
-          <sl-tab slot="nav" panel="cc" :active="activeViewer === 'cc' ? '' : null">Commons Categories</sl-tab>
           <sl-tab-panel name="tagged">
             <ve-tagged label="Tagged Images" id="tagged"></ve-tagged>
           </sl-tab-panel>
           <sl-tab-panel name="bhl">
             <ve-bhl label="Biodiversity Heritage Library" id="bhl"></ve-bhl>
+          </sl-tab-panel>
+          <sl-tab-panel name="flickr">
+            <ve-flickr label="Flickr" id="flickr"></ve-flickr>
           </sl-tab-panel>
           <sl-tab-panel name="ov">
             <ve-openverse label="Openverse" id="ov"></ve-openverse>
@@ -45,14 +47,8 @@
           <sl-tab-panel name="jstor-cc">
             <ve-jstor-cc label="JSTOR Community Collections" id="jstor-cc"></ve-jstor-cc>
           </sl-tab-panel>
-          <sl-tab-panel name="wd-images">
-            <ve-wikidata-images label="Wikidata" id="wd-images"></ve-wikidata-images>
-          </sl-tab-panel>
           <sl-tab-panel name="wc">
             <ve-wikimedia-commons label="Wikimedia Commons" id="wc"></ve-wikimedia-commons>
-          </sl-tab-panel>
-          <sl-tab-panel name="cc">
-            <ve-commons-categories label="Commons Categories" id="cc"></ve-commons-categories>
           </sl-tab-panel>
         </sl-tab-group>
       </sl-tab-panel>
@@ -66,7 +62,7 @@
             <ve-template label="JSTOR" id="jstor-docs"></ve-template>
           </sl-tab-panel>
           <sl-tab-panel name="wd-docs">
-            <ve-template label="Wikidata" id="wd-docs"></ve-template>
+            <ve-wikidata-scholarly-articles label="Wikidata" id="wd-docs"></ve-wikidata-scholarly-articles>
           </sl-tab-panel>
           <sl-tab-panel name="ia">
             <ve-template label="Internet Archive" id="ia"></ve-template>

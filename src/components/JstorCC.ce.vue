@@ -2,16 +2,6 @@
 
   <div ref="root">
     <span v-html="props.label" class="title"></span> <span v-if="images" class="count">({{ total.toLocaleString() }})</span>
-    <!--
-    <ve-image-grid 
-      id="jstor" 
-      :active="isActive"
-      :total="total" 
-      :items="images" 
-      @get-next="doQuery" 
-      @item-selected="itemSelected" 
-    ></ve-image-grid>
-    -->
     <ve-pig 
       id="jstor"
       :active="isActive"
@@ -33,13 +23,13 @@
 <script setup lang="ts">
 
   import { computed, onMounted, ref, toRaw, watch } from 'vue'
-  import { licenseUrl } from '../lib/licenses'
+  import type { Image } from '../types'
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
   
   const store = useEntitiesStore()
-  const { active, qid } = storeToRefs(store)
+  const { active, imagesMap, qid } = storeToRefs(store)
 
   const props = defineProps({
     label: { type: String },
@@ -83,35 +73,12 @@
   const showDialog = ref(false)
   watch(showDialog, () => { dialog.open = showDialog.value })
 
-  interface Image {
-    aspect_ratio?: number
-    attribution?: string
-    creator?: string
-    creator_url?: string
-    depicts?: string[]
-    description?: string
-    detail_url?: string
-    foreign_landing_url?: string
-    format?: string
-    id: string
-    height?: number
-    license?: string
-    license_url?: string
-    license_version?: string
-    provider?: string
-    score?: number
-    source?: string
-    tags?: string[]
-    title?: string
-    thumbnail?: string
-    url?: string
-    width?: number
-  }
-
   const total = ref(0)
   const images = ref<Image[]>([])
-  watch(images, () => { console.log(toRaw(images.value)) } )
-  
+  watch(images, () => {
+    store.$state.imagesMap = {...imagesMap.value, ...Object.fromEntries(images.value.map((i:Image) => [i.id, i])) }
+  })  
+
   const metadata = ref()
   watch(metadata, () => { showDialog.value = metadata.value !== undefined })
   
@@ -137,7 +104,7 @@
       limit: 20,
       tokens: ['16124', '24905214', '25794673', '24905191', '25794673', '24905216'],
       filter_queries: [
-        'ps_subject:*',
+        // 'ps_subject:*',
         'cc_reuse_license:*'
       ],
       content_set_flags: ['contributed_images'],
@@ -164,53 +131,48 @@
   }
 
   function transformItem(item: any): any {
-    console.log(item)
     let doc: any = {
       id: item.doi, 
       provider: 'JSTOR',
       logo: 'https://about.jstor.org/wp-content/themes/aboutjstor2017/static/JSTOR_Logo2017_90.png',
-      // depicts: [qid.value]
     }
     doc.url = `https://www.jstor.org/stable/${item.doi.indexOf('10.2307') === 0 ? item.doi.slice(8) : item.doi}`
-    // doc.images = {id: sha256(doc.url)}
-    if (item.item_title) doc.title = item.item_title
+    if (item.item_title) doc.label = item.item_title
     if (item.ps_desc) doc.description = item.ps_desc.join(' ')
     if (item.ps_source) doc.attribution = item.ps_source.join(' ')
     if (item.primary_agents?.length > 0) doc.creator = item.primary_agents.join('; ')
-    if (item.cc_reuse_license && item.cc_reuse_license.length == 1) {
-      if (item.cc_reuse_license[0] === 'Creative Commons: Free Reuse (CC0)') doc.license = 'https://creativecommons.org/publicdomain/zero/1.0'
-      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution') doc.license = 'https://creativecommons.org/licenses/by/4.0'
-      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution') doc.license = 'https://creativecommons.org/licenses/by-sa/4.0'
-      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution-NonCommercial') doc.license = 'CC BY-NC'
-      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution-NoDerivs') doc.license = 'CC BY-ND'
-      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution-NonCommercial-ShareAlike') doc.license = 'CC BY-NC-SA'
-      else if (item.cc_reuse_license[0] === 'Creative Commons: Attribution-NonCommercial-NoDerivs') doc.license = 'CC BY-NC-ND'
-      else doc.license = item.cc_reuse_license[0]
-    }
-    // doc.images.default = `https://www.jstor.org/stable/${item.doi.indexOf('10.2307') === 0 ? item.doi.slice(8) : item.doi}`
+    let ccLicense = item.cc_reuse_license[0]?.toLowerCase() || ''
+    if (ccLicense.indexOf('public domain mark') >= 0) doc.license = 'https://creativecommons.org/publicdomain/mark/1.0'
+    else if (ccLicense.indexOf('creative commons: free reuse (cc0)') >= 0) doc.license = 'https://creativecommons.org/publicdomain/zero/1.0'
+    else if (ccLicense.indexOf('creative commons: attribution-noncommercial-noderivs') >= 0) doc.license = 'CC BY-NC-ND'
+    else if (ccLicense.indexOf('creative commons: attribution-noncommercial-sharealike') >= 0) doc.license = 'CC BY-NC-SA'
+    else if (ccLicense.indexOf('creative commons: attribution-noncommercial') >= 0) doc.license = 'CC BY-NC'
+    else if (ccLicense.indexOf('creative commons: attribution-noderivs') >= 0) doc.license = 'CC BY-ND'
+    else if (ccLicense.indexOf('creative commons: attribution-sharealike') >= 0) doc.license = 'https://creativecommons.org/licenses/by-sa/4.0'
+    else if (ccLicense.indexOf('creative commons: attribution') >= 0) doc.license = 'https://creativecommons.org/licenses/by/4.0'
+    else doc.license = item.cc_reuse_license[0]
     doc.thumbnail = `https://www.jstor.org/api/cached/thumbnails/202003101501/byitem/${item.id}/0`
-    /*
-    doc.details = Object.fromEntries(Object.entries(item)
-      .filter(([key, value]) => {
-        // if (exclude.has(key)) return false
-        if (Array.isArray(value) && value.length == 0) return false
-        if (value === '' || value === null) return false
-        if (typeof value === 'object' && Object.keys(<any>value).length == 0) return false
-        return true
-      })
-      .map(args => [args[0], args[1]]
-    ))
-    */
     return doc
   }
-  
+
   async function itemSelected(evt: CustomEvent) {
     let id = evt.detail[0].id
-    console.log(`itemSelected`, id)
+    let image = imagesMap.value[id]
+    if (image.width && image.height) return
+
+    // Fetch info.json file to get image dimensions
     let resp:any = await fetch(`/api/jstor/${id}`)
     if (resp.ok) {
       let imageInfo = await resp.json()
-      console.log(imageInfo)  
+      image.width = imageInfo.width
+      image.height = imageInfo.height
+      let idx = images.value.findIndex((i:Image) => i.id === id)
+      if (idx > -1) {
+        let updated = [...images.value]
+        updated[idx] = image
+        images.value = updated
+        store.$state.imagesMap = {...Object.fromEntries(updated.map((i:Image) => [i.id, i])) }
+      }
     }
   }
 

@@ -46,11 +46,9 @@ export async function handler(event) {
     }
   })
   r = await r.text()
-  console.log(r)
 
   const qid = event.path.split('/').filter(pe => pe).pop()
   let query = SPARQL.replace(/{{qid}}/g, qid).trim()
-  console.log(query)
   resp = await fetch(cookieJar, `https://commons-query.wikimedia.org/sparql?query=${encodeURIComponent(query)}`, {
     headers: {
       Accept: 'application/sparql-results+json',
@@ -59,7 +57,6 @@ export async function handler(event) {
   })
   let statusCode = resp.status
   
-  console.log(`/api/commons: qid=${qid} status=${statusCode}`)
   if (!resp.ok) return { statusCode: resp.status, body: resp.statusText }
 
   resp = await resp.json()

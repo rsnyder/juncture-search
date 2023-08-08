@@ -65,7 +65,7 @@
       page_size: 20,
       page: page || priorPage + 1,
       license_type: 'all-cc',
-      source: 'bio_diversity'
+      source: 'flickr'
     }
     let qargs = Object.keys(args).map(k => `${k}=${args[k]}`).join('&')
   
@@ -88,8 +88,8 @@
       id: item.id,
       label: item.title,
       license: licenseUrl(item.license),
-      logo: 'https://www.biodiversitylibrary.org/favicon.ico',
-      provider: 'Biodiversity Heritage Library',
+      logo: 'https://combo.staticflickr.com/pw/favicon.ico',
+      provider: 'Flickr',
       source: item.foreign_landing_url,
       thumbnail: item.thumbnail,
       url: item.url,

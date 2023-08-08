@@ -2,103 +2,139 @@
 
   <div ref="root">
     <span v-html="props.label" class="title"></span> <span v-if="images" class="count">({{ images?.length.toLocaleString() }})</span>
-    <ve-image-grid id="wc" :items="images" @item-selected="itemSelected" :active="isActive"></ve-image-grid>
+    <ve-pig 
+      :id="id"
+      :active="isActive"
+      :total="images?.length || 0" 
+      :items="showing" 
+      @get-next="getNext" 
+    ></ve-pig>
   </div>
-
-  <sl-dialog :label="label" class="dialog" :style="{'--width':dialogWidth}">
-    <div v-if="metadata" class="metadata">
-      <ve-statements :eid="metadata.id"></ve-statements>
-    </div>
-    <sl-button slot="footer" variant="primary" @click="showDialog = false">Close</sl-button>
-  </sl-dialog>
 
 </template>
 
 <script setup lang="ts">
 
-  import { computed, onMounted, ref, toRaw, watch } from 'vue'
-  import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
-  
+  import type { Image } from '../types'
+
   const store = useEntitiesStore()
-  const { active, qid } = storeToRefs(store)
+  const { active, imagesMap, qid } = storeToRefs(store)
 
   const props = defineProps({
     label: { type: String },
-    id: { type: String },
+    id: { type: String, default: 'wc' },
   })
 
   const root = ref<HTMLElement | null>(null)
-  const shadowRoot = computed(() => root?.value?.parentNode as HTMLElement)
-
   const isActive = computed(() => active.value.split('/').pop() === props.id)
-  watch(isActive, () => {
-    // console.log(`wc.watch.isActive: isActive=${isActive.value} qid=${qid.value} images=${images.value?.length || 0}`)
-    if (isActive.value && !images.value) doQuery()
+
+  const entity = ref<any>()
+  const commonsCategory = computed(() => entity.value?.claims.P373 && entity.value?.claims.P373[0].mainsnak.datavalue.value.replace(/ /g,'_') )
+
+  watch(entity, () => {
+    images.value = []
+    if (isActive.value && !images.value.length) doQuery()
+    // if (entity.value?.claims.P373) doQuery()
   })
 
-  watch(qid, () => {
-    images.value = null
-    // console.log(`wc.watch.qid: qid=${qid.value} isActive=${isActive.value} images=0`)
-    if (isActive.value) doQuery()
+  watch(isActive, async () => {
+    if (isActive.value && qid.value !== entity.value?.id) entity.value = await store.fetch(qid.value)
   })
 
-  onMounted(() => { 
-    // console.log(`wc.mounted: qid=${qid.value} isActive=${isActive.value} images=${images.value?.length || 0}`)
-    dialog = shadowRoot.value?.querySelector('.dialog')
-    dialog.addEventListener('sl-hide', (evt:CustomEvent) => {
-      if (evt.target === dialog) metadata.value = undefined
+  watch(qid, async () => { 
+    images.value = []
+    if (isActive.value) entity.value = await store.fetch(qid.value)
+  })
+
+  onMounted(async () => {
+    if (isActive.value) entity.value = await store.fetch(qid.value)
+  })
+
+  const images = ref<Image[]>([])
+  watch(images, () => {
+    store.$state.imagesMap = {...imagesMap.value, ...Object.fromEntries(images.value.map((i:Image) => [i.id, i])) }
+    end.value = Math.min(50, images.value.length)
+  })
+
+  const showing = computed(() => { return images.value.slice(0, end.value) })
+
+  const end = ref(0)
+  function getNext() { end.value = Math.min(end.value + 50, images.value.length) }
+  
+  const sourcesToInclude = ['wikidata', 'commons', 'commons-categories']
+
+  async function doQuery() {
+    images.value = []
+    const refreshQarg = new URL(location.href).searchParams.get('refresh')
+    const refresh = refreshQarg !== null && ['true', '1', 'yes', ''].includes(refreshQarg.toLowerCase())
+  
+    if (!refresh) {
+      let cachedResults = await fetch(`/api/cache/wc-${qid.value}`)
+      if (cachedResults.ok) {
+        images.value = await cachedResults.json()
+        return
+      }
+    }
+
+    let promises: Promise<any>[] = []
+    if (sourcesToInclude.includes('commons')) promises.push(fetch(`/api/commons/${qid.value}`))
+    if (sourcesToInclude.includes('wikidata')) promises.push(fetch(`/api/wikidata/${qid.value}`))
+    if (sourcesToInclude.includes('atlas')) promises.push(fetch(`/api/atlas/${qid.value}`))
+    if (commonsCategory.value && sourcesToInclude.includes('commons-categories')) promises.push(fetch(`/api/commons-categories/${commonsCategory.value}`))
+    
+    Promise.all(promises).then(async (responses) => {
+      let idx = 0
+      const commonsData = sourcesToInclude.includes('commons') ? await responses[idx++].json() : []
+      const wikidataData = sourcesToInclude.includes('wikidata') ? await responses[idx++].json() : []
+      const categoriesData = commonsCategory.value && sourcesToInclude.includes('commons-categories') ? await responses[idx++].json() : []
+      let all:any = 
+        scoreImages([...commonsData, ...wikidataData, ...categoriesData])
+        .sort((a: any, b: any) => b.score - a.score)
+      
+      let ids = new Set()
+      let deduped = all
+        .filter(img => {
+          if (ids.has(img.id)) return false
+          ids.add(img.id)
+          return true
+        })
+      images.value = deduped
+      if (images.value.length) {
+        cacheResults()
+      }
     })
-    if (isActive.value) doQuery() 
-  })
-
-  let dialog: any
-  const dialogWidth = ref('80vw')
-  const showDialog = ref(false)
-  watch(showDialog, () => { dialog.open = showDialog.value })
-
-  interface ImageData {
-    id: string;
-    thumb: string;
-    alt: string;
-    width: number;
-    height: number;
-    createdBy: boolean;
-    depicts: any[];
   }
 
-  const images = ref<ImageData[] | null>()
-  watch(images, () => { 
-    // console.log(`wc.watch.images: qid=${qid.value} isActive=${isActive.value} images=${images.value?.length || 0}`)
-    // console.log(toRaw(images.value))
-    let distinct = new Set(images.value?.map(image => image.id))
-    let numCreatedBy = images.value?.reduce((acc, cur) => acc + (cur.createdBy ? 1 : 0), 0)
-    let numDepicts = images.value?.reduce((acc, cur) => acc + (cur.depicts.find(depicted => qid.value === depicted.id) ? 1 : 0), 0)
-    // console.log(`distinct=${distinct.size} depicts=${numDepicts} createdBy=${numCreatedBy}`)
+  const depicts = ref<any>({})
+  watch (depicts, () => {
+    store.updateLabels(Object.keys(depicts.value))
   })
   
-  const metadata = ref()
-  watch(metadata, () => { showDialog.value = metadata.value !== undefined })
-  
-  function doQuery() {
-    // console.log('wc.doQuery')
-    Promise.all([
-      fetch(`/api/commons/wc/${qid.value}`),
-      fetch(`/api/commons/wd/${qid.value}`)
-    ]).then(async ([commons, wikidata]) => {
-      const commonsData = await commons.json()
-      const wikidataData = await wikidata.json()
-      images.value = [...commonsData, ...wikidataData].sort((a: any, b: any) => b.score - a.score)
+  function cacheResults() {
+    fetch(`/api/cache/wc-${qid.value}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(images.value)
     })
   }
 
-  async function getMetadata(id: string) {
-    return await store.fetch(id)
-  }
-
-  async function itemSelected(evt: CustomEvent) {
-    metadata.value = await getMetadata(evt.detail[0].id)
+  function scoreImages(images) {
+    return images.map(img => {
+      img.score = 0
+      if (img.depicts) {
+        let depicted: any = Object.values(img.depicts).find((d:any) => d.id === qid.value)
+        if (depicted?.dro) img.score += 5
+        else if (depicted?.prominent) img.score += 2
+        else if (depicted) img.score += 1
+      }
+      if (img.imageQualityAssessment === 'featured') img.score += 3
+      else if (img.imageQualityAssessment === 'quality') img.score += 2
+      else if (img.imageQualityAssessment === 'valued') img.score += 1
+      return img
+    })
   }
 
 </script>

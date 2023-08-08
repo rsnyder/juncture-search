@@ -57,8 +57,6 @@ export async function handler(event) {
   let resp = await fetch(cookieJar, `https://commons-query.wikimedia.org/sparql?query=${encodeURIComponent(query)}`, {
     headers: { Accept: 'application/sparql-results+json'}
   })
-  let statusCode = resp.status
-  console.log(`/api/wikidata: qid=${qid} status=${statusCode}`)
   if (!resp.ok) return { statusCode: resp.status, body: resp.statusText }
 
   resp = await resp.json()
@@ -104,7 +102,6 @@ export async function handler(event) {
       }
 
     } catch (e) {
-      console.log('wikidata error')
       console.trace(e)
       console.log(b)
     }

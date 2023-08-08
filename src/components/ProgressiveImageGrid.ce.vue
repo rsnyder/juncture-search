@@ -2,7 +2,7 @@
 
   <div ref="root" id="image-grid">
 
-    <div v-for="img, idx in imageData"
+    <div v-if="layout.length > 0" v-for="img, idx in imageData"
       class="pig-figure"
       :id="imageData.id"
       :style="layout[idx]"
@@ -42,14 +42,14 @@
 
 <script setup lang="ts">
 
-  import { computed, nextTick, onMounted, ref, toRaw, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
 
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
   import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js'
 
-  import type { Image } from '../images'
+  import type { Image } from '../types'
   import { licenses } from '../lib/licenses'
 
   const emit = defineEmits(['item-selected', 'get-next'])
@@ -65,7 +65,6 @@
   })
 
   watch(props, () => {
-    console.log('watch:props')
     isActive.value = props.active
     imageData.value = props.items as Image[] || []
   })
@@ -84,7 +83,6 @@
 
   const width = ref(0)
   watch(width, () => { 
-    console.log('watch:width')
     clearTimeout(doLayoutDebounceTimer)
     doLayoutDebounceTimer = setTimeout(() => doLayout(), 50)
   })
@@ -96,7 +94,6 @@
 
   const imageData = <any>ref(props.items)
   watch(imageData, async (current, prior) => {
-    console.log('watch:imageData')
     // if (current.length) console.log(`ProgressiveImageGrid.imageData: size=${current.length}`)
     let added = imageData.value.slice(prior?.length || 0, imageData.value.length)
     await checkImagesSizes(added)
@@ -111,8 +108,6 @@
                          : width.value <= 1280 ? 4
                          : width.value <= 1920 ? 5
                          : 6
-
-    // console.log(`doLayout: images=${numImages} width=${width.value} minAspectRatio=${minAspectRatio}`)
 
     let _layout:any[] = []
 
@@ -191,7 +186,6 @@
   })
 
   watch(root, () => {
-    console.log('watch:root')
     if (root.value) {
       width.value = root.value?.clientWidth || 0
       const resizeObserver = new ResizeObserver(() => {
@@ -227,7 +221,6 @@
         let width = img.width < minWidth ? minWidth : img.width
         let height = img.width < minWidth ? img.height * minWidth/img.width : img.height
         let aspect_ratio = Number((width/height).toFixed(4))
-        // resolve({...image, width, height, aspect_ratio, mime: 'image/jpeg'})
         resolve({...image, aspect_ratio, format: 'image/jpeg'})
       }
       img.onerror = () => reject()

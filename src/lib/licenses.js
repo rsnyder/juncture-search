@@ -1,5 +1,16 @@
 const licenses = {
   
+  'https://creativecommons.org/publicdomain/mark/1.0': {
+    code: 'PDM',
+    shortcode: 'PDM',
+    label: 'Public Domain Mark 1.0',
+    qid: '',
+    badges: [
+      'https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/publicdomain.svg',
+      'https://mirrors.creativecommons.org/presskit/icons/pd.svg'
+    ]
+  },
+
   'https://creativecommons.org/publicdomain/zero/1.0': {
     code: 'CC0',
     shortcode: 'CC0',

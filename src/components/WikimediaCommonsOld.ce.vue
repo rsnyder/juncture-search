@@ -17,7 +17,6 @@
 <script setup lang="ts">
 
   import { computed, onMounted, ref, watch } from 'vue'
-  import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
   import type { Image } from '../types'
@@ -27,7 +26,7 @@
 
   const props = defineProps({
     label: { type: String },
-    id: { type: String, default: 'wd' },
+    id: { type: String, default: 'wc' },
   })
 
   const root = ref<HTMLElement | null>(null)
@@ -50,13 +49,13 @@
     if (isActive.value) doQuery()
   })
 
-  onMounted(() => { if (isActive.value) doQuery() })
-  
+  onMounted(() => { if (isActive.value) doQuery()  })
+
   const end = ref(0)
   function getNext() { end.value = Math.min(end.value + 50, images.value?.length || 0) }
   
   function doQuery() {
-    fetch(`/api/wikidata/${qid.value}`)
+    fetch(`/api/commons/${qid.value}`)
       .then(resp => resp.json())
       .then(data => images.value = data.sort((a: any, b: any) => b.score - a.score))
   }

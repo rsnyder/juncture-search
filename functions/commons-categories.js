@@ -61,11 +61,10 @@ export async function handler(event) {
     let batchPageids = Object.keys(resp.query.pages)
     pageids = [...pageids, ...batchPageids] 
   }
-  console.log(`/api/commons-categories: category=${category} pageids=${pageids.length}`)
 
   let entityIds = pageids.map(pageid => `(sdc:M${pageid})`).join(' ')
   let query = SPARQL.replace(/\{\{ENTITY-IDS\}\}/, entityIds)
-  // console.log(query)
+  console.log(query)
 
   let resp = await fetch(cookieJar, 'https://commons-query.wikimedia.org/sparql', {
     method: 'POST', body: `query=${encodeURIComponent(query)}`, 
@@ -76,7 +75,6 @@ export async function handler(event) {
     }
   })
   let statusCode = resp.status
-  console.log(`/api/commons-categories: category=${category} status=${statusCode}`)
   if (!resp.ok) return { statusCode: resp.status, body: resp.statusText }
 
   resp = await resp.json()

@@ -117,7 +117,7 @@
   import { computed, onMounted, ref, toRaw, watch } from 'vue'
   import { licenses } from '../lib/licenses'
   import { useEntitiesStore } from '../store/entities'
-  import type { Image } from '../images'
+  import type { Image } from '../types'
   import { storeToRefs } from 'pinia'
 
   import '@shoelace-style/shoelace/dist/components/icon/icon.js'

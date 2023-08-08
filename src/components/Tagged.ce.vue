@@ -38,7 +38,7 @@
   import { computed, onMounted, ref, toRaw, watch } from 'vue'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
-  import type { Image } from '../images'
+  import type { Image } from '../types'
 
   import '@shoelace-style/shoelace/dist/components/button/button.js'
   import '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js'
@@ -53,8 +53,6 @@
 
   const store = useEntitiesStore()
   const { active, imagesMap, labels, qid } = storeToRefs(store)
-
-  // watch(imagesMap, () => { console.log(toRaw(imagesMap.value)) })
 
   const props = defineProps({
     label: { type: String },

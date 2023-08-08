@@ -1,7 +1,15 @@
-interface Depicted {
+interface Article {
+  authors: string[]
+  doi: string
   id: string
-  prominent?: boolean
-  dro?: boolean
+  issue: string
+  main_subject: any[]
+  pages: string
+  publication: string
+  publication_date: string
+  title: string
+  volume: string
+
 }
 
 interface Image {
@@ -38,4 +46,4 @@ interface Image {
   width?: number
 }
 
-export { Image } 
+export { Article, Image } 
