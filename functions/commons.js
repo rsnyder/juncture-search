@@ -32,7 +32,7 @@ const SPARQL = `
     OPTIONAL { ?image wdt:P6243 ?dro . }
     OPTIONAL { ?image wdt:P6731 ?quality . }
   }
-  LIMIT 2000`
+  LIMIT 10000`
 
 export async function handler(event) {
   
@@ -55,13 +55,13 @@ export async function handler(event) {
       'User-Agent': 'Juncture Image Search'
     }
   })
-  let statusCode = resp.status
   
   if (!resp.ok) return { statusCode: resp.status, body: resp.statusText }
 
-  resp = await resp.json()
+  let _resp = await resp.json()
+
   let data = {}
-  resp.results.bindings.map(b => {
+  _resp.results.bindings.map(b => {
 
     try {
       let id = b.image.value.split('/').pop()
@@ -107,6 +107,8 @@ export async function handler(event) {
       console.log(b)
     }
   })
+
+  console.log('commons', resp.status, Object.keys(data).length)
 
   return { statusCode: 200, body: JSON.stringify(Object.values(data))}
 }

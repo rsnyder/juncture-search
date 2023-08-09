@@ -59,9 +59,10 @@ export async function handler(event) {
   })
   if (!resp.ok) return { statusCode: resp.status, body: resp.statusText }
 
-  resp = await resp.json()
+  let _resp = await resp.json()
+
   let data = {}
-  resp.results.bindings.map(b => {
+  _resp.results.bindings.map(b => {
     try {
       // console.log(b)
       let id = b.image.value.split('/').pop()
@@ -106,6 +107,8 @@ export async function handler(event) {
       console.log(b)
     }
   })
+
+  console.log('wikidata', resp.status, Object.keys(data).length)
 
   return { statusCode: 200, body: JSON.stringify(Object.values(data))}
 }

@@ -29,6 +29,7 @@ import EntityCard from './components/EntityCard.ce.vue'
 import EntityHeader from './components/EntityHeader.ce.vue'
 import EntityInfoboxes from './components/EntityInfoboxes.ce.vue'
 import Flickr from './components/Flickr.ce.vue'
+import Images from './components/Images.ce.vue'
 import ImageCard from './components/ImageCard.ce.vue'
 import JstorCC from './components/JstorCC.ce.vue'
 import LanguageSelector from './components/LanguageSelector.ce.vue'
@@ -57,6 +58,7 @@ customElements.define('ve-entity-card', defineCustomElement(EntityCard))
 customElements.define('ve-entity-header', defineCustomElement(EntityHeader))
 customElements.define('ve-entity-infoboxes', defineCustomElement(EntityInfoboxes))
 customElements.define('ve-flickr', defineCustomElement(Flickr))
+customElements.define('ve-images', defineCustomElement(Images))
 customElements.define('ve-image-card', defineCustomElement(ImageCard))
 customElements.define('ve-jstor-cc', defineCustomElement(JstorCC))
 customElements.define('ve-language-selector', defineCustomElement(LanguageSelector))

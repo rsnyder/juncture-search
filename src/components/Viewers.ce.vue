@@ -33,7 +33,7 @@
           <sl-tab slot="nav" panel="jstor-cc" :active="activeViewer === 'jstor-cc' ? '' : null">JSTOR</sl-tab>
           <sl-tab slot="nav" panel="wc" :active="activeViewer === 'wc' ? '' : null">Wikimedia Commons</sl-tab>
           <sl-tab-panel name="tagged">
-            <ve-tagged label="Tagged Images" id="tagged"></ve-tagged>
+            <ve-images label="Tagged Images" id="tagged"></ve-images>
           </sl-tab-panel>
           <sl-tab-panel name="bhl">
             <ve-bhl label="Biodiversity Heritage Library" id="bhl"></ve-bhl>
