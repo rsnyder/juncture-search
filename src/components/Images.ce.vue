@@ -41,7 +41,8 @@
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
   import type { Image } from '../types'
-  import { Tagged } from './tagged'
+  // import { Tagged } from '../lib/image-providers/Tagged'
+  import { Tagged } from '../lib/image-providers/Tagged'
 
   import '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js'
   import '@shoelace-style/shoelace/dist/components/details/details.js'
