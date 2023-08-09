@@ -1,15 +1,16 @@
-import type { Image } from '../types'
+import type { Image } from '../../types'
 
 export class Tagged {
 
   _qid: string = ''
+  _cacheKey: string = ''
   _refresh: boolean = false
   _end = -1
   _images: Image[] = []
   _filteredAndSorted: Image[] = []
   
-  _sourcesToInclude = ['wikidata', 'commons', 'atlas']
-  // _sourcesToInclude = ['wikidata', 'commons']
+  // _sourcesToInclude = ['wikidata', 'commons', 'atlas']
+  _sourcesToInclude = ['wikidata', 'commons']
   _sortBy = 'score'
   _filters: any = []
 
@@ -17,6 +18,7 @@ export class Tagged {
 
   constructor(qid: string, refresh: boolean = false) {
     this._qid = qid
+    this._cacheKey = `tagged-${qid}`
     this._refresh = refresh
     console.log(`Tagged: qid=${qid} refresh=${refresh}`)
   }
@@ -38,7 +40,7 @@ export class Tagged {
     this._images = []
   
     if (!this._refresh) {
-      let cachedResults = await fetch(`/api/cache/${this._qid}`)
+      let cachedResults = await fetch(`/api/cache/${this._cacheKey}`)
       // console.log(`fromCache=${cachedResults.ok}`)
       if (cachedResults.ok) {
         this._images = await cachedResults.json()
@@ -92,7 +94,7 @@ export class Tagged {
   }
 
   _cacheResults() {
-    fetch(`/api/cache/${this._qid}`, {
+    fetch(`/api/cache/${this._cacheKey}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(this._images)

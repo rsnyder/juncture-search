@@ -41,7 +41,7 @@
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
   import type { Image } from '../types'
-  import { Tagged } from './tagged'
+  import { Tagged } from '../lib/image-providers/Tagged'
 
   import '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js'
   import '@shoelace-style/shoelace/dist/components/details/details.js'
@@ -134,4 +134,4 @@
     color: #666;
     padding-left: .5em;
   }
-</style>
+</style>../lib/image-providers/tagged

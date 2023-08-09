@@ -32,6 +32,7 @@
           <sl-tab slot="nav" panel="ov" :active="activeViewer === 'ov' ? '' : null">Openverse</sl-tab>
           <sl-tab slot="nav" panel="jstor-cc" :active="activeViewer === 'jstor-cc' ? '' : null">JSTOR</sl-tab>
           <sl-tab slot="nav" panel="wc" :active="activeViewer === 'wc' ? '' : null">Wikimedia Commons</sl-tab>
+          <sl-tab slot="nav" panel="cc" :active="activeViewer === 'cc' ? '' : null">Commons Categories</sl-tab>
           <sl-tab-panel name="tagged">
             <ve-images label="Tagged Images" id="tagged"></ve-images>
           </sl-tab-panel>
@@ -49,6 +50,9 @@
           </sl-tab-panel>
           <sl-tab-panel name="wc">
             <ve-wikimedia-commons label="Wikimedia Commons" id="wc"></ve-wikimedia-commons>
+          </sl-tab-panel>
+          <sl-tab-panel name="cc">
+            <ve-commons-categories label="Commons Categories" id="cc"></ve-commons-categories>
           </sl-tab-panel>
         </sl-tab-group>
       </sl-tab-panel>
