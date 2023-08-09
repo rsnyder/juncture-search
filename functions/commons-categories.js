@@ -64,7 +64,7 @@ export async function handler(event) {
 
   let entityIds = pageids.map(pageid => `(sdc:M${pageid})`).join(' ')
   let query = SPARQL.replace(/\{\{ENTITY-IDS\}\}/, entityIds)
-  // console.log(query)
+  console.log(query)
 
   let resp = await fetch(cookieJar, 'https://commons-query.wikimedia.org/sparql', {
     method: 'POST', body: `query=${encodeURIComponent(query)}`, 
