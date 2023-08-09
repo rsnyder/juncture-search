@@ -134,4 +134,4 @@
     color: #666;
     padding-left: .5em;
   }
-</style>../lib/image-providers/tagged
+</style>

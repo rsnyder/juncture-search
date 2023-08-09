@@ -9,8 +9,8 @@ export class Tagged {
   _images: Image[] = []
   _filteredAndSorted: Image[] = []
   
-  // _sourcesToInclude = ['wikidata', 'commons', 'atlas']
-  _sourcesToInclude = ['wikidata', 'commons']
+  _sourcesToInclude = ['wikidata', 'commons', 'atlas']
+  // _sourcesToInclude = ['wikidata', 'commons']
   _sortBy = 'score'
   _filters: any = []
 
