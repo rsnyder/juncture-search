@@ -9,8 +9,8 @@ export class Tagged {
   _images: Image[] = []
   _filteredAndSorted: Image[] = []
   
-  // _sourcesToInclude = ['wikidata', 'commons', 'atlas']
-  _sourcesToInclude = ['wikidata', 'commons']
+   _sourcesToInclude = ['wikidata', 'commons', 'atlas']
+  // _sourcesToInclude = ['wikidata', 'commons']
   _sortBy = 'score'
   _filters: any = []
 
@@ -18,9 +18,9 @@ export class Tagged {
 
   constructor(qid: string, refresh: boolean = false) {
     this._qid = qid
-    this._cacheKey = `tagged-${qid}`
+    this._cacheKey = `images-${qid}`
     this._refresh = refresh
-    console.log(`Tagged: qid=${qid} refresh=${refresh}`)
+    console.log(`Images: qid=${qid} refresh=${refresh}`)
   }
 
   async next() {
@@ -31,12 +31,12 @@ export class Tagged {
     let start = this._end
     this._end = Math.min(this._end + 50, this._filteredAndSorted?.length || 0)
     let images = this._filteredAndSorted?.slice(start, this._end)
-    console.log(`Tagged.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
+    console.log(`Images.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
     return images
   }
 
   async doQuery() {
-    console.log(`Tagged.doQuery: qid=${this._qid} refresh=${this._refresh}`)
+    console.log(`Images.doQuery: qid=${this._qid} refresh=${this._refresh}`)
     this._images = []
   
     if (!this._refresh) {
@@ -89,7 +89,7 @@ export class Tagged {
     else if (this._sortBy === 'size')
       this._filteredAndSorted = [...this._filteredAndSorted.sort((a: any, b: any) => b.size - a.size)]
     this.total = this._filteredAndSorted.length
-    console.log(`Tagged.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
+    console.log(`Images.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
     return this
   }
 

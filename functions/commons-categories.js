@@ -24,18 +24,19 @@ const SPARQL = `
     VALUES (?image) { {{ENTITY-IDS}} }
     ?image schema:url ?url .
     OPTIONAL { ?image rdfs:label ?label. }
-    OPTIONAL { ?image schema:description ?description. }
+    OPTIONAL { ?image schema:description ?description . }
     OPTIONAL { ?image wdt:P275 ?license . }
     OPTIONAL { ?image (wdt:P1259 | wdt:P625) ?coords . }
-    OPTIONAL { ?image p:P180 [ps:P180 ?depicts; wikibase:rank ?rank] .}
-    ?image (schema:encodingFormat | wdt:P1163) ?mime .
-    FILTER(?mime IN ('image/jpeg', 'image/png')) .
+    OPTIONAL { ?image p:P180 [ps:P180 ?depicts; wikibase:rank ?rank] . }
+    OPTIONAL { 
+      ?image (schema:encodingFormat | wdt:P1163) ?mime .
+      FILTER(?mime IN ('image/jpeg', 'image/png')) .
+    }
     OPTIONAL { ?image (schema:width | wdt:P2049) ?width . }
     OPTIONAL { ?image (schema:height | wdt:P2048) ?height . }
     OPTIONAL { ?image wdt:P6243 ?dro . }
     OPTIONAL { ?image wdt:P6731 ?quality . }
-  }
-  LIMIT 2000`
+  }`
 
 
 export async function handler(event) {
@@ -64,7 +65,7 @@ export async function handler(event) {
 
   let entityIds = pageids.map(pageid => `(sdc:M${pageid})`).join(' ')
   let query = SPARQL.replace(/\{\{ENTITY-IDS\}\}/, entityIds)
-  console.log(query)
+  // console.log(query)
 
   let resp = await fetch(cookieJar, 'https://commons-query.wikimedia.org/sparql', {
     method: 'POST', body: `query=${encodeURIComponent(query)}`, 

@@ -82,18 +82,18 @@
     console.log(`createdBy=${createdBy.value}`)
   })
 
-  const entity = ref<any>()
-  const commonsCategory = computed(() => entity.value?.claims.P373 && entity.value?.claims.P373[0].mainsnak.datavalue.value.replace(/ /g,'_') )
-
   watch(isActive, async () => {
-    if (isActive.value && qid.value !== entity.value?.id) entity.value = await store.fetch(qid.value)
+    console.log(`Images.isActive=${isActive.value} qid=${qid.value}`)
+    if (isActive.value && !tagged) {
+      tagged = new Tagged(qid.value, refresh)
+      tagged.next().then(_images => images.value = [..._images])
+    }
   })
 
   watch(qid, async () => { 
     // console.log(`tagged.watch.qid: isActive=${isActive.value} qid=${qid.value}`)
     tagged = new Tagged(qid.value, refresh)
     tagged.next().then(_images => images.value = [..._images])
-    if (isActive.value) entity.value = await store.fetch(qid.value)
   })
 
   onMounted(async () => {
@@ -103,9 +103,10 @@
       depictsSelect.hide()
       depictsFilter.value = e.target.value 
     })
-    if (isActive.value) entity.value = await store.fetch(qid.value)
-    tagged = new Tagged(qid.value, refresh)
-    tagged.next().then(_images => images.value = [..._images])
+    if (isActive.value) {
+      tagged = new Tagged(qid.value, refresh)
+      tagged.next().then(_images => images.value = [..._images])
+    }
   })
 
   function getNext() {

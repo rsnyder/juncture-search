@@ -26,15 +26,20 @@
 
       <sl-tab-panel name="images">
         <sl-tab-group placement="start">
+          <sl-tab slot="nav" panel="images" :active="activeViewer === 'images' ? '' : null">Images</sl-tab>
           <sl-tab slot="nav" panel="tagged" :active="activeViewer === 'tagged' ? '' : null">Tagged</sl-tab>
           <sl-tab slot="nav" panel="bhl" :active="activeViewer === 'bhl' ? '' : null">Biodiversity Heritage Library</sl-tab>
           <sl-tab slot="nav" panel="flickr" :active="activeViewer === 'ov' ? '' : null">Flickr</sl-tab>
           <sl-tab slot="nav" panel="ov" :active="activeViewer === 'ov' ? '' : null">Openverse</sl-tab>
           <sl-tab slot="nav" panel="jstor-cc" :active="activeViewer === 'jstor-cc' ? '' : null">JSTOR</sl-tab>
           <sl-tab slot="nav" panel="wc" :active="activeViewer === 'wc' ? '' : null">Wikimedia Commons</sl-tab>
+          <sl-tab slot="nav" panel="wd" :active="activeViewer === 'wd' ? '' : null">Wikidata</sl-tab>
           <sl-tab slot="nav" panel="cc" :active="activeViewer === 'cc' ? '' : null">Commons Categories</sl-tab>
+          <sl-tab-panel name="images">
+            <ve-images label="Aggregated Images" id="images"></ve-images>
+          </sl-tab-panel>
           <sl-tab-panel name="tagged">
-            <ve-images label="Tagged Images" id="tagged"></ve-images>
+            <ve-tagged label="Tagged Images" id="tagged"></ve-tagged>
           </sl-tab-panel>
           <sl-tab-panel name="bhl">
             <ve-bhl label="Biodiversity Heritage Library" id="bhl"></ve-bhl>
@@ -50,6 +55,9 @@
           </sl-tab-panel>
           <sl-tab-panel name="wc">
             <ve-wikimedia-commons label="Wikimedia Commons" id="wc"></ve-wikimedia-commons>
+          </sl-tab-panel>
+          <sl-tab-panel name="wd">
+            <ve-wikidata-images label="Wikidata" id="wd"></ve-wikidata-images>
           </sl-tab-panel>
           <sl-tab-panel name="cc">
             <ve-commons-categories label="Commons Categories" id="cc"></ve-commons-categories>
@@ -127,13 +135,6 @@
   const viewer = ref()
   watch(group, () => { if (group.value && viewer.value) store.setActive(`${group.value}/${viewer.value}`) })
   watch(viewer, () => { if (group.value && viewer.value) store.setActive(`${group.value}/${viewer.value}`) })
-
-  const defaults = {
-    'data': 'wd-statements',
-    'images': 'wc',
-    'documents': 'wd-docs',
-    'related': 'related-all'
-  }
 
   function init(root: HTMLElement) {
     observer = new MutationObserver((mutationsList) => {

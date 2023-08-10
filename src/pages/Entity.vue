@@ -29,7 +29,7 @@
 
     store.setQid(Array.isArray(route.params.qid) ? route.params.qid[0] : route.params.qid )
     store.setLanguage((Array.isArray(route.query.lang) ? route.query.lang[0] : route.query.lang) || 'en')
-    let tab = (Array.isArray(route.query.tab) ? route.query.tab[0] : route.query.tab) || 'images/tagged'
+    let tab = (Array.isArray(route.query.tab) ? route.query.tab[0] : route.query.tab) || 'images/images'
     store.setActive(tab)
 
     watch(route, () => {

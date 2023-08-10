@@ -153,7 +153,7 @@
     const refresh = refreshQarg !== null && ['true', '1', 'yes', ''].includes(refreshQarg.toLowerCase())
   
     if (!refresh) {
-      let cachedResults = await fetch(`/api/cache/${qid.value}`)
+      let cachedResults = await fetch(`/api/cache/tagged-${qid.value}`)
       // console.log(`fromCache=${cachedResults.ok}`)
       if (cachedResults.ok) {
         images.value = await cachedResults.json()
@@ -174,6 +174,7 @@
       const wikidataData = sourcesToInclude.includes('wikidata') ? await responses[idx++].json() : []
       const atlasData = sourcesToInclude.includes('atlas') ? await responses[idx++].json() : []
       const categoriesData = commonsCategory.value && sourcesToInclude.includes('commons-categories') ? await responses[idx++].json() : []
+      console.log(`Tagged.doQuery: commons=${commonsData.length} wikidata=${wikidataData.length} atlas=${atlasData.length} categories=${categoriesData.length}`)
       let all:any = 
         scoreImages([...atlasData, ...commonsData, ...wikidataData, ...categoriesData])
         .sort((a: any, b: any) => b.score - a.score)
@@ -234,7 +235,7 @@
   }
   
   function cacheResults() {
-    fetch(`/api/cache/${qid.value}`, {
+    fetch(`/api/cache/tagged-${qid.value}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(images.value)
