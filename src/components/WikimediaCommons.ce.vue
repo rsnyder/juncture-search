@@ -1,12 +1,13 @@
 <template>
 
   <div ref="root">
-    <span v-html="props.label" class="title"></span> <span v-if="images" class="count">({{ images?.length.toLocaleString() }})</span>
+    <span v-html="props.label" class="title"></span> <span v-if="images" class="count">({{ (provider?.total || 0).toLocaleString() }})</span>
     <ve-pig 
       :id="id"
       :active="isActive"
-      :total="images?.length || 0" 
-      :items="showing" 
+      :total="provider?.total || 0" 
+      :items="images"
+      @item-selected="itemSelected"
       @get-next="getNext" 
     ></ve-pig>
   </div>
@@ -15,125 +16,59 @@
 
 <script setup lang="ts">
 
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, toRaw, watch } from 'vue'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
   import type { Image } from '../types'
+  import { WikimediaCommons } from '../lib/image-providers/Commons'
 
   const store = useEntitiesStore()
-  const { active, imagesMap, qid } = storeToRefs(store)
+  const { active, labels, qid } = storeToRefs(store)
 
   const props = defineProps({
     label: { type: String },
     id: { type: String, default: 'wc' },
   })
 
-  const root = ref<HTMLElement | null>(null)
-  const isActive = computed(() => active.value.split('/').pop() === props.id)
+  const refreshQarg = new URL(location.href).searchParams.get('refresh')
+  const refresh = refreshQarg !== null && ['true', '1', 'yes', ''].includes(refreshQarg.toLowerCase())
 
-  const entity = ref<any>()
-  const commonsCategory = computed(() => entity.value?.claims.P373 && entity.value?.claims.P373[0].mainsnak.datavalue.value.replace(/ /g,'_') )
-
-  watch(entity, () => {
-    images.value = []
-    if (isActive.value && !images.value.length) doQuery()
-    // if (entity.value?.claims.P373) doQuery()
-  })
-
-  watch(isActive, async () => {
-    if (isActive.value && qid.value !== entity.value?.id) entity.value = await store.fetch(qid.value)
-  })
-
-  watch(qid, async () => { 
-    images.value = []
-    if (isActive.value) entity.value = await store.fetch(qid.value)
-  })
-
-  onMounted(async () => {
-    if (isActive.value) entity.value = await store.fetch(qid.value)
-  })
+  let provider
 
   const images = ref<Image[]>([])
-  watch(images, () => {
-    store.$state.imagesMap = {...imagesMap.value, ...Object.fromEntries(images.value.map((i:Image) => [i.id, i])) }
-    end.value = Math.min(50, images.value.length)
-  })
 
-  const showing = computed(() => { return images.value.slice(0, end.value) })
+  const isActive = computed(() => active.value.split('/').pop() === props.id)
+  watch(isActive, () => { if (isActive.value && !images.value.length) getNext() })
 
-  const end = ref(0)
-  function getNext() { end.value = Math.min(end.value + 50, images.value.length) }
-  
-  const sourcesToInclude = ['wikidata', 'commons', 'commons-categories']
-
-  async function doQuery() {
+  watch(qid, () => {
     images.value = []
-    const refreshQarg = new URL(location.href).searchParams.get('refresh')
-    const refresh = refreshQarg !== null && ['true', '1', 'yes', ''].includes(refreshQarg.toLowerCase())
-  
-    if (!refresh) {
-      let cachedResults = await fetch(`/api/cache/wc-${qid.value}`)
-      if (cachedResults.ok) {
-        images.value = await cachedResults.json()
-        return
-      }
-    }
+    provider = new WikimediaCommons(qid.value, refresh)
+    if (isActive.value) getNext()
+  })
 
-    let promises: Promise<any>[] = []
-    if (sourcesToInclude.includes('commons')) promises.push(fetch(`/api/commons/${qid.value}`))
-    if (sourcesToInclude.includes('wikidata')) promises.push(fetch(`/api/wikidata/${qid.value}`))
-    if (sourcesToInclude.includes('atlas')) promises.push(fetch(`/api/atlas/${qid.value}`))
-    if (commonsCategory.value && sourcesToInclude.includes('commons-categories')) promises.push(fetch(`/api/commons-categories/${commonsCategory.value}`))
-    
-    Promise.all(promises).then(async (responses) => {
-      let idx = 0
-      const commonsData = sourcesToInclude.includes('commons') ? await responses[idx++].json() : []
-      const wikidataData = sourcesToInclude.includes('wikidata') ? await responses[idx++].json() : []
-      const categoriesData = commonsCategory.value && sourcesToInclude.includes('commons-categories') ? await responses[idx++].json() : []
-      let all:any = 
-        scoreImages([...commonsData, ...wikidataData, ...categoriesData])
-        .sort((a: any, b: any) => b.score - a.score)
-      
-      let ids = new Set()
-      let deduped = all
-        .filter(img => {
-          if (ids.has(img.id)) return false
-          ids.add(img.id)
-          return true
-        })
-      images.value = deduped
-      if (images.value.length) {
-        cacheResults()
-      }
-    })
-  }
-
-  const depicts = ref<any>({})
-  watch (depicts, () => {
-    store.updateLabels(Object.keys(depicts.value))
+  onMounted(() => {
+    provider = new WikimediaCommons(qid.value, refresh)
+    if (isActive.value) getNext()
   })
   
-  function cacheResults() {
-    fetch(`/api/cache/wc-${qid.value}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(images.value)
-    })
-  }
+  function getNext() { 
+    provider.next().then((next:Image[]) => { images.value = [...images.value, ...next] })
+   }
 
-  function scoreImages(images) {
-    return images.map(img => {
-      img.score = 0
-      if (img.depicts) {
-        let depicted: any = Object.values(img.depicts).find((d:any) => d.id === qid.value)
-        if (depicted?.dro) img.score += 5
-        else if (depicted?.prominent) img.score += 2
-        else if (depicted) img.score += 1
+  async function itemSelected(evt: CustomEvent) {
+    let id = evt.detail[0].id
+    let mid = `M${id}`
+    console.log(`itemSelected: ${mid}`)
+    fetch(`https://commons.wikimedia.org/wiki/Special:EntityData/${mid}.json`)
+    .then(resp => resp.json())
+    .then(resp => {
+      let image = images.value.find((i:Image) => i.id === id)
+      if (image) {
+        let depicted = resp.entities[mid].statements.P180.map((s:any) => s.mainsnak.datavalue.value.id)
+        store.updateLabels(depicted).then(() => {
+          if (image) image.depicts = depicted.map((d:string) => ({ id: d, label: labels.value[d] }))
+        })
       }
-      if (img.imageQualityAssessment === 'featured') img.score += 3
-      else if (img.imageQualityAssessment === 'quality') img.score += 2
-      else if (img.imageQualityAssessment === 'valued') img.score += 1
-      return img
     })
   }
 

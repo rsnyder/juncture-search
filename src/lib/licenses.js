@@ -22,7 +22,19 @@ const licenses = {
       'https://mirrors.creativecommons.org/presskit/icons/zero.svg'
     ]
   },
-    
+
+  'https://creativecommons.org/publicdomain/zero/1.0/deed.en': {
+    code: 'CC0',
+    shortcode: 'CC0',
+    label: 'CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
+    qid: 'Q6938433',
+    badges: [
+      'https://mirrors.creativecommons.org/presskit/buttons/88x31/png/cc-zero.png',
+      'https://mirrors.creativecommons.org/presskit/icons/cc.svg',
+      'https://mirrors.creativecommons.org/presskit/icons/zero.svg'
+    ]
+  },
+  
   'https://creativecommons.org/licenses/by/1.0' : {
     code: 'CC BY 1.0', 
     shortcode: 'BY',
@@ -190,6 +202,19 @@ const licenses = {
     shortcode: 'BY-SA',
     label: 'Namensnennung - Weitergabe unter gleichen Bedingungen 3.0 Deutschland (CC BY-SA 3.0 DE)',
     qid :'Q42716613',
+    badges: [
+      'https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-sa.png',
+      'https://mirrors.creativecommons.org/presskit/icons/cc.svg',
+      'https://mirrors.creativecommons.org/presskit/icons/by.svg',
+      'https://mirrors.creativecommons.org/presskit/icons/sa.svg'
+    ]
+  },
+
+  'https://creativecommons.org/licenses/by-sa/3.0/fr': {
+    code: 'CC BY-SA 3.0 FR',
+    shortcode: 'BY-SA',
+    label: 'Attribution - Partage dans les Mêmes Conditions 3.0 France (CC BY-SA 3.0 FR)',
+    qid :'Q86240326',
     badges: [
       'https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-sa.png',
       'https://mirrors.creativecommons.org/presskit/icons/cc.svg',

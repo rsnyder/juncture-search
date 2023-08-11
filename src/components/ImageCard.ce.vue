@@ -40,15 +40,17 @@
             </ul>
           </div>
 
-          <div>
+          <div v-if="image.pageid">
             <span>ID</span>
-            <a :href="`https://commons.wikimedia.org/wiki/Special:EntityData/${image.id}.json`" v-html="image.id" target="_blank"></a>
+            <a :href="`https://commons.wikimedia.org/wiki/Special:EntityData/M${image.pageid}.json`" v-html="`M${image.pageid}`" target="_blank"></a>
           </div>
 
+          <!--
           <div>
             <span>Metadata</span>
             <a :href="`https://commons.wikimedia.org/w/api.php?origin=*&format=json&action=query&prop=imageinfo&iiprop=extmetadata|size|mime&pageids=${image.pageid}`" v-html="image.pageid" target="_blank"></a>
           </div>
+          -->
 
           <div class="provider">
             <span>Provider</span>
@@ -85,17 +87,16 @@
             <span>Attribution</span> <span v-html="image.attribution"></span>
           </div>
 
-          <div v-if="image.createdBy || image.creator">
+          <div v-if="image.creator">
             <span>Created by</span>
-            <span v-if="image.createdBy" v-html="labels[image.createdBy]"></span>
-            <span v-if="image.creator" v-html="image.creator"></span>
+            <span v-if="image.creator" v-html="image.creator.label"></span>
           </div>
 
           <div v-if="image.depicts">
             <h4>Depicted entities</h4>
             <ul>
               <li v-for="depict in image.depicts" :key="depict.id">
-                {{ labels[depict.id] }}
+                {{ depict.label || labels[depict.id] }}
               </li>
             </ul>
           </div>

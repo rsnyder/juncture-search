@@ -56,5 +56,3 @@
   
   <style>
   </style>
-
-  ../../src/store/entities

@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, ref, toRaw, watch } from 'vue'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
 
@@ -84,7 +84,7 @@
   const width = ref(0)
   watch(width, () => { 
     clearTimeout(doLayoutDebounceTimer)
-    doLayoutDebounceTimer = setTimeout(() => doLayout(), 50)
+    // doLayoutDebounceTimer = setTimeout(() => doLayout(), 50)
   })
 
   let dialog: any
@@ -94,7 +94,7 @@
 
   const imageData = <any>ref(props.items)
   watch(imageData, async (current, prior) => {
-    // if (current.length) console.log(`ProgressiveImageGrid.imageData: size=${current.length}`)
+    if (current.length) console.log(`ProgressiveImageGrid.imageData: size=${current.length}`)
     let added = imageData.value.slice(prior?.length || 0, imageData.value.length)
     await checkImagesSizes(added)
     doLayout()
@@ -155,6 +155,7 @@
   }
 
   const layout = ref<any[]>([])
+  // watch(layout, () => { console.log(toRaw(layout.value)) })
 
   function imageSelected(index:number) {
     emit('item-selected', imageData.value[index])
@@ -238,8 +239,8 @@
 
   function toggleDepicts(image:Image) {
     if (qid.value) {
-      if (image.depicts[qid.value]) delete image.depicts[qid.value]
-      else image.depicts[qid.value] = {id: qid.value}
+      // if (image.depicts[qid.value]) delete image.depicts[qid.value]
+      // else image.depicts[qid.value] = {id: qid.value}
     }
   }
 

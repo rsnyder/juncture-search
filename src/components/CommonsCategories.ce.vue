@@ -1,12 +1,13 @@
 <template>
 
   <div ref="root">
-    <span v-html="props.label" class="title"></span> <span v-if="images" class="count">({{ images?.length.toLocaleString() }})</span>
-    <ve-pig 
+    <span v-html="props.label" class="title"></span> <span v-if="images.length > 0" class="count">({{ (provider?.total || 0).toLocaleString() }})</span>
+    <ve-pig
       :id="id"
       :active="isActive"
-      :total="images?.length || 0" 
-      :items="showing" 
+      :total="provider?.total || 0" 
+      :items="images"
+      @item-selected="itemSelected"
       @get-next="getNext" 
     ></ve-pig>
   </div>
@@ -16,15 +17,13 @@
 <script setup lang="ts">
 
   import { computed, onMounted, ref, toRaw, watch } from 'vue'
-  import { sha256 } from 'js-sha256'
-  import { Md5 } from 'ts-md5'
-  import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
   import type { Image } from '../types'
+  import { CommonsCategoryImages } from '../lib/image-providers/CommonsCategories'
 
   const store = useEntitiesStore()
-  const { active, imagesMap, qid } = storeToRefs(store)
+  const { active, qid } = storeToRefs(store)
 
   const props = defineProps({
     label: { type: String },
@@ -33,50 +32,51 @@
 
   const root = ref<HTMLElement | null>(null)
 
-  const isActive = computed(() => active.value.split('/').pop() === props.id)
-  watch(isActive, async () => {
-    if (isActive.value && qid.value !== entity.value?.id) entity.value = await store.fetch(qid.value)
-  })
-  
-  onMounted(async () => { if (isActive.value) entity.value = await store.fetch(qid.value) })
+  const refreshQarg = new URL(location.href).searchParams.get('refresh')
+  const refresh = refreshQarg !== null && ['true', '1', 'yes', ''].includes(refreshQarg.toLowerCase())
+
+  let provider
+
   watch(qid, async () => { 
+    images.value = []
     if (isActive.value) entity.value = await store.fetch(qid.value)
   })
+
   const entity = ref<any>()
-  watch(entity, () => { if (entity.value?.claims.P373) doQuery() })
-
-  const commonsCategory = computed(() => entity.value?.claims.P373 && entity.value?.claims.P373[0].mainsnak.datavalue.value.replace(/ /g,'_') )
-
-  const end = ref(0)
-  function getNext() { end.value = Math.min(end.value + 20, images.value.length) }
+  const commonsCategory = computed(() => entity.value?.claims?.P373 && entity.value?.claims.P373[0].mainsnak.datavalue.value.replace(/ /g,'_'))
 
   const images = ref<Image[]>([])
-  watch(images, () => { 
-    if (images.value.length) {
-      store.$state.imagesMap = {...imagesMap.value, ...Object.fromEntries(images.value.map((i:Image) => [i.id, i])) }
-      end.value = Math.min(20, images.value.length)
+
+  const isActive = computed(() => active.value.split('/').pop() === props.id)
+  watch(isActive, async() => {
+    if (isActive.value) {
+      if (qid.value !== entity.value?.id) {
+        images.value = []
+        entity.value = await store.fetch(qid.value)
+      } else if (!images.value.length) {
+        getNext()
+      }
     }
   })
-  
-  const showing = computed(() => { return images.value ? images.value.slice(0, end.value) : [] })
-  watch(showing, () => { if (showing.value.length ) console.log(`cc.showing=${showing.value.length}`) })
 
-  const categoryProps = {
-    'Commons gallery': 'P935',
-    'Commons category': 'P373',
-    "topic's main category": 'P910'
-  }
-
-  const imageExtensions = new Set('jpg jpeg png gif svg tif tiff'.split(' '))
-
-  async function doQuery() {
+  watch(commonsCategory, () => {
+    if (!commonsCategory.value) return
     images.value = []
-    let resp = await fetch(`/api/commons-categories/${commonsCategory.value}`)
-    if (resp.ok) {
-      let data = await resp.json()
-      images.value = data
-        .filter((item:any) => imageExtensions.has(item.url.split('.').pop().toLowerCase()))
-    }
+    provider = new CommonsCategoryImages(commonsCategory.value, refresh)
+    if (isActive.value) getNext()
+  })
+
+  onMounted(async() => {
+    entity.value = await store.fetch(qid.value)
+  })
+  
+  function getNext() { 
+    provider.next().then((next:Image[]) => { images.value = [...images.value, ...next] })
+   }
+
+  async function itemSelected(evt: CustomEvent) {
+    let id = evt.detail[0].id
+    console.log(`itemSelected: ${id}`)
   }
 
 </script>

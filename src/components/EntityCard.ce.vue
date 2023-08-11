@@ -19,7 +19,6 @@
 <script setup lang="ts">
 
   import { computed, onMounted, ref, toRaw, watch } from 'vue'
-  import { storeToRefs } from 'pinia'
   import { useEntitiesStore } from '../store/entities'
   import { Md5 } from 'ts-md5'
 

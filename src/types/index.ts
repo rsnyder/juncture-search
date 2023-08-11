@@ -9,7 +9,20 @@ interface Article {
   publication_date: string
   title: string
   volume: string
+}
 
+interface Creator {
+  id: string,
+  label: string,
+  url?: string
+}
+
+interface Depicted {
+  id: string,
+  label: string,
+  url?: string,
+  dro?: boolean,
+  prominent?: boolean
 }
 
 interface Image {
@@ -17,10 +30,8 @@ interface Image {
   aspect_ratio: number
   attribution?: string
   coords?: string
-  createdBy?: string // QID
-  creator?: string
-  creator_url?: string
-  depicts?: any
+  creator?: Creator
+  depicts?: Depicted[]
   description?: string
   detail_url?: string
   file?: string
