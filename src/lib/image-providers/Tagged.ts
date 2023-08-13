@@ -117,4 +117,8 @@ export class Tagged {
     })
   }
 
+  selected(image: Image) {
+    console.log(`${this.id}.selected: ${image.id}`)
+  }
+
 }

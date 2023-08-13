@@ -19,7 +19,7 @@ interface Creator {
 
 interface Depicted {
   id: string,
-  label: string,
+  label?: string,
   url?: string,
   dro?: boolean,
   prominent?: boolean
@@ -57,4 +57,4 @@ interface Image {
   width?: number
 }
 
-export { Article, Image } 
+export { Article, Depicted, Image } 

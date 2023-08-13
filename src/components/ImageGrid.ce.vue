@@ -1,108 +1,202 @@
 <template>
 
-  <div ref="root" id="image-grid"></div>
+  <div ref="root" id="image-grid">
+
+    <div v-if="layout.length >= imageData.length" v-for="img, idx in imageData"
+      class="pig-figure"
+      :id="imageData.id"
+      :style="layout[idx]"
+    >
+      <sl-tooltip :disabled="props.disableTooltips === 'true' ? '' : null" :content="imageData[idx].label || imageData[idx].file" hoist style="--sl-tooltip-arrow-size: 0;" placement="bottom">
+        <img class="image" onload="this.style.opacity = 1" :src="imageData[idx].thumbnail" @click="imageSelected(idx)">
+      </sl-tooltip>
+
+      <div class="caption">
+        <div class="icons">
+          <img v-if="imageData[idx].logo" class="provider-logo" :src="imageData[idx].logo" alt="Provider Logo">
+          <div class="license">
+            <sl-tooltip :disabled="props.disableTooltips === 'true' ? '' : null" :content="`License: ${licenses[imageData[idx].license]?.label}`" hoist placement="top">
+              <a :href="imageData[idx].license" target="_blank">{{ licenses[imageData[idx].license]?.shortcode || imageData[idx].license }}</a>
+            </sl-tooltip>
+          </div>
+          <sl-icon class="push" library="fa" :name="`${depictsEntity(imageData[idx]) ? 'fas' : 'far'}-thumbs-up`" @click="toggleDepicts(imageData[idx])"></sl-icon>
+          <sl-tooltip :disabled="props.disableTooltips === 'true' ? '' : null" content="Favorite" hoist placement="left">
+            <sl-icon library="fa" :name="`${imageData[idx].isFavorite ? 'fas' : 'far'}-star`" @click="toggleFavorite(imageData[idx])"></sl-icon>
+          </sl-tooltip>
+        </div>
+        <div class="size">
+          <span v-if="imageData[idx].width">{{ imageData[idx].width.toLocaleString() }} x {{ imageData[idx].height.toLocaleString() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sl-dialog class="dialog" :style="{'--width':dialogWidth}">
+    <div>
+      <ve-image-card :image="selectedImage"></ve-image-card>
+    </div>
+    <sl-button slot="footer" variant="primary" @click="selectedImage = null">Close</sl-button>
+  </sl-dialog>
 
 </template>
 
-<script setup lang="ts">
+<script setup  lang="ts">
 
-  import { computed, nextTick, onMounted, ref, toRaw, watch } from 'vue'
-  import yaml from 'js-yaml'
+  import { computed, onMounted, ref, toRaw, watch } from 'vue'
+  import { useEntitiesStore } from '../store/entities'
+  import { storeToRefs } from 'pinia'
 
-  const targetHeight = 250
-  const minWidth = 210
+  import '@shoelace-style/shoelace/dist/components/dialog/dialog.js'
+  import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js'
+
+  import type { Image } from '../types'
+  import { licenses } from '../lib/licenses'
 
   const emit = defineEmits(['item-selected', 'get-next'])
+ 
+  const store = useEntitiesStore()
+  const { qid } = storeToRefs(store)
 
   const props = defineProps({
+    total: { type: Number, default: 0 },
     items: { type: Array, default: () => [] },
     id: { type: String },
-    active: { type: Boolean, default: true }
+    active: { type: Boolean, default: true },
+    disableTooltips: { type: String }
   })
 
   watch(props, () => {
     isActive.value = props.active
-    images.value = props.items as Image[] || []
+    imageData.value = props.items as Image[] || []
   })
-
-  interface Image {
-    aspect_ratio?: number
-    attribution?: string
-    creator?: string
-    creator_url?: string
-    depicts?: string[]
-    description?: string
-    detail_url?: string
-    foreign_landing_url?: string
-    format?: string
-    id: string
-    height: number
-    license?: string
-    license_url?: string
-    license_version?: string
-    provider?: string
-    score?: number
-    source?: string
-    tags?: string[]
-    title?: string
-    thumbnail: string
-    url?: string
-    width: number
-  }
 
   const root = ref<HTMLElement | null>(null)
   const shadowRoot = computed(() => root?.value?.parentNode)
-  const grid = computed(() => shadowRoot.value?.querySelector('#image-grid') as HTMLElement)
-  const gridWidth = ref<number>(0)
 
   const isActive = ref(props.active)
 
-  const images = <any>ref(props.items)
-  watch(images, async (current, prior) => {
+  const selectedImage = ref<Image | null>(null)
+  watch(selectedImage, () => {
+    showDialog.value = selectedImage.value !== null 
+  })
+
+  let doLayoutDebounceTimer:any
+
+  const width = ref(0)
+  watch(width, () => { 
+    clearTimeout(doLayoutDebounceTimer)
+  })
+
+  let dialog: any
+  const dialogWidth = ref('80vw')
+  const showDialog = ref(false)
+  watch(showDialog, () => { dialog.open = showDialog.value })
+
+  const imageData = <any>ref(props.items)
+  watch(imageData, async (current, prior) => {
+    console.log(`ImageGrid.imageData: size=${current.length}`)
+    let added = imageData.value.slice(prior?.length || 0, imageData.value.length)
+    await checkImagesSizes(added)
+    doLayout()
+  })
+
+  function doLayout() {
+    console.log(`doLayout: width=${width.value} images=${imageData.value.length}`)
+    if (imageData.value.length === 0) return []
+
+    let numImages = imageData.value.length
+    const minAspectRatio = width.value <= 640 ? 2
+                         : width.value <= 1280 ? 4
+                         : width.value <= 1920 ? 5
+                         : 6
+
+    let _layout:any[] = []
+
+    let spaceBetweenImages = 10
+
+    let row:any[] = []
+    let translateX = 0
+    let translateY = 0
+    let rowAspectRatio = 0
+
+    // Loop through all our images, building them up into rows and computing
+    // the working rowAspectRatio.
+    imageData.value.forEach((image, index) => {
+      rowAspectRatio += image.aspect_ratio
+      row.push(image)
+
+      if (rowAspectRatio >= minAspectRatio || index + 1 === numImages) {
+
+        rowAspectRatio = Math.max(rowAspectRatio, minAspectRatio)
+
+        // Compute this row's height.
+        const totalDesiredWidthOfImages = width.value - spaceBetweenImages * (row.length - 1)
+        const rowHeight = totalDesiredWidthOfImages / rowAspectRatio
+
+        row.forEach(img => {
+          const imageWidth: number = rowHeight * img.aspect_ratio
+          _layout.push( {
+            width: `${Math.round(imageWidth)}px`,
+            height: `${Math.round(rowHeight + 50)}px`,
+            transform: `translate3d(${Math.round(translateX)}px, ${Math.round(translateY)}px, 0)`,
+          })
+          translateX += imageWidth + spaceBetweenImages
+        })
+
+        // Reset our state variables for next row.
+        row = []
+        rowAspectRatio = 0
+        translateY += rowHeight + spaceBetweenImages + 50
+        translateX = 0
+      }
+    })
+
+    if (root.value) root.value.style.height = `${translateY - spaceBetweenImages}px`
+    layout.value = _layout
+  }
+
+  const layout = ref<any[]>([])
+  // watch(layout, () => { console.log(toRaw(layout.value)) })
+
+  function imageSelected(index:number) {
+    selectedImage.value = imageData.value[index] as Image
+    console.log(`imageSelected: ${index}`, toRaw(selectedImage.value))
+    emit('item-selected', selectedImage.value)
+  }
+
+  onMounted(() => {
+    dialog = shadowRoot.value?.querySelector('.dialog')
+    dialog.addEventListener('sl-hide', (evt:CustomEvent) => showDialog.value = false )
     
-    if (!current.length) {
-      shadowRoot.value?.querySelectorAll('.grid-row').forEach((row) => row.remove())
+    let priorScrollY = 0
+    let checkGetMore = () => {
+      if (isActive.value) {
+        let scrollDirection = window.scrollY > priorScrollY ? 'down' : 'up'
+        priorScrollY = window.scrollY
+        if (scrollDirection === 'down' && window.innerHeight + window.scrollY >= document.body.offsetHeight - 2000) emit('get-next')
+      }
     }
 
-    images.value.slice(prior?.length || 0).forEach((image:Image) => {
-      // console.log(yaml.dump(image, {sortKeys: true, lineWidth: -1}))
-    })
-  
-    await checkImagesSizes(images.value.slice(prior?.length || 0))
-
-    let idx = 0
-    if (prior?.length > 0) {
-      let lastRow = Array.from(shadowRoot.value?.querySelectorAll('.grid-row') || []).pop()
-      let firstCardInLastRow = lastRow?.firstChild as HTMLElement
-      idx = images.value.findIndex((image:any) => image.id === firstCardInLastRow?.getAttribute('data-id'))
-      lastRow?.remove()
+    let debouncedScrollHandler = (func, timeout) => {
+      let timer:any
+      return () => {
+        clearTimeout(timer)
+        timer = setTimeout(() => { func() }, timeout)
+      }    
     }
 
-    while (idx < images.value.length) idx = makeRow(idx)
-
+    window.addEventListener('scroll', debouncedScrollHandler(checkGetMore, 50))
   })
 
-  onMounted(() => { 
-    window.addEventListener('scroll', () => {
-      if (props.active && window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
-        emit('get-next')
-      }
-    })
-  })
-
-
-  watch(grid, () => {
-    gridWidth.value = grid.value?.clientWidth
-    const resizeObserver = new ResizeObserver(() => {
-      if (grid.value?.clientWidth && grid.value?.clientWidth !== gridWidth.value) {
-        gridWidth.value = grid.value?.clientWidth
-        doLayout()
-      }
-    })
-    nextTick(() => {
-      const imageGrid = shadowRoot.value?.querySelector('#image-grid')
-      if (imageGrid) resizeObserver.observe(imageGrid)
-    })
+  watch(root, () => {
+    if (root.value) {
+      width.value = root.value?.clientWidth || 0
+      const resizeObserver = new ResizeObserver(() => {
+        if (root.value?.clientWidth && root.value?.clientWidth !== width.value)
+          width.value = root.value?.clientWidth
+      })
+      resizeObserver.observe(root.value)
+    }
   })
 
   async function checkImagesSizes(images:Image[]) {
@@ -117,7 +211,8 @@
         let found:any = images.find((item:any) => result.id === item.id)
         found.width = result.width
         found.height = result.height
-        found.mime = result.mime
+        found.aspect_ratio = result.aspect_ratio
+        found.format = result.format
       })
     }
   }
@@ -128,119 +223,27 @@
       img.onload = () => {
         let width = img.width < minWidth ? minWidth : img.width
         let height = img.width < minWidth ? img.height * minWidth/img.width : img.height
-        resolve({...image, width, height, mime: 'image/jpeg'})
+        let aspect_ratio = Number((width/height).toFixed(4))
+        resolve({...image, aspect_ratio, format: 'image/jpeg'})
       }
       img.onerror = () => reject()
       img.src = image.thumbnail
     })
   }
 
-  function maxImagesInRow(images: Image[], rowWidth: number, maxHeight: number, gap: number): number {
-    // console.log('maxImagesInRow', images, rowWidth, maxHeight, gap)
-    let scaledImages = images.map((image) => {
-      let scale = maxHeight / image.height;
-      return { width: image.width * scale || 200, height: maxHeight };
-    });
+  function toggleFavorite(image:Image) {
+    image.isFavorite = !image.isFavorite
+  }
 
-    let currentWidth = 0;
-    let imageCount = 0;
-    for (let i = 0; i < scaledImages.length; i++) {
-      currentWidth += scaledImages[i].width;
-      if (i !== 0) {
-        currentWidth += gap; // add the gap between images
-      }
-      if (currentWidth <= rowWidth) {
-        imageCount++;
-      } else {
-        break;
-      }
+  function depictsEntity(image:Image) {
+    return qid.value && image.depicts && image.depicts[qid.value] !== undefined
+  }
+
+  function toggleDepicts(image:Image) {
+    if (qid.value) {
+      // if (image.depicts[qid.value]) delete image.depicts[qid.value]
+      // else image.depicts[qid.value] = {id: qid.value}
     }
-    return imageCount || 1;
-  }
-
-  function calculateRowHeight(images: Image[], rowWidth: number, gap: number, padding: number) {
-    let totalOriginalWidth = images.reduce((sum, image) => sum + image.width, 0);
-    let totalGapWidth = gap * (images.length - 1) + (padding * 2) * images.length;
-    let scale = (rowWidth - totalGapWidth) / totalOriginalWidth;
-    let scaledImages = images.map(image => {
-      let origWidth = image.width || 100
-      let origHeight = image.height || 100
-      let width = Number((origWidth * scale).toFixed(0))
-      let height = Number((origHeight * scale).toFixed(0))
-      let aspectRatio =  Number((origWidth / origHeight).toFixed(3))
-      return { width, height, aspectRatio }
-    })
-
-    // Calculate the row height based on scaled images
-    let rowHeight = Math.max(...scaledImages.map(image => image.height));
-    return Number((rowHeight).toFixed(0))
-  }
-
-  function doLayout() {
-    if (!isActive || !gridWidth.value) return
-    shadowRoot.value?.querySelectorAll('.grid-row').forEach((row) => row.remove())
-    let idx = 0
-    while (idx < images.value.length && idx < images.value.length) idx = makeRow(idx)
-  }
-
-  function makeRow(idx:number, gap=20, padding=0) {
-    let max = maxImagesInRow(images.value.slice(idx) as Image[], gridWidth.value, targetHeight, gap)
-    let rowImages = images.value.slice(idx, idx + max) as Image[]
-
-    let rowHeight = calculateRowHeight(rowImages, gridWidth.value, gap, padding)
-    if (rowHeight < 0) return idx + max
-
-    // console.log(`makeRow: images: ${idx+1}-${idx + max} rowHeight: ${rowHeight}`)
-    
-    let row = document.createElement('div')
-    row.className = 'grid-row'
-    row.style.display = 'flex'
-    row.style.gap = `${gap}px`
-    row.style.marginBottom = '2rem'
-    grid.value?.appendChild(row)
-
-    for (let i = 0; i < rowImages.length; i++) {
-      let image = rowImages[i]
-      let aspect = Number((image.width/image.height).toFixed(3))
-      let width = rowHeight < targetHeight * 2
-        ? Number((rowHeight * aspect).toFixed(0))
-        : Number(((targetHeight + 100) * aspect).toFixed(0))
-      
-      // Create the image card
-      let imageCardEl = document.createElement('div')
-      imageCardEl.className = 'image-card'
-      imageCardEl.style.width = `${width}px`
-      imageCardEl.style.boxShadow = '2px 2px 4px 0 #ccc'
-      imageCardEl.style.borderRadius = '4px'
-      imageCardEl.setAttribute('data-id', image.id)
-      imageCardEl.addEventListener('click', () => emit('item-selected', image))
-
-      // let imgEl = document.createElement('img')
-      // imgEl.src = image.thumbnail
-      // imgEl.style.width = `calc(100% - ${padding * 2}px)`
-      // imageCardEl.appendChild(imgEl)
-
-      let imgEl = document.createElement('div')
-      imgEl.className = 'img'
-      imgEl.style.backgroundImage = `url('${image.thumbnail.replace(/'/g, '%27')}')`
-      imageCardEl.appendChild(imgEl)
-
-      let textEl = document.createElement('div')
-      textEl.className = 'text'
-      let textItems:string[] = []
-      textItems.push(`<div>${idx + i + 1}: ${image.id}</div>`)
-      textItems.push(`<div>${image.width} x ${image.height} (${image.aspect_ratio})</div>`)
-      if (image.title) textItems.push(`<div class="clamp">${image.title}</div>`)
-      // if (image.width) textItems.push(`<p>${image.width.toLocaleString()} x ${image.height.toLocaleString()} ${image.mime.split('/').pop()}</p>`)
-      // if (image.score) textItems.push(`<p>Score: ${image.score}</p>`)
-      textEl.innerHTML = textItems.join('')
-      imageCardEl.appendChild(textEl)
-
-      row.appendChild(imageCardEl)
-    }
-
-    return idx + max // return the index of the next image
-
   }
 
 </script>
@@ -250,13 +253,79 @@
   * { box-sizing: border-box; }
 
   #image-grid {
+    position: relative;
     margin: 2rem;    
+  }
+
+  .pig-figure {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    /* overflow: hidden; */
+    width: 100px;
+    box-shadow: 2px 2px 4px 0 #ccc;
+  }
+
+  .pig-figure:hover {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  }
+
+  .image {
+    left: 0;
+    top: 0;
+    width: 100%;
+    opacity: 0;
+    background-color: #D5D5D5;
+  }
+
+  .image:hover {
+    cursor: pointer;
+  }
+
+  .caption {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    padding: 6px 3px 3px 3px;
+  }
+
+  .icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .size {
+    width: 100%;
+    font-size: 0.8em;
+    margin-top: 3px;
+  }
+
+  .provider-logo {
+    height: 20px;
+  }
+
+  .license {
+    cursor: pointer;
+    display: inline-block;
   }
 
   .image-card {
     font-size: 0.85em;
     display: flex;
     flex-direction: column;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+  }
+
+  .title img {
+    width: 16px;
+    opacity: 1;
   }
 
   .clamp {
@@ -277,11 +346,26 @@
     padding: 0;
   }
 
-  .img {
-    width: 100%;
-    height: 200px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+  .license {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.8em;
+    margin-left: 0.5rem;
   }
+
+  a.license {
+    color: black;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  sl-icon {
+    font-size: 1.2rem;
+  }
+
+  .push {
+    margin-left: auto;
+  }
+
 </style>

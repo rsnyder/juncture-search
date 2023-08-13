@@ -8,7 +8,11 @@ export function getImages(entity:any, refresh: boolean = false, limit: number = 
 
 export class CommonsCategoryImages {
 
-  _providerId: string = 'cc'
+  id: string = 'commons-category'
+  total:number = 0
+  
+  _depicts: any = {}
+
   _providerName: string = 'Commons Category'
 
   _commonsCategory: string = ''
@@ -24,33 +28,39 @@ export class CommonsCategoryImages {
   _filters: any = []
   _imageExtensions = new Set('jpg jpeg png gif svg tif tiff'.split(' '))
 
-  total:number = 0
-
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {
     this._commonsCategory = entity.claims.P373[0].mainsnak.datavalue.value.replace(/ /g,'_')
     this._cacheKey = `cc-${this._commonsCategory}`
     this._refresh = refresh
     this._limit = limit
-    console.log(`${this._providerId}: category=${this._commonsCategory} refresh=${this._refresh} limit=${this._limit}`) 
+    console.log(`${this.id}: category=${this._commonsCategory} refresh=${this._refresh} limit=${this._limit}`) 
   }
   
   reset() {
-    this._end = 0
+    this._end = this._end > 0 ? 0 : this._end
   }
 
   async next() {
     if (this._end < 0) {
       this._end = 0
-      await this.doQuery()
+      await this._doQuery()
     }
     let start = this._end
     this._end = Math.min(this._end + 50, this._filteredAndSorted?.length || 0)
     let images = this._filteredAndSorted?.slice(start, this._end)
-    console.log(`${this._providerId}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
+    // console.log(`${this.id}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
     return images
   }
 
-  async getSubcategories(category: string, maxDepth:number = 1, depth: number = 1, subcats: string[] = []) {
+  async getDepicts() {
+    return this._depicts
+  }
+
+  imageSelected(image: Image) {
+    console.log(`${this.id}.selected: ${image.id}`)
+  }
+
+  async _getSubcategories(category: string, maxDepth:number = 1, depth: number = 1, subcats: string[] = []) {
     let url = `https://commons.wikimedia.org/w/api.php?origin=*&action=query&format=json&list=categorymembers&cmtitle=Category:${category.replace(/ /g,'_')}&cmtype=subcat&cmlimit=500`
     let resp:any = await fetch(url)
     if (resp.ok) {
@@ -58,14 +68,14 @@ export class CommonsCategoryImages {
       let subcategories = resp.query.categorymembers.map((cat:any) => cat.title.replace('Category:', ''))
       subcategories.forEach((cat:string) => subcats.push(cat))
       if (depth < maxDepth) {
-        await Promise.all(subcategories.map(async (cat:string) => this.getSubcategories(cat, maxDepth, depth + 1, subcats)))
+        await Promise.all(subcategories.map(async (cat:string) => this._getSubcategories(cat, maxDepth, depth + 1, subcats)))
         if (depth + 1 == maxDepth) return subcats
       }
     }
     return subcats
   }
 
-  async getCategoryImageIds(category:string, limit:number = 100) {
+  async _getCategoryImageIds(category:string, limit:number = 100) {
     let pageIds:string[] = []
     let extensions = new Set('jpg jpeg png gif svg tif tiff'.split(' '))
     let continueToken = ''
@@ -82,7 +92,7 @@ export class CommonsCategoryImages {
     return pageIds.slice(0, limit)
   }
 
-  async getImagesMetadata(pageIds: string[]) {
+  async _getImagesMetadata(pageIds: string[]) {
     let images:Image[] = []
 
     const batchSize = 50
@@ -104,7 +114,7 @@ export class CommonsCategoryImages {
     return images
   }
 
-  async getImagesMetadataParallel(pageIds: string[]) {
+  async _getImagesMetadataParallel(pageIds: string[]) {
     let images:Image[] = []
 
     const batchSize = 50
@@ -125,7 +135,7 @@ export class CommonsCategoryImages {
       )
     }
     await Promise.all(promises)
-    console.log(`getImagesMetadataParallel: processed ${images.length} images in ${promises.length} batches`)
+    // console.log(`getImagesMetadataParallel: processed ${images.length} images in ${promises.length} batches`)
     return images
   }
 
@@ -134,6 +144,7 @@ export class CommonsCategoryImages {
     let emd = imgInfo.extmetadata
     let file = ccPage.title.replace('File:', '')
     let image:any = {
+      api: this.id,
       id: ccPage.pageid, 
       pageid: ccPage.pageid,
       source: `https://commons.wikimedia.org/wiki/File:${file.replace(/ /g, '_').replace(/\?/g,'%3F')}`,
@@ -157,35 +168,34 @@ export class CommonsCategoryImages {
     return image
   }
 
-  async doQuery() {
-    console.log(`${this._providerId}.doQuery: category=${this._commonsCategory} refresh=${this._refresh}`)
+  async _doQuery() {
+    // console.log(`${this.id}.doQuery: category=${this._commonsCategory} refresh=${this._refresh}`)
   
     if (!this._refresh) {
       let cachedResults = await fetch(`/api/cache/${this._cacheKey}`)
       if (cachedResults.ok) {
         this._images = await cachedResults.json()
-        console.log(`fromCache=${this._images.length}`)
-        this.filterAndSort()
+        this._filterAndSort()
+        console.log(`${this.id}.doQuery: category=${this._commonsCategory} images=${this._images.length} from_cache=true`)
         return
       }
     }
   
-    let categories = [this._commonsCategory, ...(await this.getSubcategories(this._commonsCategory))]
+    let categories = [this._commonsCategory, ...(await this._getSubcategories(this._commonsCategory))]
     let pageIds:string[] = []
-    await Promise.all(categories.map((cat:string) => this.getCategoryImageIds(cat).then((ids:string[]) => pageIds = [...pageIds, ...ids])))
-    console.log(`CommonCategories: categories=${categories.length} pageIds=${pageIds.length}`)
+    await Promise.all(categories.map((cat:string) => this._getCategoryImageIds(cat).then((ids:string[]) => pageIds = [...pageIds, ...ids])))
 
-    let images = await this.getImagesMetadataParallel(pageIds)
+    let images = await this._getImagesMetadataParallel(pageIds)
 
     this.total = images.length
     this._images = images
-    console.log(`${this._providerId}.doQuery: images=${this.total}`)
+    console.log(`${this.id}.doQuery: category=${this._commonsCategory} images=${this._images.length} from_cache=false`)
   
-    this.filterAndSort()
+    this._filterAndSort()
     if (this._images?.length) this._cacheResults()
   }
 
-  filterAndSort(sortBy: string = this._sortBy, filters: any = this._filters) {
+  _filterAndSort(sortBy: string = this._sortBy, filters: any = this._filters) {
     this._sortBy = sortBy
     this._filters = filters
     this._end = 0
@@ -195,7 +205,7 @@ export class CommonsCategoryImages {
       this._filteredAndSorted = [...this._filteredAndSorted.sort((a: any, b: any) => b.size - a.size)]
     if (this._limit >= 0) this._filteredAndSorted = this._filteredAndSorted.slice(0, this._limit)
     this.total = this._filteredAndSorted.length
-    console.log(`${this._providerId}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
+    // console.log(`${this.id}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
     return this
   }
 

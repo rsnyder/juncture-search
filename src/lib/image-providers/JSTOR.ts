@@ -7,7 +7,11 @@ export function getImages(entity:any, refresh: boolean = false, limit: number = 
 
 export class JSTOR {
 
-  _providerId: string = 'jstor'
+  id: string = 'jstor'
+  total:number = 0
+  
+  _depicts: any = {}
+
   _providerName: string = 'JSTOR'
   _searchEndpoint = '/api/search/jstor/basic'
   _pager:string = ''
@@ -26,18 +30,17 @@ export class JSTOR {
   _filters: any = []
   _imageExtensions = new Set('jpg jpeg png gif svg tif tiff'.split(' '))
   _fetching = false
-  total:number = 0
 
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {
     this._entity = entity
-    this._cacheKey = `${this._providerId}-${this._entity.id}`
+    this._cacheKey = `${this.id}-${this._entity.id}`
     this._refresh = refresh
     this._limit = limit
-    console.log(`${this._providerId}: qid=${this._entity.id} refresh=${this._refresh} limit=${this._limit}`)
+    console.log(`${this.id}: qid=${this._entity.id} refresh=${this._refresh} limit=${this._limit}`)
   }
 
   reset() {
-    this._end = 0
+    this._end = this._end > 0 ? 0 : this._end
   }
 
   async next(): Promise<Image[]> {
@@ -48,8 +51,16 @@ export class JSTOR {
     let start = this._end
     this._end = Math.min(this._end + 50, this._filteredAndSorted?.length || 0)
     let images = this._filteredAndSorted?.slice(start, this._end)
-    console.log(`${this._providerId}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
+    // console.log(`${this.id}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
     return images
+  }
+
+  async getDepicts() {
+    return this._depicts
+  }
+
+  imageSelected(image: Image) {
+    console.log(`${this.id}.selected: ${image.id}`)
   }
 
   async doQuery() {
@@ -58,9 +69,8 @@ export class JSTOR {
       let cachedResults = await fetch(`/api/cache/${this._cacheKey}`)
       if (cachedResults.ok) {
         this._images = await cachedResults.json()
-        // console.log(`fromCache=${this._images.length}`)
         this.filterAndSort()
-        console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=true`)
+        console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=true`)
         return
       }
     }
@@ -105,12 +115,12 @@ export class JSTOR {
   
     this.filterAndSort()
     if (this._images?.length) this._cacheResults()
-    console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
-
+    // console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
   }
 
   _transformItem(item: any): any {
     let doc: any = {
+      api: this.id,
       id: item.doi, 
       provider: 'JSTOR',
       logo: 'https://about.jstor.org/wp-content/themes/aboutjstor2017/static/JSTOR_Logo2017_90.png',
@@ -144,7 +154,7 @@ export class JSTOR {
       this._filteredAndSorted = [...this._filteredAndSorted.sort((a: any, b: any) => b.size - a.size)]
     if (this._limit >= 0) this._filteredAndSorted = this._filteredAndSorted.slice(0, this._limit)
     this.total = this._filteredAndSorted.length
-    console.log(`${this._providerId}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
+    // console.log(`${this._providerId}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
     return this
   }
 

@@ -2,7 +2,7 @@
 
   <div ref="root" id="image-grid">
 
-    <div v-if="layout.length > 0" v-for="img, idx in imageData"
+    <div v-if="layout.length >= imageData.length" v-for="img, idx in imageData"
       class="pig-figure"
       :id="imageData.id"
       :style="layout[idx]"
@@ -40,9 +40,9 @@
 
 </template>
 
-<script setup lang="ts">
+<script setup  lang="ts">
 
-  import { computed, onMounted, ref, toRaw, watch } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
 
@@ -84,7 +84,6 @@
   const width = ref(0)
   watch(width, () => { 
     clearTimeout(doLayoutDebounceTimer)
-    // doLayoutDebounceTimer = setTimeout(() => doLayout(), 50)
   })
 
   let dialog: any
@@ -160,6 +159,7 @@
   function imageSelected(index:number) {
     emit('item-selected', imageData.value[index])
     selectedImage.value = imageData.value[index] as Image
+    console.log(`imageSelected: ${index}`, selectedImage.value)
   }
 
   onMounted(() => { 

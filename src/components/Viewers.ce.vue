@@ -25,6 +25,8 @@
       </sl-tab-panel>
 
       <sl-tab-panel name="images">
+        <ve-images label="Aggregated Images" id="images"></ve-images>
+        <!--
         <sl-tab-group placement="start">
           <sl-tab slot="nav" panel="images" :active="activeViewer === 'images' ? '' : null">Images</sl-tab>
           <sl-tab slot="nav" panel="tagged" :active="activeViewer === 'tagged' ? '' : null">Tagged</sl-tab>
@@ -63,6 +65,7 @@
             <ve-commons-categories label="Commons Categories" id="cc"></ve-commons-categories>
           </sl-tab-panel>
         </sl-tab-group>
+        -->
       </sl-tab-panel>
 
       <sl-tab-panel name="documents">
@@ -134,12 +137,17 @@
   const group = ref()
   const viewer = ref()
   watch(group, () => { if (group.value && viewer.value) store.setActive(`${group.value}/${viewer.value}`) })
-  watch(viewer, () => { if (group.value && viewer.value) store.setActive(`${group.value}/${viewer.value}`) })
+  watch(viewer, () => { 
+    if (group.value && viewer.value) store.setActive(`${group.value}/${viewer.value}`)
+    else if (group.value) store.setActive(`${group.value}`)
+  })
 
   function init(root: HTMLElement) {
     observer = new MutationObserver((mutationsList) => {
       mutationsList
-        .filter(rec => rec.attributeName === 'active' && rec.target.nodeName === 'SL-TAB-PANEL')
+        .filter(rec => rec.attributeName === 'active')
+        // .filter (rec => {console.log(rec); return true;})
+        // .filter(rec => rec.target.nodeName === 'SL-TAB-PANEL')
         .map(rec => rec.target as HTMLElement)
         .filter(el => el.getAttribute('active') !== null)
         .forEach(el => {
@@ -148,8 +156,10 @@
           } else {
             viewer.value = undefined
             group.value = el.getAttribute('name')
-            let found = Array.from(el.children[0].children).find((c:any) => c.active && c.nodeName === 'SL-TAB-PANEL')
-            if (found) viewer.value = found.getAttribute('name') || undefined
+            let found = el.children.length && Array.from(el.children[0].children).find((c:any) => c.active && c.nodeName === 'SL-TAB-PANEL')
+            // if (found) viewer.value = found.getAttribute('name') || undefined
+            if (found) viewer.value = found ? found.getAttribute('name') : undefined
+
             // else viewer.value = defaults[group.value]
           }
         })

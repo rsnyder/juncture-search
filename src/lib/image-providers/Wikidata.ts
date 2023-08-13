@@ -1,6 +1,7 @@
-import type { Image } from '../../types'
+import type { Image, Depicted } from '../../types'
 import { licenseUrl } from '../licenses'
 import { mwImage } from '../../../functions/mw-utils'
+import { toRaw } from 'vue'
 
 export function getImages(entity:any, refresh: boolean = false, limit: number = -1) {
   return new Wikidata(entity, refresh, limit)
@@ -8,7 +9,11 @@ export function getImages(entity:any, refresh: boolean = false, limit: number = 
 
 export class Wikidata {
 
-  _providerId: string = 'wd'
+  id: string = 'wikidata'
+  total:number = 0
+  
+  _depicts: any = {}
+
   _providerName: string = 'Wikidata'
 
   _qid: string = ''
@@ -23,8 +28,6 @@ export class Wikidata {
   _sortBy = 'score'
   _filters: any = []
   _imageExtensions = new Set('jpg jpeg png gif svg tif tiff'.split(' '))
-
-  total:number = 0
 
   _sparql_template = `
     SELECT ?item ?label ?description ?copyright ?depicts ?depictsLabel ?rank ?creator ?creatorLabel ?iiif ?url WHERE {
@@ -58,43 +61,59 @@ export class Wikidata {
   `
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {
     this._qid = entity.id
-    this._cacheKey = `${this._providerId}-${this._qid}`
+    this._cacheKey = `${this.id}-${this._qid}`
     this._refresh = refresh
     this._limit = limit
-    console.log(`${this._providerId}: qid=${this._qid} refresh=${this._refresh} limit=${this._limit}`)
+    console.log(`${this.id}: qid=${this._qid} refresh=${this._refresh} limit=${this._limit}`)
   }
 
   reset() {
-    this._end = 0
+    this._end = this._end > 0 ? 0 : this._end
   }
 
   async next(): Promise<Image[]> {
     if (this._end < 0) {
       this._end = 0
-      await this.doQuery()
+      await this._doQuery()
     }
     let start = this._end
     this._end = Math.min(this._end + 50, this._filteredAndSorted?.length || 0)
     let images = this._filteredAndSorted?.slice(start, this._end)
-    console.log(`${this._providerId}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
+    // console.log(`${this.id}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
     return images
   }
 
-  async doQuery() {
+  async getDepicts() {
+    if (this._end < 0) {
+      this._end = 0
+      await this._doQuery()
+    }
+    this._images.forEach((img:Image) => {
+      (img.depicts || []).forEach(d => {
+        if (this._depicts[d.id] )this._depicts[d.id]++
+        else this._depicts[d.id] = 1
+      })
+    })
+    return this._depicts
+  }
+  
+  imageSelected(image: Image) {
+    console.log(`${this.id}.selected: ${image.id}`)
+  }
+
+  async _doQuery() {
   
     if (!this._refresh) {
       let cachedResults = await fetch(`/api/cache/${this._cacheKey}`)
       if (cachedResults.ok) {
         this._images = await cachedResults.json()
-        // console.log(`fromCache=${this._images.length}`)
-        this.filterAndSort()
-        console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=true`)
+        this._filterAndSort()
+        console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=true`)
         return
       }
     }
   
     let query = this._sparql_template.replace(/{{qid}}/g, this._qid).trim()
-    // console.log(query)
     let resp = await fetch(`https://query.wikidata.org/sparql?query=${encodeURIComponent(query)}`, {
       headers: { Accept: 'application/sparql-results+json'}
     })
@@ -103,7 +122,6 @@ export class Wikidata {
       let data = {}
       _resp.results.bindings.map(b => {
         try {
-          // console.log(b)
           let id = b.item.value.split('/').pop()
           let file = decodeURIComponent(b.url.value.split('/').pop())
           if (!data[id]) data[id] = {
@@ -116,7 +134,7 @@ export class Wikidata {
             url: mwImage(file),
             thumbnail: mwImage(file, 400),
             iiif: b.iiif?.value || `https://iiif.juncture-digital.org/wc:${file.replace(/\s/g,'_')}/manifest.json`,
-            depicts: {},
+            depicts: [],
           }
           let isPublicDomain = b.copyright?.value.split('/').pop() === 'Q19652'
           let license = licenseUrl(b.license?.value.replace(/http:/, 'https:').replace(/\/$/, '') || (isPublicDomain ? 'PD' : 'unknown'))
@@ -126,11 +144,12 @@ export class Wikidata {
           if (b.description?.value) data[id].description = b.description.value
           if (b.creator) data[id].creator = { id: b.creator.value.split('/').pop(), label: b.creatorLabel?.value }
     
-          let depicted = b.depicts?.value.split('/').pop()
-          if (depicted) {
-            data[id].depicts[depicted] = { id: depicted, label: b.depictsLabel?.value || depicted }
-            if (b.rank?.value.split('#').pop().replace('Rank', '') === 'Preferred') data[id].depicts[depicted].prominent = true
-            if (b.dro?.value.split('/').pop() === depicted) data[id].depicts[depicted].dro = true
+          let depictedId = b.depicts?.value.split('/').pop()
+          if (depictedId) {
+            let depicted:Depicted = { id: depictedId, label: b.depictsLabel?.value || depictedId}
+            if (b.rank?.value.split('#').pop().replace('Rank', '') === 'Preferred') depicted.prominent = true
+            if (b.dro?.value.split('/').pop() === depicted) depicted.dro = true
+            data[id].depicts.push(depicted)
           }
     
         } catch (e) {
@@ -141,14 +160,16 @@ export class Wikidata {
       let images = this._scoreImages(
         Object.values(data).filter((item:any) => this._imageExtensions.has(item.url.split('.').pop().toLowerCase()))
       )
-      this.total = images.length
+      images = images.filter(i => i.license !== 'UNKNOWN')
       await this._getImageInfo(images)
-      this._images = images.filter(i => i.license !== 'UNKNOWN')
+      this.total = images.length
+      this._images = images
+      console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
     }
   
-    this.filterAndSort()
+    this._filterAndSort()
     if (this._images?.length) this._cacheResults()
-    console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
+    // console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
 
   }
 
@@ -157,7 +178,6 @@ export class Wikidata {
     for (let i=0; i < infoNeeded.length; i += 50) {
       let titles = infoNeeded.slice(i, i + 50).map(i => `File:${i.file?.replace(/ /g, '_').replace(/\?/g,'%3F')}`).join('|')
       let url = `https://commons.wikimedia.org/w/api.php?origin=*&format=json&action=query&titles=${titles}&prop=imageinfo&iiprop=extmetadata|size|mime`
-      // console.log(url)
       let resp:any = await fetch(url)
       if (resp.ok) {
         let _resp = await resp.json()
@@ -176,7 +196,7 @@ export class Wikidata {
     return images
   }
 
-  filterAndSort(sortBy: string = this._sortBy, filters: any = this._filters) {
+  _filterAndSort(sortBy: string = this._sortBy, filters: any = this._filters) {
     this._sortBy = sortBy
     this._filters = filters
     this._end = 0
@@ -186,7 +206,7 @@ export class Wikidata {
       this._filteredAndSorted = [...this._filteredAndSorted.sort((a: any, b: any) => b.size - a.size)]
     if (this._limit >= 0) this._filteredAndSorted = this._filteredAndSorted.slice(0, this._limit)
     this.total = this._filteredAndSorted.length
-    console.log(`${this._providerId}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
+    // console.log(`${this._providerId}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
     return this
   }
 

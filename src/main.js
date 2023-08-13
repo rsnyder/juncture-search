@@ -31,6 +31,7 @@ import EntityInfoboxes from './components/EntityInfoboxes.ce.vue'
 import Flickr from './components/Flickr.ce.vue'
 import Images from './components/Images.ce.vue'
 import ImageCard from './components/ImageCard.ce.vue'
+import ImageGrid from './components/ImageGrid.ce.vue'
 import JstorCC from './components/JstorCC.ce.vue'
 import LanguageSelector from './components/LanguageSelector.ce.vue'
 import Markdown from './components/Markdown.ce.vue'
@@ -60,13 +61,14 @@ customElements.define('ve-entity-infoboxes', defineCustomElement(EntityInfoboxes
 customElements.define('ve-flickr', defineCustomElement(Flickr))
 customElements.define('ve-images', defineCustomElement(Images))
 customElements.define('ve-image-card', defineCustomElement(ImageCard))
+customElements.define('ve-image-grid', defineCustomElement(ImageGrid))
 customElements.define('ve-jstor-cc', defineCustomElement(JstorCC))
 customElements.define('ve-language-selector', defineCustomElement(LanguageSelector))
 customElements.define('ve-markdown', defineCustomElement(Markdown))
 customElements.define('ve-modal', defineCustomElement(Modal))
 customElements.define('ve-openverse', defineCustomElement(Openverse))
 customElements.define('ve-pal', defineCustomElement(ProgressiveArticlesList))
-customElements.define('ve-pig', defineCustomElement(ProgressiveImageGrid))
+customElements.define('ve-progressive-image-grid', defineCustomElement(ProgressiveImageGrid))
 customElements.define('ve-referencing', defineCustomElement(Referencing))
 customElements.define('ve-sites', defineCustomElement(Sites))
 customElements.define('ve-statements', defineCustomElement(Statements))

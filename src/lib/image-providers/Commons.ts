@@ -1,6 +1,7 @@
 import type { Image } from '../../types'
 import { licenseUrl } from '../licenses'
 import { mwImage } from '../../../functions/mw-utils'
+import { toRaw } from 'vue'
 
 export function getImages(entity:any, refresh: boolean = false, limit: number = -1) {
   return new WikimediaCommons(entity, refresh, limit)
@@ -8,7 +9,11 @@ export function getImages(entity:any, refresh: boolean = false, limit: number = 
 
 export class WikimediaCommons {
 
-  _providerId: string = 'wc'
+  id: string = 'commons'
+  total:number = 0
+  
+  _depicts: any = {}
+
   _providerName: string = 'Wikimedia Commons'
 
   _qid: string = ''
@@ -24,14 +29,12 @@ export class WikimediaCommons {
   _filters: any = []
   _imageExtensions = new Set('jpg jpeg png gif svg tif tiff'.split(' '))
 
-  total:number = 0
-
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {
     this._qid = entity.id
-    this._cacheKey = `${this._providerId}-${this._qid}`
+    this._cacheKey = `${this.id}-${this._qid}`
     this._refresh = refresh
     this._limit = limit
-    console.log(`${this._providerId}: qid=${this._qid} refresh=${this._refresh} limit=${this._limit}`)
+    console.log(`${this.id}: qid=${this._qid} refresh=${this._refresh} limit=${this._limit}`)
   }
 
   reset() {
@@ -41,24 +44,42 @@ export class WikimediaCommons {
   async next(): Promise<Image[]> {
     if (this._end < 0) {
       this._end = 0
-      await this.doQuery()
+      await this._doQuery()
     }
     let start = this._end
     this._end = Math.min(this._end + 50, this._filteredAndSorted?.length || 0)
     let images = this._filteredAndSorted?.slice(start, this._end)
-    console.log(`${this._providerId}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
+    // console.log(`${this.id}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
     return images
   }
 
-  async doQuery() {
-    console.log(`${this._providerId}.doQuery: qid=${this._qid} refresh=${this._refresh}`)
+  async getDepicts() {
+    if (this._end < 0) {
+      this._end = 0
+      await this._doQuery()
+    }
+    this._images.forEach((img:Image) => {
+      (img.depicts || []).forEach(d => {
+        if (this._depicts[d.id])this._depicts[d.id]++
+        else this._depicts[d.id] = 1
+      })
+    })
+    return this._depicts
+  }
+
+  imageSelected(image: Image) {
+    console.log(`${this.id}.selected: ${image.id}`)
+  }
+
+  async _doQuery() {
+    // console.log(`${this.id}.doQuery: qid=${this._qid} refresh=${this._refresh}`)
   
     if (!this._refresh) {
       let cachedResults = await fetch(`/api/cache/${this._cacheKey}`)
       if (cachedResults.ok) {
         this._images = await cachedResults.json()
-        console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=true`)
-        this.filterAndSort()
+        console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=true`)
+        this._filterAndSort()
         return
       }
     }
@@ -71,7 +92,6 @@ export class WikimediaCommons {
 
     while (sroffset != undefined) {
       let url = `https://commons.wikimedia.org/w/api.php?origin=*&action=query&list=search&srsearch=haswbstatement:P180=${this._qid}|P170=${this._qid}&srnamespace=6&format=json&srlimit=${srlimit}&sroffset=${sroffset}`
-      console.log(url)
       let resp: any = await fetch(url)
       if (resp.ok) {
         resp = await resp.json()
@@ -95,6 +115,7 @@ export class WikimediaCommons {
           let emd = imgInfo.extmetadata
           let file = page.title.replace('File:', '')
           let image:any = {
+            api: this.id,
             id: page.pageid, 
             pageid: page.pageid,
             source: `https://commons.wikimedia.org/wiki/File:${file.replace(/ /g, '_').replace(/\?/g,'%3F')}`,
@@ -106,7 +127,8 @@ export class WikimediaCommons {
             width: imgInfo.width,
             height: imgInfo.height,
             format: imgInfo.mime.split('/').pop().toUpperCase(),
-            aspect_ratio: Number((imgInfo.width/imgInfo.height).toFixed(2))
+            aspect_ratio: Number((imgInfo.width/imgInfo.height).toFixed(2)),
+            depicts: [{id: this._qid }],
           }
 
           if (emd.ImageDescription) image.description = emd.ImageDescription.value
@@ -120,16 +142,17 @@ export class WikimediaCommons {
         })
       }
       this.total = images.length
+
       this._images = images
     }
   
-    this.filterAndSort()
-    if (this._images?.length) this._cacheResults()
-    console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
+    this._filterAndSort()
+    if (this._images?.length) this._cacheResults() 
+    // console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
 
   }
 
-  filterAndSort(sortBy: string = this._sortBy, filters: any = this._filters) {
+  _filterAndSort(sortBy: string = this._sortBy, filters: any = this._filters) {
     this._sortBy = sortBy
     this._filters = filters
     this._end = 0
@@ -139,7 +162,7 @@ export class WikimediaCommons {
       this._filteredAndSorted = [...this._filteredAndSorted.sort((a: any, b: any) => b.size - a.size)]
     if (this._limit >= 0) this._filteredAndSorted = this._filteredAndSorted.slice(0, this._limit)
     this.total = this._filteredAndSorted.length
-    console.log(`${this._providerId}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
+    // console.log(`${this.id}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
     return this
   }
 
