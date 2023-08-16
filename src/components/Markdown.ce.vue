@@ -99,10 +99,10 @@
   // watch(content, () => console.log(toRaw(content.value)))
 
   onMounted(async () =>  {
-    let mdUrl = process.env.mode === 'development' 
+    let mdUrl = process.env.NODE_ENV === 'development' 
       ? `pages/${language.value}/${props.page}.md` 
       : `https://raw.githubusercontent.com/juncture-digital/search/main/public/pages/${language.value}/${props.page}.md`
-    console.log(`mode=${process.env.mode} mdUrl=${mdUrl}`)
+    // console.log(`mode=${process.env.NODE_ENV} mdUrl=${mdUrl}`)
     markdown.value = await getMarkdown(mdUrl)
   })
 

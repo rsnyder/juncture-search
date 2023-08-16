@@ -1,33 +1,15 @@
 import type { Image, Depicted } from '../../types'
 import { licenseUrl } from '../licenses'
 import { mwImage } from '../../../functions/mw-utils'
-import { toRaw } from 'vue'
+import { ImageProvider } from './ImageProvider'
 
-export function getImages(entity:any, refresh: boolean = false, limit: number = -1) {
-  return new Wikidata(entity, refresh, limit)
-}
-
-export class Wikidata {
+export class Wikidata extends ImageProvider {
 
   id: string = 'wikidata'
-  total:number = 0
+  name: string = 'Wikidata'
+  logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
   
-  _depicts: any = {}
-
-  _providerName: string = 'Wikidata'
-
-  _qid: string = ''
-  _cacheKey: string = ''
-  _refresh: boolean = false
-  _end = -1
-  _limit = -1
-
-  _images: Image[] = []
-  _filteredAndSorted: Image[] = []
-  
-  _sortBy = 'score'
-  _filters: any = []
-  _imageExtensions = new Set('jpg jpeg png gif svg tif tiff'.split(' '))
+  _fetching: boolean = false
 
   _sparql_template = `
     SELECT ?item ?label ?description ?copyright ?depicts ?depictsLabel ?rank ?creator ?creatorLabel ?iiif ?url WHERE {
@@ -60,33 +42,17 @@ export class Wikidata {
     }
   `
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {
-    this._qid = entity.id
-    this._cacheKey = `${this.id}-${this._qid}`
-    this._refresh = refresh
-    this._limit = limit
-    console.log(`${this.id}: qid=${this._qid} refresh=${this._refresh} limit=${this._limit}`)
+    super(entity, refresh, limit)
   }
 
-  reset() {
-    this._end = this._end > 0 ? 0 : this._end
-  }
-
-  async next(): Promise<Image[]> {
-    if (this._end < 0) {
-      this._end = 0
-      await this._doQuery()
-    }
-    let start = this._end
-    this._end = Math.min(this._end + 50, this._filteredAndSorted?.length || 0)
-    let images = this._filteredAndSorted?.slice(start, this._end)
-    // console.log(`${this.id}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
-    return images
+  hasMore() {
+    return this._cursor < this._images.length || this._hasMore
   }
 
   async getDepicts() {
-    if (this._end < 0) {
-      this._end = 0
+    if (this._cursor < 0) {
       await this._doQuery()
+      this._cursor = 0
     }
     this._images.forEach((img:Image) => {
       (img.depicts || []).forEach(d => {
@@ -96,20 +62,20 @@ export class Wikidata {
     })
     return this._depicts
   }
-  
-  imageSelected(image: Image) {
-    console.log(`${this.id}.selected: ${image.id}`)
-  }
 
   async _doQuery() {
-  
+    // if (this._fetching) return
+    let self = this
+    this._fetching = true
+
+    this._hasMore = false
     if (!this._refresh) {
-      let cachedResults = await fetch(`/api/cache/${this._cacheKey}`)
+      let cacheKey = `${this.id}-${this._qid}`
+      let cachedResults = await fetch(`/api/cache/${cacheKey}`)
       if (cachedResults.ok) {
         this._images = await cachedResults.json()
         this._filterAndSort()
-        console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=true`)
-        return
+        this._fetching = false
       }
     }
   
@@ -145,12 +111,13 @@ export class Wikidata {
           if (b.creator) data[id].creator = { id: b.creator.value.split('/').pop(), label: b.creatorLabel?.value }
     
           let depictedId = b.depicts?.value.split('/').pop()
-          if (depictedId) {
-            let depicted:Depicted = { id: depictedId, label: b.depictsLabel?.value || depictedId}
-            if (b.rank?.value.split('#').pop().replace('Rank', '') === 'Preferred') depicted.prominent = true
-            if (b.dro?.value.split('/').pop() === depicted) depicted.dro = true
+          let depicted = data[id].depicts.find(d => d.id === depictedId)
+          if (!depicted) {
+            depicted = { id: depictedId, label: b.depictsLabel?.value || depictedId}
             data[id].depicts.push(depicted)
           }
+          if (b.rank?.value.split('#').pop().replace('Rank', '') === 'Preferred') depicted.prominent = true
+          if (b.dro?.value.split('/').pop() === depictedId) depicted.dro = true
     
         } catch (e) {
           console.trace(e)
@@ -162,15 +129,12 @@ export class Wikidata {
       )
       images = images.filter(i => i.license !== 'UNKNOWN')
       await this._getImageInfo(images)
-      this.total = images.length
       this._images = images
-      console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
+      this._fetching = false
     }
   
     this._filterAndSort()
     if (this._images?.length) this._cacheResults()
-    // console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
-
   }
 
   async _getImageInfo(images:Image[]) {
@@ -194,38 +158,6 @@ export class Wikidata {
       }
     }
     return images
-  }
-
-  _filterAndSort(sortBy: string = this._sortBy, filters: any = this._filters) {
-    this._sortBy = sortBy
-    this._filters = filters
-    this._end = 0
-    if (this._sortBy === 'score')
-      this._filteredAndSorted = [...this._images.sort((a: any, b: any) => b.score - a.score)]
-    else if (this._sortBy === 'size')
-      this._filteredAndSorted = [...this._filteredAndSorted.sort((a: any, b: any) => b.size - a.size)]
-    if (this._limit >= 0) this._filteredAndSorted = this._filteredAndSorted.slice(0, this._limit)
-    this.total = this._filteredAndSorted.length
-    // console.log(`${this._providerId}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
-    return this
-  }
-
-  _cacheResults() {
-    fetch(`/api/cache/${this._cacheKey}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this._images)
-    })
-  }
-
-  _scoreImages(images) {
-    return images.map(img => {
-      img.score = 0
-      if (img.imageQualityAssessment === 'featured') img.score += 3
-      else if (img.imageQualityAssessment === 'quality') img.score += 2
-      else if (img.imageQualityAssessment === 'valued') img.score += 1
-      return img
-    })
   }
 
 }

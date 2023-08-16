@@ -6,7 +6,6 @@ import { sha256 } from 'js-sha256'
 
 function tokenIsValid(expiration:number) {
   let isExpired = expiration <= Date.now()
-  console.log(`tokenIsValid=${!isExpired}`)
   return !isExpired
 }
 

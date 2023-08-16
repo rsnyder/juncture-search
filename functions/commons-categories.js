@@ -53,7 +53,6 @@ export async function handler(event) {
         headers: { 'User-Agent': 'Juncture Image Search' }
       })
     let statusCode = resp.status
-    console.log(`/api/commons-categories: category=${category} status=${statusCode}`)
     if (!resp.ok) return { statusCode: resp.status, body: resp.statusText }
 
     resp = await resp.json()

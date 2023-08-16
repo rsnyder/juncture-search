@@ -83,8 +83,9 @@
   let doLayoutDebounceTimer:any
 
   const width = ref(0)
-  watch(width, () => { 
+  watch(width, () => {
     clearTimeout(doLayoutDebounceTimer)
+    if (width.value) doLayoutDebounceTimer = setTimeout(doLayout, 100)
   })
 
   let dialog: any
@@ -94,14 +95,14 @@
 
   const imageData = <any>ref(props.items)
   watch(imageData, async (current, prior) => {
-    console.log(`ImageGrid.imageData: size=${current.length}`)
+    // console.log(`ImageGrid.imageData: size=${current.length}`)
     let added = imageData.value.slice(prior?.length || 0, imageData.value.length)
     await checkImagesSizes(added)
     doLayout()
   })
 
   function doLayout() {
-    console.log(`doLayout: width=${width.value} images=${imageData.value.length}`)
+    // console.log(`doLayout: width=${width.value} images=${imageData.value.length}`)
     if (imageData.value.length === 0) return []
 
     let numImages = imageData.value.length
@@ -160,7 +161,6 @@
 
   function imageSelected(index:number) {
     selectedImage.value = imageData.value[index] as Image
-    console.log(`imageSelected: ${index}`, toRaw(selectedImage.value))
     emit('item-selected', selectedImage.value)
   }
 
@@ -185,7 +185,7 @@
       }    
     }
 
-    window.addEventListener('scroll', debouncedScrollHandler(checkGetMore, 50))
+    window.addEventListener('scroll', debouncedScrollHandler(checkGetMore, 100))
   })
 
   watch(root, () => {

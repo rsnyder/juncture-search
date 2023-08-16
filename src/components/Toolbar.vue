@@ -6,9 +6,8 @@
       <span v-if="title" v-html="title"></span>
     </div>
     <ve-wikidata-search></ve-wikidata-search>
-    <ve-language-selector></ve-language-selector>
+    <!-- <ve-language-selector></ve-language-selector> -->
     <ve-auth></ve-auth>
-    <!--<ve-theme-selector></ve-theme-selector> -->
   </div>
   
 </template>
@@ -40,8 +39,6 @@
 
   const version = ref(process.env.npm_package_version)
   const mode = ref(process.env.NODE_ENV)
-
-  console.log(`version=${version.value} mode=${mode.value}`)
 
 </script>
 

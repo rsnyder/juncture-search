@@ -10,7 +10,7 @@
         
         <div>
           <sl-select id="depictedFilter" label="Select a Few" pill hoist multiple clearable>
-            <sl-option v-for="(ct, qid) in depicts" :value="qid">{{ labels[qid] || qid }}</sl-option>
+            <sl-option v-for="(ct, qid) in depicts" :value="qid">{{ labels[qid] || qid }} ({{ ct }})</sl-option>
           </sl-select>
           <span>Sort by: </span>
           
@@ -69,6 +69,7 @@
   import { WikimediaCommons } from '../lib/image-providers/Commons'
   import { CommonsCategoryImages } from '../lib/image-providers/CommonsCategories'
   import { JSTOR } from '../lib/image-providers/JSTOR'
+  import { Openverse } from '../lib/image-providers/Openverse'
   import { Flickr } from '../lib/image-providers/Flickr'
   import { BHL } from '../lib/image-providers/BHL'
 
@@ -95,35 +96,26 @@
     initProviders()
   })
 
-  let _providers = [
-    { class: Wikidata, tag: 'Wikimedia Commons'},
-    { class: WikimediaCommons, tag: 'Wikimedia Commons'},
-    { class: CommonsCategoryImages, tag: 'Wikimedia Commons'},
-    { class: JSTOR, tag: 'JSTOR'},
-    { class: BHL, tag: 'BHL'},
-    { class: Flickr, tag: 'Flickr'},
+  let imageProviders = [
+    { class: Wikidata, tag: 'Wikimedia Commons', enabled: false},
+    { class: WikimediaCommons, tag: 'Wikimedia Commons', enabled: true},
+    { class: CommonsCategoryImages, tag: 'Wikimedia Commons', enabled: false},
+    { class: JSTOR, tag: 'JSTOR', enabled: false},
+    { class: BHL, tag: 'BHL', enabled: false},
+    { class: Flickr, tag: 'Flickr', enabled: false},
+    { class: Openverse, tag: 'Openverse', enabled: false},
   ]
   const providers = ref<any[]>([])
-  const providersEnabled = ref<any>({'Wikimedia Commons': true, 'JSTOR': true, 'BHL': true, 'Flickr': true})
-  watch(providers, () => {
-    if (isActive.value) getNext()
-  })  
+  const providersEnabled = ref<any>({})
+  watch(providers, () => { if (isActive.value) getNext() })  
 
   function initProviders(limit = -1) {
-    providers.value = _providers.map(p => ({ instance: new p.class(entity.value, refresh, limit), tag: p.tag, hasMore: true }))
-    providers.value.forEach(p => {
-      p.instance.getDepicts().then((depicted: any) => {
-        let updated = {...depicts.value}
-        let qids = Object.keys(depicted)
-        if (qids.length === 0) return
-        console.log(p.instance.id, toRaw(depicted))
-        for (let qid of qids) {
-          if (updated[qid]) updated[qid] += depicted[qid]
-          else updated[qid] = depicted[qid]
-        }
-        depicts.value = updated
-      })
-    })
+    providers.value = imageProviders
+      .filter(p => p.enabled)
+      .map(p => ({ instance: new p.class(entity.value, refresh, limit), tag: p.tag }))
+    providersEnabled.value = imageProviders
+      .filter(p => p.enabled)
+      .reduce((acc, p) => { acc[p.tag] = p.enabled; return acc }, {})
   }
 
   const sortby = ref<string>()
@@ -132,16 +124,16 @@
 
   const depictsFilter = ref<string[]>([])
   watch(depictsFilter, () => {
-    console.log(`depictsFilter=${depictsFilter.value}`)
+    c// onsole.log(`depictsFilter=${depictsFilter.value}`)
   })
 
   const createdBy = ref<boolean>(false)
   watch(createdBy, () => {
-    console.log(`createdBy=${createdBy.value}`)
+    // console.log(`createdBy=${createdBy.value}`)
   })
 
   watch(isActive, async () => {
-    console.log(`Images.isActive=${isActive.value} qid=${qid.value}`)
+    // console.log(`Images.isActive=${isActive.value} qid=${qid.value}`)
     if (isActive.value) {
       if (qid.value !== entity.value?.id) {
         images.value = []
@@ -153,13 +145,13 @@
   })
 
   watch(qid, async () => { 
-    console.log(`Images.watch.qid: isActive=${isActive.value} qid=${qid.value}`)
+    // console.log(`Images.watch.qid: isActive=${isActive.value} qid=${qid.value}`)
     images.value = []
     if (isActive.value) entity.value = await store.fetch(qid.value)
   })
 
   onMounted(async () => {
-    console.log(`Images.noMounted=${isActive.value} qid=${qid.value}`)
+    // console.log(`Images.noMounted=${isActive.value} qid=${qid.value}`)
     shadowRoot.value?.querySelector('#createdBy')?.addEventListener('sl-change', (e: any) => { createdBy.value = e.target.checked })
     shadowRoot.value?.querySelector('#depictedFilter')?.addEventListener('sl-change', (e: any) => {
       let depictsSelect = e.target as SlSelect
@@ -169,22 +161,43 @@
     entity.value = await store.fetch(qid.value)
   })
 
+  const depictsProcessed = new Set()
+  function getDepicts(provider: any) {
+    if (depictsProcessed.has(provider.id)) return
+    provider.getDepicts().then((depicted: any) => {
+      let updated = {...depicts.value}
+      let qids = Object.keys(depicted)
+      if (qids.length === 0) return
+      for (let qid of qids) {
+        if (updated[qid]) updated[qid] += depicted[qid]
+        else updated[qid] = depicted[qid]
+      }
+      depicts.value = updated
+    })
+    depictsProcessed.add(provider.id)
+  }
+
+  let initial = true
+  let fetching = false
   async function getNext() {
-    // console.log(`Images.getNext: isActive=${isActive.value} qid=${qid.value}`)
+    if (fetching) return
+    fetching = true
     let toAdd = 0
     for (let provider of providers.value) {
-      let tag = provider.tag
-      let enabled = providersEnabled.value[tag]
-      let hasMore = provider.hasMore
-      // console.log(`provider=${provider.tag} enabled=${enabled} hasMore=${hasMore}`)
-      if (!enabled || !hasMore) continue
-      let providerImages = await provider.instance.next()
-      toAdd += providerImages.length
-      images.value = [...images.value, ...providerImages]
-      if (providerImages.length === 50) break
-      provider.hasMore = false
+      if (providersEnabled.value[provider.tag]) {
+        while (provider.instance.hasMore() && toAdd < 50) {
+          let providerImages = await provider.instance.next()
+          if (initial) getDepicts(provider.instance)
+          if (providerImages.length === 0) break
+          images.value = [...images.value, ...providerImages]
+          toAdd += providerImages.length
+        }
+        if (initial) getDepicts(provider.instance)
+        if (toAdd >= 50 && !initial) break
+      }
     }
-    // images.value = [...images.value, ...toAdd]
+    initial = false
+    fetching = false
   }
 
   function setProviders(e: any) {
@@ -202,20 +215,21 @@
   const images = ref<Image[]>([])
   watch(images, () => {
     store.$state.imagesMap = {...imagesMap.value, ...Object.fromEntries(images.value.map((i:Image) => [i.id, i])) }
+    if (images.value.length === 0) depicts.value = {}
   })
 
   const depicts = ref<any>({})
   watch (depicts, () => {
-    console.log('depicts', toRaw(depicts.value))
+    // console.log('depicts', toRaw(depicts.value))
     store.updateLabels(Object.keys(depicts.value))
   })
 
   function itemSelected(e: any) {
     let selectedImage = e.detail[0]
-    console.log('itemSelected',selectedImage)
     let provider = providers.value.find(p => p.instance.id === selectedImage.api).instance
-    console.log('provider',provider)
-    provider.imageSelected(selectedImage)
+    provider.imageSelected(selectedImage).then(qids => { 
+      if (qids?.length > 0) store.updateLabels(qids) 
+    })
   }
 
 </script>

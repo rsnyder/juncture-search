@@ -31,6 +31,7 @@ export async function handler(event, context, callback) {
   .catch(err => {
     console.log(err)
   })
+  console.log(resp.status, resp.statusText)
   if (resp.ok) {
     resp = await resp.json()
     return { statusCode: 200, body: JSON.stringify(resp)}

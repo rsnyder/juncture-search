@@ -1,6 +1,6 @@
 <template>
 
-  <sl-tab-group>
+  <sl-tab-group ref="root">
     <sl-tab slot="nav" panel="formatted">Formatted</sl-tab>
     <sl-tab slot="nav" panel="raw">Raw</sl-tab>
  
@@ -9,6 +9,14 @@
         
         <div id="image">
           <img :src="image?.thumbnail" :alt="image.title" />
+          <div v-if="image.depicts">
+            <h4>Depicted entities</h4>
+            <ul>
+              <li v-for="depict in image.depicts" :data-qid="depict.id" :key="depict.id">
+                <div>{{ depict.label || labels[depict.id] }}</div>
+              </li>
+            </ul>
+          </div>
         </div>
         
         <div id="metadata">
@@ -122,6 +130,7 @@
   import { storeToRefs } from 'pinia'
 
   import '@shoelace-style/shoelace/dist/components/icon/icon.js'
+  import '@shoelace-style/shoelace/dist/components/popup/popup.js'
   import '@shoelace-style/shoelace/dist/components/tab/tab.js'
   import '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js'
   import '@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js'
@@ -146,6 +155,7 @@
 
   const root = ref<HTMLElement | null>(null)
   const host = computed(() => (root.value?.getRootNode() as any)?.host)
+  const shadowRoot = computed(() => root?.value?.parentNode)
 
   const image = computed(() => props.image as Image)
 
@@ -178,6 +188,11 @@
   :host {
     display:inline-block;
     width: 100%;
+  }
+
+  #image {
+    display: flex;
+    gap: 1rem;
   }
 
   #image img {

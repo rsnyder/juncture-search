@@ -1,80 +1,37 @@
+import { ImageProvider } from './ImageProvider'
 import type { Image } from '../../types'
-import { licenseUrl } from '../licenses'
 
-export function getImages(entity:any, refresh: boolean = false, limit: number = -1) {
-  return new JSTOR(entity, refresh, limit)
-}
-
-export class JSTOR {
+export class JSTOR extends ImageProvider {
 
   id: string = 'jstor'
-  total:number = 0
+  name: string = 'JSTOR'
+  logo: string = 'https://about.jstor.org/wp-content/themes/aboutjstor2017/static/JSTOR_Logo2017_90.png'
   
-  _depicts: any = {}
-
-  _providerName: string = 'JSTOR'
   _searchEndpoint = '/api/search/jstor/basic'
   _pager:string = ''
 
-  _entity: any
-  _qid: string = ''
-  _cacheKey: string = ''
-  _refresh: boolean = false
-  _end = -1
-  _limit = -1
-
-  _images: Image[] = []
-  _filteredAndSorted: Image[] = []
-  
-  _sortBy = 'score'
-  _filters: any = []
-  _imageExtensions = new Set('jpg jpeg png gif svg tif tiff'.split(' '))
-  _fetching = false
+  _pageSize = 100
 
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {
-    this._entity = entity
-    this._cacheKey = `${this.id}-${this._entity.id}`
-    this._refresh = refresh
-    this._limit = limit
-    console.log(`${this.id}: qid=${this._entity.id} refresh=${this._refresh} limit=${this._limit}`)
+    super(entity, refresh, limit)
   }
 
-  reset() {
-    this._end = this._end > 0 ? 0 : this._end
+  async imageSelected(image: Image): Promise<string[]> {
+    if (image.width && image.height) return []
+
+    // Fetch info.json file to get image dimensions
+    return fetch(`/api/jstor/${image.id}`)
+      .then((resp:any) => resp.json())
+      .then((imageInfo:any) => {
+        image.width = imageInfo.width
+        image.height = imageInfo.height
+        return []
+      })
+      // .catch(err => console.error(err))
+
   }
 
-  async next(): Promise<Image[]> {
-    if (this._end < 0) {
-      this._end = 0
-      await this.doQuery()
-    }
-    let start = this._end
-    this._end = Math.min(this._end + 50, this._filteredAndSorted?.length || 0)
-    let images = this._filteredAndSorted?.slice(start, this._end)
-    // console.log(`${this.id}.next end=${this._end} images=${this._filteredAndSorted.length} returned=${images.length}`)
-    return images
-  }
-
-  async getDepicts() {
-    return this._depicts
-  }
-
-  imageSelected(image: Image) {
-    console.log(`${this.id}.selected: ${image.id}`)
-  }
-
-  async doQuery() {
-  
-    if (!this._refresh) {
-      let cachedResults = await fetch(`/api/cache/${this._cacheKey}`)
-      if (cachedResults.ok) {
-        this._images = await cachedResults.json()
-        this.filterAndSort()
-        console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=true`)
-        return
-      }
-    }
-  
+  async _doQuery() {
     let label = this._entity.label.indexOf(' ') > 0 ? `"${this._entity.label}"^2` : `${this._entity.label}^2`
     let aliases = this._entity.aliases.map((alias:string) => alias.indexOf(' ') > 0 ? `"${alias}"^1` : `${alias}^1`)
     
@@ -87,7 +44,7 @@ export class JSTOR {
 
     let searchArgs: any = {
       query,
-      limit: 20,
+      limit: this._pageSize,
       tokens: ['16124', '24905214', '25794673', '24905191', '25794673', '24905216'],
       filter_queries: [
         // 'ps_subject:*',
@@ -106,24 +63,26 @@ export class JSTOR {
     })
     if (resp.ok) {
       resp = await resp.json()
+      if (resp.results.length < this._pageSize) this._hasMore = false
       if (resp.paging && resp.paging.next) this._pager = resp.paging.next
       results = {total: resp.total || 0, items: resp.results}
       let updated: any = [...this._images || [], ...results.items.map((item: any) => this._transformItem(item))]
       this._images = updated
-      this.total = results.total
+    } else {
+      this._hasMore = false
     }
   
-    this.filterAndSort()
+    this._filterAndSort()
     if (this._images?.length) this._cacheResults()
-    // console.log(`${this._providerId}.doQuery: qid=${this._qid} images=${this._images.length} from_cache=false`)
+    // console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} hasMore=${this._hasMore}`)
   }
 
   _transformItem(item: any): any {
     let doc: any = {
       api: this.id,
       id: item.doi, 
-      provider: 'JSTOR',
-      logo: 'https://about.jstor.org/wp-content/themes/aboutjstor2017/static/JSTOR_Logo2017_90.png',
+      provider: this.name,
+      logo: this.logo,
     }
     doc.url = `https://www.jstor.org/stable/${item.doi.indexOf('10.2307') === 0 ? item.doi.slice(8) : item.doi}`
     if (item.item_title) doc.label = item.item_title
@@ -142,38 +101,6 @@ export class JSTOR {
     else doc.license = item.cc_reuse_license[0]
     doc.thumbnail = `https://www.jstor.org/api/cached/thumbnails/202003101501/byitem/${item.id}/0`
     return doc
-  }
-
-  filterAndSort(sortBy: string = this._sortBy, filters: any = this._filters) {
-    this._sortBy = sortBy
-    this._filters = filters
-    this._end = 0
-    if (this._sortBy === 'score')
-      this._filteredAndSorted = [...this._images.sort((a: any, b: any) => b.score - a.score)]
-    else if (this._sortBy === 'size')
-      this._filteredAndSorted = [...this._filteredAndSorted.sort((a: any, b: any) => b.size - a.size)]
-    if (this._limit >= 0) this._filteredAndSorted = this._filteredAndSorted.slice(0, this._limit)
-    this.total = this._filteredAndSorted.length
-    // console.log(`${this._providerId}.filterAndSort: sortby=${this._sortBy} images=${this.total}`)
-    return this
-  }
-
-  _cacheResults() {
-    fetch(`/api/cache/${this._cacheKey}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this._images)
-    })
-  }
-
-  _scoreImages(images) {
-    return images.map(img => {
-      img.score = 0
-      if (img.imageQualityAssessment === 'featured') img.score += 3
-      else if (img.imageQualityAssessment === 'quality') img.score += 2
-      else if (img.imageQualityAssessment === 'valued') img.score += 1
-      return img
-    })
   }
 
 }

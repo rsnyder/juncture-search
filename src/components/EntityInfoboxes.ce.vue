@@ -23,7 +23,7 @@
   })
 
   watch(infoboxTargets, () => {
-    // console.log(`infoboxTargets=${Object.keys(infoboxTargets.value).length} language=${language.value}`)
+    // console.log(`infoboxTargets=${Object.keys(infoboxTargets.value).length}`)
     initTippy(Object.values(infoboxTargets.value))
   })
 
@@ -49,7 +49,7 @@
     nextTick(() => {
       infoboxTargets.value = Object.fromEntries(Array.from(
         root.querySelectorAll('[data-qid]'))
-        .map(el => [el.id, el])
+        .map(el => [(el as HTMLElement).dataset.qid, el])
       )
     })
   }
@@ -65,7 +65,7 @@
         targets, {
         allowHTML: true,
         interactive: true,
-        delay: [200, null],
+        delay: [100, null],
         placement: 'auto',
         theme: 'light-border',
         touch: 'hold',

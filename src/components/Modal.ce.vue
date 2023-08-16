@@ -66,7 +66,6 @@
 
   function getMetadata() {
     let url = `https://bgsnochsrl.execute-api.us-east-1.amazonaws.com/prod/metadata/${props.doi}`
-    console.log(`Fetching ${url}`)
     fetch(url).then(resp => resp.json()).then(data => metadata.value = data)
   }
 

@@ -264,7 +264,8 @@
 
       </tr>
     </table>
-    <ve-entity-infoboxes></ve-entity-infoboxes>
+    
+    <!--<ve-entity-infoboxes></ve-entity-infoboxes>-->
 
   </div>
   

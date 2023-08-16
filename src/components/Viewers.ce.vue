@@ -25,7 +25,7 @@
       </sl-tab-panel>
 
       <sl-tab-panel name="images">
-        <ve-images label="Aggregated Images" id="images"></ve-images>
+        <ve-images label="Images" id="images"></ve-images>
         <!--
         <sl-tab-group placement="start">
           <sl-tab slot="nav" panel="images" :active="activeViewer === 'images' ? '' : null">Images</sl-tab>

@@ -38,7 +38,7 @@ interface Image {
   foreign_landing_url?: string
   format?: string
   id: string
-  iiif: string  // IIIF manifest URL
+  iiif?: string  // IIIF manifest URL
   imageQualityAssessment?: string
   isFavorite?: boolean
   height?: number
@@ -46,7 +46,7 @@ interface Image {
   logo?: string   // provider logo
   pageid?: string
   provider?: string  // name of provider
-  raw: object
+  raw?: object
   score?: number
   size?: number
   source?: string

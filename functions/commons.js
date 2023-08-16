@@ -49,6 +49,7 @@ export async function handler(event) {
 
   const qid = event.path.split('/').filter(pe => pe).pop()
   let query = SPARQL.replace(/{{qid}}/g, qid).trim()
+  // console.log(query)
   resp = await fetch(cookieJar, `https://commons-query.wikimedia.org/sparql?query=${encodeURIComponent(query)}`, {
     headers: {
       Accept: 'application/sparql-results+json',
@@ -72,7 +73,7 @@ export async function handler(event) {
       if (!data[id]) data[id] = {
         api: 'commons',
         id,
-        pageid: id.slice(1),
+        pageid: Number(id.slice(1)),
         file,
         source: `https://commons.wikimedia.org/wiki/File:${file.replace(/ /g, '_').replace(/\?/g,'%3F')}`,
         provider: 'Wikimedia Commons',
@@ -96,12 +97,15 @@ export async function handler(event) {
       if (b.description?.value) data[id].description = b.description.value
       if (b.quality?.value) data[id].imageQualityAssessment = commonsImageQualityAssessment[b.quality.value.split('/').pop()]
 
-      let depicted = b.depicts?.value.split('/').pop()
-      if (depicted) {
-        data[id].depicts[depicted] = { id: depicted }
-        if (b.rank?.value.split('#').pop().replace('Rank', '') === 'Preferred') data[id].depicts[depicted].prominent = true
-        if (b.dro?.value.split('/').pop() === depicted) data[id].depicts[depicted].dro = true
+      let depictsId = b.depicts?.value?.split('/').pop()
+      let depicted = data[id].depicts.find(d => d.id === depictsId)
+      if (!depicted) {
+        depicted = { id: depictsId }
+        data[id].depicts.push(depicted)
       }
+      if (b.rank?.value.split('#').pop().replace('Rank', '') === 'Preferred') depicted.prominent = true
+      if (b.dro?.value.split('/').pop() === depicted.id) depicted.dro = true
+  
     } catch (e) {
       console.trace(e)
       console.log(b)

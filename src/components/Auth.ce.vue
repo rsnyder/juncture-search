@@ -38,8 +38,6 @@
 
   onMounted(async () => {
     netlifyIdentity.on('init', _user => store.setUser(_user))
-    // netlifyIdentity.on('open', () => console.log('Widget opened'))
-    // netlifyIdentity.on('close', () => console.log('Widget closed'))
     netlifyIdentity.on('error', err => console.error('Error', err))
     netlifyIdentity.on('login', _user => {
       store.setUser(_user)
@@ -50,13 +48,8 @@
   })
 
   watch(user, () => {
-    console.log('auth.user', toRaw(user.value))
     if (user.value) localStorage.setItem('user', JSON.stringify(user.value))
     else if (localStorage.getItem('user')) localStorage.removeItem('user')
-  })
-
-  watch(userid, () => {
-    console.log(`userid=${userid.value}`)
   })
 
   function login() {
@@ -73,7 +66,6 @@
     if (!_user) return Promise.resolve(null)
     if (!isLoggedIn.value) {
       // keep users logged in
-      console.log('refreshing token')
       const formData = new FormData()
       formData.append('grant_type', 'refresh_token')
       formData.append('refresh_token', _user.token.refresh_token)
@@ -81,7 +73,6 @@
         method : 'POST',
         body : formData
       }).then(x=>x.json()).then((newToken: any) => {
-        console.log('newToken', newToken)
         _user.token.access_token=newToken.access_token
         _user.token.refresh_token=newToken.refresh_token
         _user.token.expires_at = (jwt_decode(newToken.access_token) as any).exp * 1000
