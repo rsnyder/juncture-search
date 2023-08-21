@@ -69,6 +69,8 @@
       </sl-tab-panel>
 
       <sl-tab-panel name="documents">
+        <ve-articles label="articles" id="articles"></ve-articles>
+        <!--
         <sl-tab-group placement="start">
           <sl-tab slot="nav" panel="jstor-docs" :active="activeViewer === 'jstor-docs' ? '' : null">JSTOR</sl-tab>
           <sl-tab slot="nav" panel="wd-docs" :active="activeViewer === 'wd-docs' ? '' : null">Wikidata</sl-tab>
@@ -83,6 +85,7 @@
             <ve-template label="Internet Archive" id="ia"></ve-template>
           </sl-tab-panel>
         </sl-tab-group>
+      -->
       </sl-tab-panel>
 
       <sl-tab-panel name="related">

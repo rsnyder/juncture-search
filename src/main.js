@@ -21,6 +21,7 @@ registerIconLibrary('fa', {
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js'
 setBasePath('https://raw.githubusercontent.com//juncture-digital/search/main/src')
 
+import ArticlesList from './components/ArticlesList.ce.vue'
 import Auth from './components/Auth.ce.vue'
 import Claims from './components/Claims.ce.vue'
 import EntityCard from './components/EntityCard.ce.vue'
@@ -32,7 +33,6 @@ import ImageGrid from './components/ImageGrid.ce.vue'
 import LanguageSelector from './components/LanguageSelector.ce.vue'
 import Markdown from './components/Markdown.ce.vue'
 import Modal from './components/Modal.ce.vue'
-import ProgressiveArticlesList from './components/ProgressiveArticlesList.ce.vue'
 import Referencing from './components/Referencing.ce.vue'
 import Sites from './components/Sites.ce.vue'
 import Statements from './components/Statements.ce.vue'
@@ -41,6 +41,7 @@ import Viewers from './components/Viewers.ce.vue'
 import WikidataScholarlyArticles from './components/WikidataScholarlyArticles.ce.vue'
 import WikidataSearch from './components/WikidataSearch.ce.vue'
 
+customElements.define('ve-articles', defineCustomElement(ArticlesList))
 customElements.define('ve-auth', defineCustomElement(Auth))
 customElements.define('ve-claims', defineCustomElement(Claims))
 customElements.define('ve-entity-card', defineCustomElement(EntityCard))
@@ -52,7 +53,7 @@ customElements.define('ve-image-grid', defineCustomElement(ImageGrid))
 customElements.define('ve-language-selector', defineCustomElement(LanguageSelector))
 customElements.define('ve-markdown', defineCustomElement(Markdown))
 customElements.define('ve-modal', defineCustomElement(Modal))
-customElements.define('ve-pal', defineCustomElement(ProgressiveArticlesList))
+customElements.define('ve-pal', defineCustomElement(ArticlesList))
 customElements.define('ve-referencing', defineCustomElement(Referencing))
 customElements.define('ve-sites', defineCustomElement(Sites))
 customElements.define('ve-statements', defineCustomElement(Statements))
