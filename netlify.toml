@@ -1,7 +1,7 @@
 [functions]
   directory = "./functions"
-  node_bundler = "esbuild"
-  external_node_modules = ["mongodb"]
+  # node_bundler = "esbuild"
+  # external_node_modules = ["mongodb"]
 
 [[redirects]]
   from = "/api/*"
