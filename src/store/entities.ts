@@ -24,6 +24,7 @@ export const useEntitiesStore = defineStore('entities', {
   state: () => ({
     active: '',
     allLabels: {},
+    articlesMap: {},
     entity: <Entity>{},
     entityData: {},
     fetching: false,

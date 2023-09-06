@@ -1,14 +1,45 @@
+interface ArticleProvider {
+  id: string
+  reset(): void
+  hasMore(): boolean
+  next(): Promise<Article[]>
+  getMainSubjects(): Promise<MainSubjectsCount>
+  articleSelected(article: Article): void
+}
+
+interface MainSubject {
+  id: string,
+  label: string
+}
+
+type MainSubjectsCount = {
+  [key: string]: number
+}
+
+type Person = {
+  id?: string,
+  label: string
+}
+
+type Publication = {
+  id?: string,
+  label: string
+}
+
 interface Article {
-  authors: string[]
+  api: string
+  authors?: Person[]
+  citation_line?: string
   doi: string
   id: string
-  issue: string
-  main_subject: any[]
-  pages: string
-  publication: string
-  publication_date: string
-  title: string
-  volume: string
+  issue?: string
+  main_subjects?: MainSubject[]
+  pages?: string
+  publications?: Publication[]
+  publication_date?: Date
+  title?: string
+  url: string
+  volume?: string
 }
 
 interface Creator {
@@ -57,4 +88,4 @@ interface Image {
   width?: number
 }
 
-export { Article, Depicted, Image } 
+export { Article, ArticleProvider, Depicted, Image, MainSubject, MainSubjectsCount } 

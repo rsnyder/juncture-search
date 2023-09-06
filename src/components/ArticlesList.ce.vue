@@ -3,13 +3,13 @@
   <div ref="root" id="articles-list">
     <ul>
       <li v-for="article, idx in articles" :key="qid" @click="articleSelected(article)">
-        <div>
-          <span class="idx">{{ idx }}.&nbsp;&nbsp;</span>
-          <span v-html="article.title[0]['@value']"></span>
+        <div class="flex">
+          <span class="w-10 mr-2 text-right">{{ idx + 1 }}.</span>
+          <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" :href="article.url" target="_blank" v-html="article?.title || 'Untitled'"></a>
         </div>
-        <ul class="subjects">
+        <!--<ul class="subjects">
           <li v-for="subject in article['main subject']" :key="subject['@id']" v-html="subject.label"></li>
-        </ul>
+        </ul>-->
       </li>
     </ul>
   </div>
@@ -75,10 +75,10 @@
   watch(showDialog, () => { dialog.open = showDialog.value })
 
   const articles = ref<Article[]>(props.articles as Article[])
-  watch(articles, () => { if (articles.value.length > 0) console.log(toRaw(articles.value)) })
+  // watch(articles, () => { if (articles.value.length > 0) console.log(toRaw(articles.value)) })
 
   function doLayout() {
-    console.log('doLayout')
+    // console.log('doLayout')
   }
 
   function articleSelected(article:Article) {
@@ -124,17 +124,5 @@
 </script>
 
 <style>
-
-  * { box-sizing: border-box; }
-
-  #articles-list li {
-    min-height: 2rem;
-    list-style: none;
-  }
-
-  .subjects li {
-    display: inline-block;
-    margin-right: 0.5rem;
-  }
-
+  @import '../tailwind.css';
 </style>

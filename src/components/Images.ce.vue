@@ -124,7 +124,7 @@
 
   const depictsFilter = ref<string[]>([])
   watch(depictsFilter, () => {
-    c// onsole.log(`depictsFilter=${depictsFilter.value}`)
+    console.log(`depictsFilter=${depictsFilter.value}`)
   })
 
   const createdBy = ref<boolean>(false)

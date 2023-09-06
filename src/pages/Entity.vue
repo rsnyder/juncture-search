@@ -12,7 +12,7 @@
     
   <script setup lang="ts">
   
-    import { watch } from 'vue'
+    import { onMounted, toRaw, watch } from 'vue'
     import { useRouter, useRoute } from 'vue-router'
     import Toolbar from '../components/Toolbar.vue'
 
@@ -29,7 +29,7 @@
 
     store.setQid(Array.isArray(route.params.qid) ? route.params.qid[0] : route.params.qid )
     store.setLanguage((Array.isArray(route.query.lang) ? route.query.lang[0] : route.query.lang) || 'en')
-    let tab = (Array.isArray(route.query.tab) ? route.query.tab[0] : route.query.tab) || 'images/images'
+    let tab = (Array.isArray(route.query.tab) ? route.query.tab[0] : route.query.tab) || 'images'
     store.setActive(tab)
 
     watch(route, () => {
@@ -39,15 +39,26 @@
       store.setLanguage(language)
     })
 
+    onMounted(() => {
+      if (route.query.tab) {
+        let tab = (Array.isArray(route.query.tab) ? route.query.tab[0] : route.query.tab) || 'images'
+        store.setActive(tab)
+      }
+      else {
+        store.setActive('images')
+      }
+    })
+
     watch(qid, () => { if (qid.value) setRoute(qid.value, language.value, active.value) })
     watch(language, () => { if (qid.value) setRoute(qid.value, language.value, active.value) })
     watch(active, () => { if (qid.value) setRoute(qid.value, language.value, active.value) })
 
   function setRoute(qid:string, lang:string, tab:string) {
+    // console.log('setRoute', qid, lang, tab)
     let options:any = { name: 'entity', params: { qid } }
     let query:any = {}
     if (lang !== 'en') query.lang = lang
-    if (tab !== 'data/wd-statements') query.tab = tab
+    if (tab !== 'images') query.tab = tab
     if (Object.keys(query).length > 0) options.query = query
     router.push(options)
   }

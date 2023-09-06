@@ -5,7 +5,7 @@ import { ImageProvider } from './ImageProvider'
 
 export class Wikidata extends ImageProvider {
 
-  id: string = 'wikidata'
+  id: string = 'wikidata-images'
   name: string = 'Wikidata'
   logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
   

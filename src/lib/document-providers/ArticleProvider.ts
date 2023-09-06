@@ -1,6 +1,7 @@
-import type { Article } from '../../types'
+import type { Article, MainSubject, MainSubjectsCount } from '../../types'
+import type { ArticleProvider } from '../../types'
 
-export class ArticleProvider {
+export class ArticleProviderBase implements ArticleProvider {
 
   id: string = 'article-provider'
   name: string = 'Article Provider'
@@ -15,7 +16,7 @@ export class ArticleProvider {
   _cursor = -1
   _hasMore: boolean = true
   _limit = -1
-  _mainSubjects: any = {}
+  _mainSubjects: MainSubjectsCount = {}
 
   _sortBy = 'score'
   _filters: any = []
@@ -66,7 +67,6 @@ export class ArticleProvider {
       }
     }
   
-    
     this._articles = []
     this._filterAndSort()
 

@@ -24,8 +24,14 @@
       code(code, language) {
         // Use custom juncture renderer.
         if (language === 'juncture') {
-          console.log(code)
-          return `<div class="juncture">${code}</div>`;
+          console.log(marked.parse('<h1>Title</h1>', {mangle: false, headerIds: false}))
+          // return `<div class="juncture">${code}</div>`;
+          return `<ve-header title="Test" color="#990001">
+              <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+              </ul>
+            </ve-header>`
         }
 
         // Use default code renderer.
@@ -46,7 +52,13 @@
   })
 
   watch(route, () => { getMarkdown() })
-  onMounted(() => { getMarkdown() })
+  onMounted(() => {
+    const wcScript = document.createElement('script')
+    wcScript.setAttribute('src', 'https://jstor-labs.github.io/tailwind-preline/dist/js/index.js')
+    wcScript.setAttribute('type', 'module')
+    document.head.appendChild(wcScript)
+    getMarkdown() 
+  })
 
   function getMarkdown() {
     let owner = route.params.owner
