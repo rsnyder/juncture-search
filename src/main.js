@@ -22,6 +22,7 @@ registerIconLibrary('fa', {
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js'
 setBasePath('https://raw.githubusercontent.com//juncture-digital/search/main/src')
 
+import ArticleCard from './components/ArticleCard.ce.vue'
 import Articles from './components/Articles.ce.vue'
 import ArticlesList from './components/ArticlesList.ce.vue'
 import Auth from './components/Auth.ce.vue'
@@ -36,6 +37,7 @@ import LanguageSelector from './components/LanguageSelector.ce.vue'
 import Menu from './components/Menu.ce.vue'
 import Markdown from './components/Markdown.ce.vue'
 import Modal from './components/Modal.ce.vue'
+import ModalTWP from './components/ModalTWP.ce.vue'
 import Referencing from './components/Referencing.ce.vue'
 import Sites from './components/Sites.ce.vue'
 import Statements from './components/Statements.ce.vue'
@@ -44,6 +46,7 @@ import Viewers from './components/Viewers.ce.vue'
 import WikidataScholarlyArticles from './components/WikidataScholarlyArticles.ce.vue'
 import WikidataSearch from './components/WikidataSearch.ce.vue'
 
+customElements.define('ve-article-card', defineCustomElement(ArticleCard))
 customElements.define('ve-articles', defineCustomElement(Articles))
 customElements.define('ve-articles-list', defineCustomElement(ArticlesList))
 customElements.define('ve-auth', defineCustomElement(Auth))
@@ -58,6 +61,7 @@ customElements.define('ve-language-selector', defineCustomElement(LanguageSelect
 customElements.define('ve-markdown', defineCustomElement(Markdown))
 customElements.define('ve-menu', defineCustomElement(Menu))
 customElements.define('ve-modal', defineCustomElement(Modal))
+customElements.define('ve-modal-twp', defineCustomElement(ModalTWP))
 customElements.define('ve-pal', defineCustomElement(ArticlesList))
 customElements.define('ve-referencing', defineCustomElement(Referencing))
 customElements.define('ve-sites', defineCustomElement(Sites))

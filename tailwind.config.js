@@ -4,7 +4,9 @@ export default {
   content: [
     './index.html', 
     './src/**/*.{html,vue,js}', 
-    'node_modules/preline/dist/*.js'],
+    'node_modules/preline/dist/*.js',
+    './node_modules/flowbite/**/*.js'
+  ],
   darkMode: 'class',
   theme: {
     extend: {
@@ -16,6 +18,7 @@ export default {
     }
   },
   plugins: [
-    preline
+    preline,
+    require('flowbite/plugin')
   ]
 }
