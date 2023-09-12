@@ -97,13 +97,13 @@
   })
 
   let imageProviders = [
-    { class: Wikidata, tag: 'Wikimedia Commons', enabled: false},
+    { class: Wikidata, tag: 'Wikimedia Commons', enabled: true},
     { class: WikimediaCommons, tag: 'Wikimedia Commons', enabled: true},
-    { class: CommonsCategoryImages, tag: 'Wikimedia Commons', enabled: false},
-    { class: JSTOR, tag: 'JSTOR', enabled: false},
-    { class: BHL, tag: 'BHL', enabled: false},
-    { class: Flickr, tag: 'Flickr', enabled: false},
-    { class: Openverse, tag: 'Openverse', enabled: false},
+    { class: CommonsCategoryImages, tag: 'Wikimedia Commons', enabled: true},
+    { class: JSTOR, tag: 'JSTOR', enabled: true},
+    { class: BHL, tag: 'BHL', enabled: true},
+    { class: Flickr, tag: 'Flickr', enabled: true},
+    { class: Openverse, tag: 'Openverse', enabled: true},
   ]
   const providers = ref<any[]>([])
   const providersEnabled = ref<any>({})
@@ -185,6 +185,7 @@
     let toAdd = 0
     for (let provider of providers.value) {
       if (providersEnabled.value[provider.tag]) {
+        console.log('getNext', provider.instance.id, provider.instance.hasMore())
         while (provider.instance.hasMore() && toAdd < 50) {
           let providerImages = await provider.instance.next()
           if (initial) getDepicts(provider.instance)

@@ -64,6 +64,7 @@ export class Wikidata extends ImageProvider {
   }
 
   async _doQuery() {
+    console.log('do query')
     // if (this._fetching) return
     let self = this
     this._fetching = true

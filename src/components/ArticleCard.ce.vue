@@ -1,22 +1,12 @@
 <script setup lang="ts">
 
-import { computed, onMounted, PropType, ref, toRaw, watch } from 'vue'
+import { PropType, ref } from 'vue'
 import { Article } from '../types'
 
 const root = ref<HTMLElement | null>(null)
-const host = computed(() => (root.value?.getRootNode() as any)?.host)
-const shadowRoot = computed(() => root?.value?.parentNode as HTMLElement)
 
 const props = defineProps({
   article: Object as PropType<Article>
-})
-
-onMounted(() => {
-  console.log('ArticleCard', props.article)
-})
-
-watch(props, () => {
-  console.log('ArticleCard', props.article)
 })
 
 </script>

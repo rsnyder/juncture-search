@@ -1,6 +1,18 @@
 <template>
 
-  <ve-entity-card v-if="qid" :qid="qid"></ve-entity-card>
+  <ve-entity-grid aspect-base="2">
+    <ul>
+      <li>Q171497</li>
+      <li>Q34687</li>
+      <li>Q5194627</li>
+      
+      <li>Q157211</li>
+      <li>Q5582</li>
+      <li>Q20265518</li>
+      <li>Q127216</li>
+      
+    </ul>
+  </ve-entity-grid>
   
 </template>
     
@@ -8,7 +20,6 @@
 
   import { onMounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
-  import EntityCard from '../components/EntityCard.vue'
 
   const route = useRoute()
 

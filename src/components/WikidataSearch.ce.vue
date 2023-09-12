@@ -1,6 +1,11 @@
 <template>
 
   <div ref="root" class="wikidata-search flex w-full">
+    
+    <select ref="lang" class="px-2 block bg-slate-100 border-gray-100 text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
+      <option v-for="lang in languages" :key="lang.code" :value="lang.code" :title="lang.tooltip" :selected="lang.code === 'en' ? '' : null" v-html="lang.label"></option>
+    </select>
+    
     <div id="autocompleteContainer" class="autocomplete__container" role="combobox">
       <input
         id="autocompleteInput"
@@ -37,31 +42,13 @@
     </div>
   </div>
 
-  <!--
-  <div class="flex items-center justify-center">   
-    <label for="simple-search" class="sr-only">Search</label>
-    <div class="relative w-full max-w-[500px]">
-      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"/>
-        </svg>
-      </div>
-      <input type="text" @keyup="inputHandler" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search branch name..." required>
-    </div>
-  </div>
-  -->
-
 </template>
   
 <script setup lang="ts">
 
-  import { computed, onMounted, ref, watch } from 'vue'
-
-
+  import { computed, onMounted, ref, toRaw, watch } from 'vue'
   import { useEntitiesStore } from '../store/entities'
-  import { storeToRefs } from 'pinia'
   const store = useEntitiesStore()
-  const { language } = storeToRefs(store)
 
   const wdResults = ref<any[]>([])
   const autocompleteResults = ref<HTMLInputElement>()
@@ -74,7 +61,28 @@
   const isSearching = ref(false)
 
   const root = ref<HTMLElement | null>(null)
+  const lang = ref<HTMLSelectElement>()
   const shadowRoot = computed(() => root?.value?.parentNode)
+
+  const languages = [
+    {code: 'ar', label: 'العربية', tooltip: 'Arabic'},
+    {code: 'de', label: 'Deutsch', tooltip: 'German'},
+    {code: 'en', label: 'English', tooltip: 'English'},
+    {code: 'es', label: 'español', tooltip: 'Spanish'},
+    {code: 'fr', label: 'français', tooltip: 'French'},
+    {code: 'he', label: 'עברית', tooltip: 'Hebrew'},
+    {code: 'it', label: 'italiano', tooltip: 'Italian'},
+    {code: 'ja', label: '日本語', tooltip: 'Japanese'},
+    {code: 'ko', label: '한국어', tooltip: 'Korean'},
+    {code: 'nl', label: 'Nederlands', tooltip: 'Dutch'},
+    {code: 'pl', label: 'polski', tooltip: 'Polish'},
+    {code: 'pt', label: 'português', tooltip: 'Portuguese'},
+    {code: 'ru', label: 'русский', tooltip: 'Russian'},
+    {code: 'zh', label: '中文', tooltip: 'Chinese'},
+    {code: 'hi', label: 'हिन्दी', tooltip: 'Hindi'},
+    {code: 'bn', label: 'বাংলা', tooltip: 'Bengali'},
+    {code: 'id', label: 'Bahasa Indonesia', tooltip: 'Indonesian'}
+  ]
 
   // watch(host, () => init())
   onMounted(() => init() )
@@ -129,9 +137,10 @@
   }
 
   function doSearch() {
+    let language = (lang.value?.children[lang.value.selectedIndex] as HTMLOptionElement).value
     if (!searchFor.value || isSearching.value) return
     isSearching.value = true
-    let url = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${searchFor.value}&uselang=${language.value}&language=${language.value}&format=json&origin=*&continue=${searchContinue.value}`
+    let url = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${searchFor.value}&uselang=${language}&language=${language}&format=json&origin=*&continue=${searchContinue.value}`
     fetch(url)
       .then(res => res.json())
       .then(res => {

@@ -157,6 +157,7 @@ export class HSDropdown extends Component {
   }
 
   close($dropdownEl, noAnimation = false) {
+    console.log('close', $dropdownEl, noAnimation)
     const $menuEl = $dropdownEl.querySelector('.hs-dropdown-menu');
 
     const destroy = () => {

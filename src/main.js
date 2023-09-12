@@ -28,8 +28,12 @@ import ArticlesList from './components/ArticlesList.ce.vue'
 import Auth from './components/Auth.ce.vue'
 import Claims from './components/Claims.ce.vue'
 import EntityCard from './components/EntityCard.ce.vue'
+import EntityCardStack from './components/EntityCardStack.ce.vue'
+import EntityGrid from './components/EntityGrid.ce.vue'
 import EntityHeader from './components/EntityHeader.ce.vue'
+import EntityInfobox from './components/EntityInfobox.ce.vue'
 import EntityInfoboxes from './components/EntityInfoboxes.ce.vue'
+import Header from './components/Header.ce.vue'
 import Images from './components/Images.ce.vue'
 import ImageCard from './components/ImageCard.ce.vue'
 import ImageGrid from './components/ImageGrid.ce.vue'
@@ -52,8 +56,12 @@ customElements.define('ve-articles-list', defineCustomElement(ArticlesList))
 customElements.define('ve-auth', defineCustomElement(Auth))
 customElements.define('ve-claims', defineCustomElement(Claims))
 customElements.define('ve-entity-card', defineCustomElement(EntityCard))
+customElements.define('ve-entity-card-stack', defineCustomElement(EntityCardStack))
+customElements.define('ve-entity-grid', defineCustomElement(EntityGrid))
 customElements.define('ve-entity-header', defineCustomElement(EntityHeader))
+customElements.define('ve-entity-infobox', defineCustomElement(EntityInfobox))
 customElements.define('ve-entity-infoboxes', defineCustomElement(EntityInfoboxes))
+customElements.define('ve-header', defineCustomElement(Header))
 customElements.define('ve-images', defineCustomElement(Images))
 customElements.define('ve-image-card', defineCustomElement(ImageCard))
 customElements.define('ve-image-grid', defineCustomElement(ImageGrid))
