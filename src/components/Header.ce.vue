@@ -18,7 +18,8 @@ const menuItems = ref<HTMLUListElement>()
 const props = defineProps({
   title: { type: String },
   logo: { type: String },
-  color: { type: String, default: '#444' }
+  color: { type: String, default: '#444' },
+  auth: { type: String },
 })
 
 </script>
@@ -35,7 +36,7 @@ const props = defineProps({
         <div v-else></div>
         <h1 v-if="title" v-html="title" class="text-4xl text-white font-semibold font-serif"></h1>
         <div v-else></div>
-        <ve-menu v-if="menuItems" v-html="menuItems.outerHTML"></ve-menu>
+        <ve-menu v-if="menuItems" :auth="props.auth || null" v-html="menuItems.outerHTML"></ve-menu>
         <div v-else></div>
       </div>
   

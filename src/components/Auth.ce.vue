@@ -37,6 +37,7 @@
   const root = ref<HTMLElement | null>(null)
 
   onMounted(async () => {
+    console.log('auth.onMounted')
     netlifyIdentity.on('init', _user => store.setUser(_user))
     netlifyIdentity.on('error', err => console.error('Error', err))
     netlifyIdentity.on('login', _user => {
@@ -48,6 +49,7 @@
   })
 
   watch(user, () => {
+    console.log('auth.watch.user', user.value)
     if (user.value) localStorage.setItem('user', JSON.stringify(user.value))
     else if (localStorage.getItem('user')) localStorage.removeItem('user')
   })
@@ -62,6 +64,7 @@
   }
 
   function validate() {
+    console.log('auth.validate')
     let _user: any = localStorage.getItem('user') && JSON.parse(localStorage.getItem('user') || '{}' )
     if (!_user) return Promise.resolve(null)
     if (!isLoggedIn.value) {

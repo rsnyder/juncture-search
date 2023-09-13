@@ -61,7 +61,7 @@ export const useEntitiesStore = defineStore('entities', {
 
     setUser(user:any) {
       this.user = user
-      this.isLoggedIn = user !== null && tokenIsValid(user.tokenExpiration)
+      this.isLoggedIn = user !== null && (user.provider === 'github' || tokenIsValid(user.tokenExpiration))
       this.userid = user !== null 
         ? sha256(user.email.toLowerCase().trim())
         : null
