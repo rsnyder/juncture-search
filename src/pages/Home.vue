@@ -117,7 +117,10 @@
 
     const root = ref<HTMLElement | null>(null)
     
-    onMounted(() => initFlowbite() )
+    onMounted(() => {
+      initFlowbite()
+      if (route.query.eid) store.setQid(route.query.eid as string)
+    })
 
     watch(qid, () => { if (qid.value) setRoute(qid.value, language.value) })
     watch(language, () => { if (qid.value) setRoute(qid.value, language.value) })
