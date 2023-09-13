@@ -84,7 +84,11 @@ function getMenuItems() {
 
   /***************** Netlify auth *****************/
 
+  let netlifyIdentityEndpoint = 'https://juncture-search.netlify.app/.netlify/identity'
+
   function setupNetlifyAuth() {
+    if (location.hostname === 'search.plant-humanities.org') netlifyIdentityEndpoint = 'https://search.plant-humanities.org/.netlify/identity'
+    console.log('setupNetlifyAuth', location, netlifyIdentityEndpoint)
     let _user: any = localStorage.getItem('auth-user') && JSON.parse(localStorage.getItem('auth-user') || '{}' )
     if (_user?.provider === 'netlify') store.setUser(_user)
     else store.setUser(null)
@@ -99,7 +103,7 @@ function getMenuItems() {
       store.setUser({provider: 'netlify', name: _user.user_metadata.full_name, email: _user.email, token: _user.token})
       netlifyIdentity.close()
     })
-    netlifyIdentity.init({ APIUrl: 'https://juncture-search.netlify.app/.netlify/identity'})
+    netlifyIdentity.init({ APIUrl: netlifyIdentityEndpoint})
     validateNetlifyUser()
   }
 
@@ -111,7 +115,7 @@ function getMenuItems() {
       const formData = new FormData()
       formData.append('grant_type', 'refresh_token')
       formData.append('refresh_token', _user.token.refresh_token)
-      fetch('https://juncture-search.netlify.app/.netlify/identity/token', {
+      fetch(`${netlifyIdentityEndpoint}/token`, {
         method : 'POST',
         body : formData
       }).then(x=>x.json()).then((newToken: any) => {
