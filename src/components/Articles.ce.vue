@@ -108,7 +108,7 @@
     }
   })
 
-  watch(active, () => console.log(`active=${active.value}`))
+  // watch(active, () => console.log(`active=${active.value}`))
 
   watch(qid, async () => { 
     articles.value = []

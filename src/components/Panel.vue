@@ -1,6 +1,6 @@
 <template>
   
-  <div class="flex-col justify-center border p-4 rounded-sm mb-4 bg-slate-50">
+  <div class="flex-col justify-center border p-4 rounded-lg mb-4 bg-slate-50">
     <slot v-if="slots.default"></slot>
 
     <div v-else class="flex animate-pulse">

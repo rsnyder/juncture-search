@@ -5,21 +5,18 @@
       <sl-tab slot="nav" panel="data" :active="active.indexOf('data') === 0">Data</sl-tab>
       <sl-tab slot="nav" panel="images" :active="active === 'images'">Images</sl-tab>
       <sl-tab slot="nav" panel="documents" :active="active === 'documents'">Documents</sl-tab>
-      <sl-tab slot="nav" panel="related" :active="active.indexOf('related') === 0">Related Entities</sl-tab>
+      <sl-tab slot="nav" panel="sites" :active="active === 'sites'">Resource Web Sites</sl-tab>
+      <sl-tab slot="nav" panel="related" :active="active === 'related'">Related Entities</sl-tab>
 
       <sl-tab-panel name="data">
         <sl-tab-group placement="start">
           <sl-tab slot="nav" panel="data-statements" :active="active === 'data-statements'">Entity Properties</sl-tab>
           <sl-tab slot="nav" panel="data-referencing" :active="active === 'data-referencing'">Referencing Entities</sl-tab>
-          <sl-tab slot="nav" panel="data-sites" :active="active === 'data-sites'">Site Links</sl-tab>
           <sl-tab-panel name="data-statements">
             <ve-statements></ve-statements>
           </sl-tab-panel>
           <sl-tab-panel name="data-referencing">
             <ve-referencing id="data-referencing"></ve-referencing>
-          </sl-tab-panel>
-          <sl-tab-panel name="data-sites">
-            <ve-sites id="data-sites"></ve-sites>
           </sl-tab-panel>
         </sl-tab-group>
       </sl-tab-panel>
@@ -32,6 +29,15 @@
         <ve-articles label="articles" id="documents"></ve-articles>
       </sl-tab-panel>
 
+      <sl-tab-panel name="sites">
+        <ve-sites id="sites"></ve-sites>
+      </sl-tab-panel>
+
+      <sl-tab-panel name="related">
+        <ve-mentioned-entities id="related"></ve-mentioned-entities>
+      </sl-tab-panel>
+
+      <!--
       <sl-tab-panel name="related">
         <sl-tab-group placement="start">
           <sl-tab slot="nav" panel="related-all" :active="active === 'related-all'">All</sl-tab>
@@ -48,6 +54,7 @@
           </sl-tab-panel>
         </sl-tab-group>
       </sl-tab-panel>
+      -->
 
     </sl-tab-group>
   </div>

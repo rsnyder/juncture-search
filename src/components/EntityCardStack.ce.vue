@@ -1,6 +1,6 @@
 <template>
 
-  <div ref="root" class="card-stack mr-8"
+  <div ref="root" class="card-stack"
     :style="{
         width: `${size}px`,
         height: `${size + 50}px`

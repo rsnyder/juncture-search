@@ -1,0 +1,36 @@
+categories:
+  People:
+    - Q5     # human
+  Places:
+    - P625   # coords
+    - P6766  # whos on first
+  Organizations:
+    - Q955824   # learned society
+    - Q1331793  # media company
+    - Q43229    # organization
+  Plants:
+    - Q756      # plant
+    - genus of plants
+    - species of plant
+  Animals:
+    - Q729      # animal
+  Visual Artwork:
+    - Q93184    # drawing
+    - Q3305213  # painting
+    - Q15727816 # painting series
+    - Q4502142  # visual artwork
+    - Q18761202 # watercolor painting
+  Music:
+    - Q638      # music
+  Artists:
+    - Q483501   # artist
+    - Q15296811 # drawer
+    - Q644687   # illustrator
+    - Q1028181  # painter
+    - Q33231    # photographer
+    - Q1281618  # sculptor
+    - Q3391743  # visual artist
+    - Q17505902 # watercolorist
+  Movements:
+    - Q968159 # art movement
+    - Q3326717 # literary movement

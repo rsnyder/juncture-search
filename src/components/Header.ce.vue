@@ -29,7 +29,7 @@ const props = defineProps({
   <header ref="root"
     class="relative flex flex-wrap 2xl:justify-start 2xl:flex-nowrap z-30 w-full text-sm py-4 dark:bg-gray-800">
     
-    <div class="max-w-[85rem] w-full mx-auto px-4 2xl:flex 2xl:items-center 2xl:justify-between" aria-label="Global">
+    <div class="max-w-[85rem] w-full mx-auto px-4" aria-label="Global">
 
       <div class="flex items-center gap-3 justify-between">
         <img v-if="logo" :src="logo" alt="Website Logo" class="h-[3em] max-w-none">

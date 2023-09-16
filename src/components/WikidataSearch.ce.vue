@@ -2,8 +2,11 @@
 
   <div ref="root" class="wikidata-search flex w-full">
     
-    <select ref="lang" class="px-2 block bg-slate-100 border-gray-100 text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
-      <option v-for="lang in languages" :key="lang.code" :value="lang.code" :title="lang.tooltip" :selected="lang.code === 'en' ? '' : null" v-html="lang.label"></option>
+    <select ref="lang" 
+      class="hidden md:block px-2 bg-slate-100 border-gray-100 text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
+      <template v-for="lang in languages" :key="lang.code">
+        <option :value="lang.code" :selected="lang.code === 'en'" v-html="lang.label"></option>
+      </template>
     </select>
     
     <div id="autocompleteContainer" class="autocomplete__container" role="combobox">

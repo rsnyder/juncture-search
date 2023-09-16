@@ -38,6 +38,7 @@ import Images from './components/Images.ce.vue'
 import ImageCard from './components/ImageCard.ce.vue'
 import ImageGrid from './components/ImageGrid.ce.vue'
 import LanguageSelector from './components/LanguageSelector.ce.vue'
+import MentionedEntities from './components/MentionedEntities.ce.vue'
 import Menu from './components/Menu.ce.vue'
 import Markdown from './components/Markdown.ce.vue'
 import Modal from './components/Modal.ce.vue'
@@ -67,6 +68,7 @@ customElements.define('ve-image-card', defineCustomElement(ImageCard))
 customElements.define('ve-image-grid', defineCustomElement(ImageGrid))
 customElements.define('ve-language-selector', defineCustomElement(LanguageSelector))
 customElements.define('ve-markdown', defineCustomElement(Markdown))
+customElements.define('ve-mentioned-entities', defineCustomElement(MentionedEntities))
 customElements.define('ve-menu', defineCustomElement(Menu))
 customElements.define('ve-modal', defineCustomElement(Modal))
 customElements.define('ve-modal-twp', defineCustomElement(ModalTWP))

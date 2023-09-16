@@ -18,20 +18,31 @@
   <div class="max-w-5xl m-auto">
 
     <panel>
-    <h1 class="text-2xl font-bold mb-4">Welcome to the Plant Humanities Search tool</h1>
-    <p>This tool provides a convenient way to find web resources for a named entity (a person, place, plant, etc).</p>
-    <p class="mt-4">Entity search results include:</p>
-    <ul class="ml-4 max-w-md list-disc list-inside dark:text-gray-400">
-      <li>High resolution images (public domain and open licensed)</li>
-      <li>Journal articles</li>
-      <li>Links to relevant web sites</li>
-      <li>Maps</li>
-      <li>Wikidata knowledge graph properties</li>
-      <li>and more...</li>
-    </ul>
-  </panel>
+      <h1 class="text-2xl font-bold mb-4">Welcome to the Plant Humanities Search tool</h1>
+      <p>
+        This search tool provides a convenient way to find web resources for a named entity (a person, place, plant, etc) 
+        using the Wikidata knowledge graph - for use in creating visual essays, teaching, and research.
+      </p>
+      <p class="mt-4">Entity search results include:</p>
+      <ul class="ml-4 max-w-md list-disc list-inside dark:text-gray-400">
+        <li>High resolution images (public domain and open licensed)</li>
+        <li>Journal articles</li>
+        <li>Links to relevant web sites</li>
+        <li>Maps</li>
+        <li>Wikidata knowledge graph properties</li>
+        <li>and more...</li>
+      </ul>
+    </panel>
 
-    <panel class="bg-slate-100">
+    <panel>
+      <h1 class="text-2xl font-bold mb-4">What is an entity?</h1>
+      <p>
+        This search tool provides a convenient way to find web resources for a named entity (a person, place, plant, etc) 
+        using the Wikidata knowledge graph - for use in creating visual essays, teaching, and research.
+      </p>
+    </panel>
+
+    <panel class="bg-[#a2a58f]">
       <div class="flex-col w-full max-w-[500px] m-auto">
         <h1 class="text-3xl font-bold">Find an Entity</h1>
         <p class="mt-2">Search the Wikidata knowledge graph for a person, place, plant, animal, etc.</p>
@@ -39,48 +50,73 @@
         <!--<p class="mt-2">Example: <a href="/entity/Q171497">sunflower</a>, rose</p>-->
       </div>
     </panel>
-    
+
     <panel>
-      <h1 class="text-2xl font-bold mb-8">Some example entities...</h1>
-      <div class="flex gap-x-8">
-        <ve-entity-card-stack label="People">
+      <h1 class="text-2xl font-bold mb-4">Some example entities...</h1>
+      <p class="mb-8">Below are some example entity groups for exploration.</p>
+      <div class="flex flex-wrap justify-around">
+        <ve-entity-card-stack label="Botanists">
           <ul>
             <li>Q1043</li>
-            <li>Q1700717</li>
-            <li>Q5194627</li>
-            <li>Q157211</li>
-            <li>Q5582</li>
-            <li>Q127216</li>
+            <li>Q37970</li>
+            <li>Q296898</li>
+            <li>Q153408</li>
+            <li>Q394451</li>
+            <li>Q1035</li>
+            <li>Q155764</li>
+            <li>Q333419</li>
+            <li>Q3017494</li>
+            <li>Q347356</li>
+            <li>Q4794782</li>
           </ul>
         </ve-entity-card-stack>
-        <ve-entity-card-stack label="Places">
+        <ve-entity-card-stack label="Herbaria">
           <ul>
+            <li>Q18748726</li>
+            <li>Q838691</li>
+            <li>Q636275</li>
+            <li>Q133822</li>
+            <li>Q1852803</li>
+            <li>Q677516</li>
+            <li>Q309388</li>
+            <li>Q3731149</li>
+            <li>Q688704</li>
+            <li>Q1420103</li>
+            <li>Q4032</li>
+            <li>Q3052500</li>
+          </ul>
+        </ve-entity-card-stack>
+        <ve-entity-card-stack label="Plants">
+          <ul>
+            <li>Q27686509</li>
+            <li>Q214733</li>
+            <li>Q192190</li>
+            <li>Q33036816</li>
+            <li>Q34687</li>
+            <li>Q759876</li>
+            <li>Q1067933</li>
+            <li>Q182448</li>
+            <li>Q161426</li>
+            <li>Q101815</li>
+            <li>Q2104475</li>
+            <li>Q5194627</li>
+            <li>Q14080</li>
+          </ul>
+        </ve-entity-card-stack>
+        <ve-entity-card-stack label="Gardens">
+          <ul>
+            <li>Q2195976</li>
+            <li>Q18769666</li>
+            <li>Q3162464</li>
+            <li>Q188617</li>
+            <li>Q336701</li>
+            <li>Q2444945</li>
+            <li>Q585521</li>
+            <li>Q2566136</li>
+            <li>Q1890086</li>
             <li>Q1264942</li>
-            <li>Q34687</li>
-            <li>Q5194627</li>
-            <li>Q157211</li>
-            <li>Q5582</li>
-            <li>Q127216</li>
-          </ul>
-        </ve-entity-card-stack>
-        <ve-entity-card-stack label="Plants">
-          <ul>
-            <li>Q171497</li>
-            <li>Q34687</li>
-            <li>Q5194627</li>
-            <li>Q157211</li>
-            <li>Q5582</li>
-            <li>Q127216</li>
-          </ul>
-        </ve-entity-card-stack>
-        <ve-entity-card-stack label="Plants">
-          <ul>
-            <li>Q171497</li>
-            <li>Q34687</li>
-            <li>Q5194627</li>
-            <li>Q157211</li>
-            <li>Q5582</li>
-            <li>Q127216</li>
+            <li>Q1923740</li>
+            <li>Q45242</li>
           </ul>
         </ve-entity-card-stack>
       </div>
