@@ -1,7 +1,15 @@
 <template>
 
   <div ref="root">
-    <sl-details>
+
+    <div v-if="fetching" class="flex w-full items-center justify-center space-x-4 m-4">
+      <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <span class="text-xl font-medium">Finding articles...</span>
+    </div>
+
+    <sl-details v-else>
       <div slot="summary">
         <span v-html="props.label" class="title"></span>
       </div>
@@ -194,6 +202,8 @@
 </script>
 
 <style>
+  @import '../tailwind.css';
+
   .title {
     font-size: 1.5em;
     font-weight: bold;

@@ -1137,6 +1137,10 @@ input:checked + .toggle-bg {
   margin: auto;
 }
 
+.m-4 {
+  margin: 1rem;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -1204,6 +1208,18 @@ input:checked + .toggle-bg {
 
 .mt-\[-2rem\] {
   margin-top: -2rem;
+}
+
+.mr-auto {
+  margin-right: auto;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.mt-16 {
+  margin-top: 4rem;
 }
 
 .block {
@@ -1382,6 +1398,10 @@ input:checked + .toggle-bg {
   width: 4rem;
 }
 
+.w-6 {
+  width: 1.5rem;
+}
+
 .min-w-\[15rem\] {
   min-width: 15rem;
 }
@@ -1490,6 +1510,16 @@ input:checked + .toggle-bg {
 
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 .cursor-default {
@@ -1612,6 +1642,12 @@ input:checked + .toggle-bg {
   margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
 }
 
+.space-y-8 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+}
+
 .divide-y > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-y-reverse: 0;
   border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
@@ -1696,6 +1732,10 @@ input:checked + .toggle-bg {
   border-width: 0px;
 }
 
+.border-\[3px\] {
+  border-width: 3px;
+}
+
 .border-b {
   border-bottom-width: 1px;
 }
@@ -1727,6 +1767,14 @@ input:checked + .toggle-bg {
 .border-gray-300 {
   --tw-border-opacity: 1;
   border-color: rgb(209 213 219 / var(--tw-border-opacity));
+}
+
+.border-current {
+  border-color: currentColor;
+}
+
+.border-t-transparent {
+  border-top-color: transparent;
 }
 
 .bg-\[\#a2a58f\] {

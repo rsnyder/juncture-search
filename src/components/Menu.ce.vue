@@ -54,7 +54,6 @@ function getMenuItems() {
   })
 
   watch(user, () => {
-    console.log(user.value)
     if (user.value) localStorage.setItem('auth-user', JSON.stringify(user.value))
     else if (localStorage.getItem('auth-user')) localStorage.removeItem('auth-user')
   })
@@ -75,7 +74,6 @@ function getMenuItems() {
   function toggleLogin(evt:Event) {
     evt.preventDefault()
     isLoggedIn.value = !isLoggedIn.value
-    console.log(`toggleLogin: isLoggedIn=${isLoggedIn.value}`)
     let menu = shadowRoot.value.querySelector('.hs-dropdown.open')?.querySelector('.hs-dropdown-menu') as HTMLElement
     menu.classList.remove('block')
     menu.classList.add('hidden')
@@ -88,18 +86,14 @@ function getMenuItems() {
 
   function setupNetlifyAuth() {
     if (location.hostname === 'search.plant-humanities.org') netlifyIdentityEndpoint = 'https://search.plant-humanities.org/.netlify/identity'
-    console.log('setupNetlifyAuth', location, netlifyIdentityEndpoint)
     let _user: any = localStorage.getItem('auth-user') && JSON.parse(localStorage.getItem('auth-user') || '{}' )
     if (_user?.provider === 'netlify') store.setUser(_user)
     else store.setUser(null)
-    console.log(`setupNetlifyAuth: isLoggedIn=${isLoggedIn.value}`)
     netlifyIdentity.on('init', _user => {
-      console.log('netlifyIdentity.on(init)', _user)
       if (_user) store.setUser({provider: 'netlify', name: _user.user_metadata.full_name, email: _user.email, token: _user.token})
     })
     netlifyIdentity.on('error', err => console.error('Error', err))
     netlifyIdentity.on('login', _user => {
-      console.log('netlifyIdentity.on(login)', _user)
       store.setUser({provider: 'netlify', name: _user.user_metadata.full_name, email: _user.email, token: _user.token})
       netlifyIdentity.close()
     })
@@ -110,7 +104,6 @@ function getMenuItems() {
   function validateNetlifyUser() {
     let _user: any = localStorage.getItem('auth-user') && JSON.parse(localStorage.getItem('auth-user') || '{}' )
     if (_user && !isLoggedIn.value) {
-      console.log('validateNetlifyUser: _user', _user)
       // keep users logged in
       const formData = new FormData()
       formData.append('grant_type', 'refresh_token')
@@ -146,7 +139,6 @@ function getMenuItems() {
     let _user: any = localStorage.getItem('auth-user') && JSON.parse(localStorage.getItem('auth-user') || '{}' )
     if (_user?.provider === 'github') store.setUser(_user)
     else store.setUser(null)
-    console.log(`setupGithubAuth: isLoggedIn=${isLoggedIn.value}`)
     let code = (new URL(window.location.href)).searchParams.get('code')
     if (code) {
       let href = `${location.pathname}${location.hash}`

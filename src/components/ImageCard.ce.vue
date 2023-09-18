@@ -14,6 +14,7 @@
             <ul>
               <li v-for="depict in image.depicts" :data-qid="depict.id" :key="depict.id">
                 <div>{{ depict.label || labels[depict.id] }}</div>
+                <ve-entity-infobox :qid="depict.id" v-html="depict.label || labels[depict.id]"></ve-entity-infobox>
               </li>
             </ul>
           </div>

@@ -150,6 +150,7 @@
                         :id="`prop-${pid}-${idx}-${pval.mainsnak.datavalue.value.id}`" :data-qid="pval.mainsnak.datavalue.value.id" 
                         @click="entitySelected">
                   </span>
+                  <ve-entity-infobox :qid="pval.mainsnak.datavalue.value.id" v-html="labels[pval.mainsnak.datavalue.value.id] || pval.mainsnak.datavalue.value.id"></ve-entity-infobox>
                   <!-- <span v-if="descriptions[pval.mainsnak.datavalue.value.id]" class="description" v-html="description(pval.mainsnak.datavalue.value.id)"></span> -->
                 </template>
                 

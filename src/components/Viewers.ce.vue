@@ -6,7 +6,7 @@
       <sl-tab slot="nav" panel="images" :active="active === 'images'">Images</sl-tab>
       <sl-tab slot="nav" panel="documents" :active="active === 'documents'">Documents</sl-tab>
       <sl-tab slot="nav" panel="sites" :active="active === 'sites'">Resource Web Sites</sl-tab>
-      <sl-tab slot="nav" panel="related" :active="active === 'related'">Related Entities</sl-tab>
+      <sl-tab slot="nav" panel="referenced" :active="active === 'referenced'">Referenced Entities</sl-tab>
 
       <sl-tab-panel name="data">
         <sl-tab-group placement="start">
@@ -33,8 +33,8 @@
         <ve-sites id="sites"></ve-sites>
       </sl-tab-panel>
 
-      <sl-tab-panel name="related">
-        <ve-mentioned-entities id="related"></ve-mentioned-entities>
+      <sl-tab-panel name="referenced">
+        <ve-mentioned-entities id="referenced"></ve-mentioned-entities>
       </sl-tab-panel>
 
       <!--

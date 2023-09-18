@@ -1,7 +1,15 @@
 <template>
 
   <div ref="root">
-    <div v-for="e in entities.filter(e => e.types).sort((a:Entity, b:Entity) => a.label.localeCompare(b.label))" :key="e.id"
+
+    <div v-if="isLoading" class="flex w-full items-center justify-center space-x-4 mt-8">
+      <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <span class="text-xl font-medium">Finding referenced entities...</span>
+    </div>
+
+    <div v-else v-for="e in entities.filter(e => e.types).sort((a:Entity, b:Entity) => a.label.localeCompare(b.label))" :key="e.id"
       class="flex items-center p-2 space-x-4 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
       @click="itemSelected(e)"
     >
@@ -65,7 +73,9 @@
 
   const entity = ref<any>()
   watch(qid, async () => entity.value = await store.fetch(qid.value) )
-  watch(entity, async () => entities.value = await loadData() )
+
+  watch(entity, async () => { if (entities.value.length === 0) entities.value = await loadData() })
+  watch(isActive, async () => { if (entities.value.length === 0) entities.value = await loadData() })
 
   onMounted(async () =>  {
     await loadEntityTypes()
@@ -80,7 +90,7 @@
   const byCategory = ref({})
   
   const entities = ref<Entity[]>([])
-  watch(entities, () => console.log(toRaw(entities.value)))
+  // watch(entities, () => console.log(toRaw(entities.value)))
 
   const exclude = new Set(['wd:Q101896'])
 

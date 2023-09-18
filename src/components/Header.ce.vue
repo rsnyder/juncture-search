@@ -18,8 +18,9 @@ const menuItems = ref<HTMLUListElement>()
 const props = defineProps({
   title: { type: String },
   logo: { type: String },
+  url: { type: String },
   color: { type: String, default: '#444' },
-  auth: { type: String },
+  auth: { type: String }
 })
 
 </script>
@@ -32,8 +33,14 @@ const props = defineProps({
     <div class="max-w-[85rem] w-full mx-auto px-4" aria-label="Global">
 
       <div class="flex items-center gap-3 justify-between">
-        <img v-if="logo" :src="logo" alt="Website Logo" class="h-[3em] max-w-none">
+        <template v-if="logo">
+          <a v-if="url" :href="url">
+            <img :src="logo" alt="Website Logo" class="h-[3em] max-w-none">
+          </a>
+          <img v-else :src="logo" alt="Website Logo" class="h-[3em] max-w-none">
+        </template>
         <div v-else></div>
+
         <h1 v-if="title" v-html="title" class="text-4xl text-white font-semibold font-serif"></h1>
         <div v-else></div>
         <ve-menu v-if="menuItems" :auth="props.auth || null" v-html="menuItems.outerHTML"></ve-menu>
