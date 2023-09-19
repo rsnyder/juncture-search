@@ -13,8 +13,7 @@
             <h4>Depicted entities</h4>
             <ul>
               <li v-for="depict in image.depicts" :data-qid="depict.id" :key="depict.id">
-                <div>{{ depict.label || labels[depict.id] }}</div>
-                <ve-entity-infobox :qid="depict.id" v-html="depict.label || labels[depict.id]"></ve-entity-infobox>
+                <ve-entity-infobox v-if="depict.label || labels[depict.id]" :qid="depict.id" v-html="depict.label || labels[depict.id]"></ve-entity-infobox>
               </li>
             </ul>
           </div>
@@ -155,8 +154,6 @@
   })
 
   const root = ref<HTMLElement | null>(null)
-  const host = computed(() => (root.value?.getRootNode() as any)?.host)
-  const shadowRoot = computed(() => root?.value?.parentNode)
 
   const image = computed(() => props.image as Image)
 

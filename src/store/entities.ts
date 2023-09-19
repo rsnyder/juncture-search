@@ -164,10 +164,12 @@ export const useEntitiesStore = defineStore('entities', {
               labels[qid][lang] = label
             })
             this.allLabels = labels
+            // console.log(`updateLabels: ${toUpdate.length} -> ${Object.keys(this.allLabels).length}`)
           }
           this.labelsFetching = false
         }
         this.labels = langLabels(this.allLabels, this.language)
+        return this.labels
       }
     },
 

@@ -72,7 +72,10 @@
   })
 
   const entity = ref<any>()
-  watch(qid, async () => entity.value = await store.fetch(qid.value) )
+  watch(qid, async () => {
+    entities.value = []
+    entity.value = await store.fetch(qid.value) 
+  })
 
   watch(entity, async () => { if (entities.value.length === 0) entities.value = await loadData() })
   watch(isActive, async () => { if (entities.value.length === 0) entities.value = await loadData() })

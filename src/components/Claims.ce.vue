@@ -32,10 +32,16 @@
                   <!-- Property -->
                   <template v-if="pval.mainsnak.snaktype == 'value'">
                     <template v-if="pval.mainsnak.datavalue?.type === 'wikibase-entityid'">
+                      <!--
                       <span class="prop-value wikibase-entityid" v-html="labels[pval.mainsnak.datavalue.value.id]" 
                             :id="`prop-${pid}-${idx}-${pval.mainsnak.datavalue.value.id}`" :data-qid="pval.mainsnak.datavalue.value.id" 
                             @click="entitySelected">
                       </span>
+                      -->
+                      <ve-entity-infobox 
+                        :qid="pval.mainsnak.datavalue.value.id" 
+                        v-html="labels[pval.mainsnak.datavalue.value.id] || pval.mainsnak.datavalue.value.id"
+                      ></ve-entity-infobox>
                       <!-- <span v-if="descriptions[pval.mainsnak.datavalue.value.id]" class="description" v-html="description(pval.mainsnak.datavalue.value.id)"></span> -->
                     </template>
                     <span v-else-if="pval.mainsnak.datavalue?.type === 'wikibase-property'" :class="`prop-value ${pval.mainsnak.datavalue?.type}`">
@@ -67,10 +73,16 @@
                     <template v-for="(val, vidx) in values">
                       <template v-if="val.snaktype == 'value'">
                         <template v-if="val.datavalue?.type === 'wikibase-entityid'">
+                          <!--
                           <span :class="`prop-value ${val.datavalue?.type}`" :key="`qual-${pid}-${vidx}`" v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
                                 :id="`qual-${pid}-${val.datavalue.value.id}`" :data-qid="val.datavalue.value.id" 
                                 @click="entitySelected">
                           </span>
+                          -->
+                          <ve-entity-infobox 
+                            :qid="val.datavalue.value.id" 
+                            v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
+                          ></ve-entity-infobox>
                         </template>
                         <span v-else-if="val.datavalue?.type === 'quantity'" :class="`prop-value ${val.datavalue?.type}`" v-html="quantity(val.datavalue.value)"></span>
                         <span v-else-if="val.datavalue?.type === 'time'" :class="`prop-value ${val.datavalue?.type}`" v-html="formattedTime(val.datavalue.value)"></span>
@@ -106,10 +118,16 @@
                               <template v-if="val.snaktype == 'value'">
                               
                                 <template v-if="val.datavalue?.type === 'wikibase-entityid'">
+                                  <!--
                                   <span :class="`prop-value ${val.datavalue?.type}`" :key="`r${ridx}-${pidx}-${idx}`" v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
                                         :id="`r${ridx}-${pidx}-${val.datavalue.value.id}`" :data-qid="val.datavalue.value.id"
                                         @click="entitySelected">
                                   </span>
+                                  -->
+                                  <ve-entity-infobox 
+                                    :qid="val.datavalue.value.id" 
+                                    v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
+                                  ></ve-entity-infobox>
                                   <!-- <span v-if="descriptions[val.datavalue.value.id]" class="description" v-html="description(val.datavalue.value.id)"></span> -->
                                 </template>
                                 <span v-else-if="val.datavalue?.type === 'quantity'" :class="`prop-value ${val.datavalue?.type}`" v-html="quantity(val.datavalue.value)"></span>
@@ -146,11 +164,16 @@
               <template v-if="pval.mainsnak.snaktype == 'value'">
                 
                 <template v-if="pval.mainsnak.datavalue?.type === 'wikibase-entityid'">
+                  <!--
                   <span :class="`prop-value ${pval.mainsnak.datavalue?.type}`" v-html="labels[pval.mainsnak.datavalue.value.id] || pval.mainsnak.datavalue.value.id"
                         :id="`prop-${pid}-${idx}-${pval.mainsnak.datavalue.value.id}`" :data-qid="pval.mainsnak.datavalue.value.id" 
                         @click="entitySelected">
                   </span>
-                  <ve-entity-infobox :qid="pval.mainsnak.datavalue.value.id" v-html="labels[pval.mainsnak.datavalue.value.id] || pval.mainsnak.datavalue.value.id"></ve-entity-infobox>
+                  -->
+                  <ve-entity-infobox 
+                    :qid="pval.mainsnak.datavalue.value.id" 
+                    v-html="labels[pval.mainsnak.datavalue.value.id] || pval.mainsnak.datavalue.value.id"
+                  ></ve-entity-infobox>
                   <!-- <span v-if="descriptions[pval.mainsnak.datavalue.value.id]" class="description" v-html="description(pval.mainsnak.datavalue.value.id)"></span> -->
                 </template>
                 
@@ -192,10 +215,16 @@
                 <template v-for="(val, vidx) in values">
                   <template v-if="val.snaktype == 'value'">
                     <template v-if="val.datavalue?.type === 'wikibase-entityid'">
+                      <!--
                       <span :class="`prop-value ${val.datavalue?.type}`" :key="`qual-${pid}-${vidx}`" v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
                             :id="`qual-${pid}-${val.datavalue.value.id}`" :data-qid="val.datavalue.value.id" 
                             @click="entitySelected">
                       </span>
+                      -->
+                      <ve-entity-infobox 
+                        :qid="val.datavalue.value.id" 
+                        v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
+                      ></ve-entity-infobox>
                       <!-- <span v-if="descriptions[val.datavalue.value.id]" class="description" v-html="description(val.datavalue.value.id)"></span> -->
                     </template>
                     <span v-else-if="val.datavalue?.type === 'quantity'" :class="`prop-value ${val.datavalue?.type}`" v-html="quantity(val.datavalue.value)"></span>
@@ -230,10 +259,15 @@
                         <template v-for="(val, idx) in values">
                           <template v-if="val.snaktype == 'value'">
                             <template v-if="val.datavalue?.type === 'wikibase-entityid'">
-                              <span :class="`prop-value ${val.datavalue?.type}`" :key="`r${ridx}-${pidx}-${idx}`" v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
+                              <!--<span :class="`prop-value ${val.datavalue?.type}`" :key="`r${ridx}-${pidx}-${idx}`" v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
                                     :id="`r${ridx}-${pidx}-${val.datavalue.value.id}`" :data-qid="val.datavalue.value.id"
                                     @click="entitySelected">
                               </span>
+                              -->
+                              <ve-entity-infobox 
+                                :qid="val.datavalue.value.id" 
+                                v-html="labels[val.datavalue.value.id] || val.datavalue.value.id"
+                              ></ve-entity-infobox>
                               <!-- <span v-if="descriptions[val.datavalue.value.id]" class="description" v-html="description(val.datavalue.value.id)"></span> -->
                             </template>
                             <span v-else-if="val.datavalue?.type === 'quantity'" :class="`prop-value ${val.datavalue?.type}`" v-html="quantity(val.datavalue.value)"></span>
