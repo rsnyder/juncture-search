@@ -6,7 +6,7 @@ export class Wikidata extends ArticleProviderBase {
 
   id: string = 'wikidata-articles'
   name: string = 'Wikidata'
-  logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
+  logo: string = 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg'
   
   _fetching: boolean = false
 
@@ -224,45 +224,17 @@ export class Wikidata extends ArticleProviderBase {
 
   async getMainSubjects() {
     if (this._cursor < 0) {
-      await this._doQuery()
       this._cursor = 0
+      await this._getIndex()
     }
-    this._articles.forEach((doc:Article) => {
-      (doc.main_subjects || []).forEach(ms => {
+    this._index.forEach((doc:any) => {
+      (doc.mainSubject || []).forEach(ms => {
         if (this._mainSubjects[ms.id]) this._mainSubjects[ms.id]++
         else this._mainSubjects[ms.id] = 1
       })
     })
+    console.log(this._mainSubjects)
     return this._mainSubjects
-  }
-
-  async _doQuery() {
-    if (this._fetching) return
-    this._fetching = true
-
-    if (this._index.length === 0) {
-      await this._getIndex()
-    }
-
-    /*
-    this._hasMore = false
-    if (!this._refresh) {
-      let cacheKey = `${this.id}-${this._qid}`
-      let cachedResults = await fetch(`/api/cache/${cacheKey}`)
-      if (cachedResults.ok) {
-        this._articles = await cachedResults.json()
-        this._filterAndSort()
-        this._fetching = false
-      }
-    }
-    */
-
-    if (this._details.length < this._index.length) {
-
-    }
-  
-    this._details = this._index.slice(0, 100).map(id => ({ id }))
-
   }
 
   async _getIndex() {
@@ -315,6 +287,8 @@ export class Wikidata extends ArticleProviderBase {
       api: this.id,
       id: e['@id'].replace(/wd:/, ''),
       doi: e.DOI,
+      logo: this.logo,
+      provider: this.name,
       url: `https://doi.org/${e.DOI}`
     }
     if (e.issue) article.issue = e.issue
@@ -332,13 +306,13 @@ export class Wikidata extends ArticleProviderBase {
     article.authors = [
       ...e.author_name_string
         ? Array.isArray(e.author_name_string)
-          ? e.author_name_string.map(ans => ({ label: ans.author_name_string, seq: ans.ordinal }))
-          : [{ label: e.author_name_string, seq: e.author_name_string.ordinal }]
+          ? e.author_name_string.map(ans => ({ label: ans.author_name_string, seq: parseInt(ans.ordinal) }))
+          : [{ label: e.author_name_string.author_name_string, seq: parseInt(e.author_name_string.ordinal) }]
         : [],
       ...e.author
         ? Array.isArray(e.author)
-          ? e.author.map(a => ({ id: a.author['@id'].replace(/wd:/, ''), label: a.label, seq: a.ordinal }))
-          : [{ id: e.author.author['@id'].replace(/wd:/, ''), label: e.author.label, seq: e.author.ordinal }]
+          ? e.author.map(a => ({ id: a.author['@id'].replace(/wd:/, ''), label: a.label, seq: parseInt(a.ordinal) }))
+          : [{ id: e.author.author['@id'].replace(/wd:/, ''), label: e.author.label, seq: parseInt(e.author.ordinal) }]
         : []
     ].sort((a, b) => a.seq - b.seq).map(a => delete a.seq && a)
     

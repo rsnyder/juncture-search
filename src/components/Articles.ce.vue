@@ -9,19 +9,68 @@
       <span class="text-xl font-medium">Finding articles...</span>
     </div>
 
-    <sl-details v-else>
+    <div v-else>
+
       <div slot="summary">
         <span v-html="props.label" class="title"></span>
       </div>
-      
+
+      <div class="hs-dropdown relative inline-flex" data-hs-dropdown-auto-close="inside">
+        <button id="hs-dropdown-item-checkbox" type="button" class="hs-dropdown-toggle py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800">
+          Content providers
+          <svg class="hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-gray-600" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 dark:bg-gray-800 dark:border dark:border-gray-700" aria-labelledby="hs-dropdown-item-checkbox">
+          
+          <div class="relative flex items-center py-2 px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div class="flex items-center h-5">
+              <input id="hs-dropdown-item-checkbox-wikidata" data-provider="Wikidata" name="hs-dropdown-item-checkbox-wikidata" type="checkbox"
+                @click="setProviders"
+                class="border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" 
+                aria-describedby="hs-dropdown-item-checkbox-delete-description" 
+                :checked="providersEnabled.Wikidata ? '' : null"
+              >
+            </div>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg" class="ml-4 h-4 w-4">
+            <label for="hs-dropdown-item-checkbox-wikidata" class="ml-2">
+              <span class="text-sm font-semibold text-gray-800 dark:text-gray-300">Wikidata</span>
+            </label>
+          </div>
+          
+          <div class="relative flex items-center py-2 px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div class="flex items-center h-5">
+              <input id="hs-dropdown-item-checkbox-jstor" data-provider="JSTOR" name="hs-dropdown-item-checkbox-jstor" type="checkbox" 
+                @click="setProviders"
+                class="border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" 
+                aria-describedby="hs-dropdown-item-checkbox-delete-description" 
+                :checked="providersEnabled.JSTOR ? '' : null"
+              >
+            </div>
+            <img src="https://about.jstor.org/wp-content/themes/aboutjstor2017/static/JSTOR_Logo2017_90.png" class="ml-4 h-4 w-4">
+            <label for="hs-dropdown-item-checkbox-jstor" class="ml-2">
+              <span class="text-sm font-semibold text-gray-800 dark:text-gray-300">JSTOR</span>
+            </label>
+          </div>
+    
+        </div>
+      </div>
+
+      <!--
       <div class="filters">
 
         <div id="providers">
           <span>Provider: </span>
-          <sl-checkbox id="Wikimedia Commons" :checked="providersEnabled['Wikimedia Commons']" @click="setProviders">Wikimedia Commons</sl-checkbox>
-          <sl-checkbox id="JSTOR" :checked="providersEnabled['JSTOR']" @click="setProviders">JSTOR</sl-checkbox>        </div>
+          <sl-checkbox id="Wikidata" :checked="providersEnabled['Wikidata']" @click="setProviders">Wikidata</sl-checkbox><br/>
+          <sl-checkbox id="JSTOR" :checked="providersEnabled['JSTOR']" @click="setProviders">JSTOR</sl-checkbox>        
+        </div>
+
       </div>
-    </sl-details>
+      -->
+
+    </div>
 
     <ve-articles-list 
       :id="id"
@@ -41,6 +90,8 @@
   import { useEntitiesStore } from '../store/entities'
   import { storeToRefs } from 'pinia'
   import type { Article, ArticleProvider } from '../types'
+  // @ts-ignore
+  import { HSDropdown } from '../lib/preline/components/hs-dropdown'
 
   import '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js'
   import '@shoelace-style/shoelace/dist/components/details/details.js'
@@ -61,6 +112,7 @@
   const root = ref<HTMLElement | null>(null)
   const shadowRoot = computed(() => root?.value?.parentNode)
   const isActive = computed(() => active.value.split('/').pop() === props.id)
+  watch(shadowRoot, (shadowRoot) => new HSDropdown(shadowRoot).init() )
 
   const refreshQarg = new URL(location.href).searchParams.get('refresh')
   const refresh = refreshQarg !== null && ['true', '1', 'yes', ''].includes(refreshQarg.toLowerCase())
@@ -97,11 +149,6 @@
   const mainSubjectsFilter = ref<string[]>([])
   watch(mainSubjectsFilter, () => {
     // console.log(`mainSubjectsFilter=${mainSubjectsFilter.value}`)
-  })
-
-  const createdBy = ref<boolean>(false)
-  watch(createdBy, () => {
-    // console.log(`createdBy=${createdBy.value}`)
   })
 
   watch(isActive, async () => {
@@ -167,13 +214,18 @@
   }
 
   function setProviders(e: any) {
+    console.log('setProviders', e.target.id)
     e.preventDefault()
     e.stopPropagation()
-    let providerTag = e.target.id
+    let providerTag = e.target.dataset.provider
+    console.log(shadowRoot.value?.querySelectorAll(`[data-provider="${providerTag}"]`))
+    shadowRoot.value?.querySelectorAll(`[data-provider="${providerTag}"]`).forEach((el: any) => el.checked = !el.checked)
+
     providers.value = providers.value.map(p => { p.hasMore = true; return p; } )
     providers.value.forEach(p => p.instance.reset())
     let copy = {...providersEnabled.value}
     copy[providerTag] = !copy[providerTag]
+    console.log('setProviders', copy)
     providersEnabled.value = copy
     articles.value = []
     getNext()

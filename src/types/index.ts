@@ -33,8 +33,10 @@ interface Article {
   doi: string
   id: string
   issue?: string
+  logo?: string
   main_subjects?: MainSubject[]
   pages?: string
+  provider?: string
   publications?: Publication[]
   publication_date?: Date
   title?: string

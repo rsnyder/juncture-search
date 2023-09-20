@@ -19,8 +19,8 @@
               <a :href="imageData[idx].license" target="_blank">{{ licenses[imageData[idx].license]?.shortcode || imageData[idx].license }}</a>
             </sl-tooltip>
           </div>
-          <sl-icon class="push" library="fa" :name="`${depictsEntity(imageData[idx]) ? 'fas' : 'far'}-thumbs-up`" @click="toggleDepicts(imageData[idx])"></sl-icon>
-          <sl-tooltip :disabled="props.disableTooltips === 'true' ? '' : null" content="Favorite" hoist placement="left">
+          <sl-icon v-if="isLoggedIn" class="push" library="fa" :name="`${depictsEntity(imageData[idx]) ? 'fas' : 'far'}-thumbs-up`" @click="toggleDepicts(imageData[idx])"></sl-icon>
+          <sl-tooltip v-if="isLoggedIn" :disabled="props.disableTooltips === 'true' ? '' : null" content="Favorite" hoist placement="left">
             <sl-icon library="fa" :name="`${imageData[idx].isFavorite ? 'fas' : 'far'}-star`" @click="toggleFavorite(imageData[idx])"></sl-icon>
           </sl-tooltip>
         </div>
@@ -55,7 +55,7 @@
   const emit = defineEmits(['item-selected', 'get-next'])
  
   const store = useEntitiesStore()
-  const { qid } = storeToRefs(store)
+  const { isLoggedIn, qid } = storeToRefs(store)
 
   const props = defineProps({
     total: { type: Number, default: 0 },

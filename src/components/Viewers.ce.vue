@@ -26,7 +26,7 @@
       </sl-tab-panel>
 
       <sl-tab-panel name="documents">
-        <ve-articles label="articles" id="documents"></ve-articles>
+        <ve-articles label="Articles" id="documents"></ve-articles>
       </sl-tab-panel>
 
       <sl-tab-panel name="sites">

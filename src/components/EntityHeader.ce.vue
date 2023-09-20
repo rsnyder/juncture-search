@@ -5,14 +5,23 @@
       <div class="text">
         <div class="label">
           <span class="label" v-html="entity.label"></span>
-          <span class="wikidata-link">(<a target="_blank" :href="wikidataUrl" v-html="entity.id"></a>)</span>
+          <!--<span class="wikidata-link">(<a target="_blank" :href="wikidataUrl" v-html="entity.id"></a>)</span>-->
         </div>
         <div v-if="entity.aliases" class="aliases" v-html="entity.aliases.join(' | ')"></div>
         <div v-if="entity.description" class="description" v-html="entity.description"></div>
         <div v-if="summaryText" class="summary-text">
           <div v-html="summaryText"></div>
-          <div class="more" v-if="wikipedia">Source: <a :href="wikipedia.url">{{wikipedia.title}}</a></div>
+          <div class="flex items-center gap-2">Source:
+            <a target="_blank" :href="wikidataUrl">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg" class="h-8 w-8">
+            </a>
+            <a :href="wikipedia.url" class="flex items-center space-x-2">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Wikipedia_svg_logo.svg" class="h-8 w-8">
+              <span v-html="wikipedia.title"></span>
+            </a>
         </div>
+        </div>
+        <!--
         <div class="links">
           <span v-if="wikipedia" class="wikipedia link" title="Wikipedia"><a target="_blank" :href="wikipedia.url"><img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Wikipedia_svg_logo.svg"></a></span>
           <span class="wikimedia link" title="Wikidata"><a target="_blank" :href="wikidataUrl"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg"></a></span>
@@ -20,6 +29,7 @@
           <span v-if="wikiquoteUrl" class="wikimedia link" title="Wikiquote"><a target="_blank" :href="wikiquoteUrl"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Wikiquote-logo.svg"></a></span>
           <span v-if="wikivoyageUrl" class="wikimedia link" title="Wikivoyage"><a target="_blank" :href="wikivoyageUrl"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Wikivoyage-logo.svg"></a></span>
         </div>
+        -->
       </div>
       
       <div v-if="backgroundImage" class="image" :style="{backgroundImage}"></div>
@@ -68,6 +78,12 @@
 
 <style>
 
+  @import '../tailwind.css';
+
+  a {
+    @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600
+  }
+  
   .card {
     display: grid;
     grid-template-columns: 1fr minmax(0, 40%);

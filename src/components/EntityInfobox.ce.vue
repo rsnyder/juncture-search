@@ -42,8 +42,13 @@
     Object.values(result.entities).forEach((entity:any) => {
       entity.summaryText = {}
       if (entity.claims.P18) {
-        entity.image = entity.claims.P18[0].mainsnak.datavalue.value
-        entity.thumbnail = mwImage(entity.image)
+        for (let i = 0; i < entity.claims.P18.length; i++) {
+          let img:any = entity.claims.P18[i]
+          if (img.mainsnak.snaktype !== 'value') continue
+          entity.image = entity.claims.P18[0].mainsnak.datavalue.value
+          entity.thumbnail = mwImage(entity.image)
+          break
+        }
       }
     })
     entities.value = {...entities.value, ...result.entities}
@@ -62,7 +67,7 @@
       url += `/${width}px-${mwImg}`
       if (extension === 'svg') {
         url += '.png'
-      } else if (extension === 'tif' || extension === 'tiff') {
+      } else if (extension === 'tif' || extension === 'tiff' || extension === 'djvu') {
         url += '.jpg'
       }
     }
@@ -75,7 +80,7 @@
 
   <div ref="root" class="hs-tooltip inline-block [--trigger:click] [--placement:top]">
     <a class="hs-tooltip-toggle block text-center" href="javascript:;" title="Click for more information">
-      <span v-html="text"></span>
+      <span v-html="text" class="text-red-800 underline underline-offset-4 decoration-dotted"></span>
 
       <div class="hs-tooltip-content z-30 hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible hidden opacity-0 transition-opacity absolute invisible max-w-xs bg-white border border-gray-100 text-left rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700" role="tooltip">
         <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-700/[.7]">
@@ -87,12 +92,17 @@
             <p class="mt-1 text-gray-800 dark:text-gray-400">
               {{ description }}
             </p>
-            <div class="mt-5 text-xs text-gray-500 dark:text-gray-500">
+            <div class="flex items-center space-x-4 mt-5 text-xs text-gray-500 dark:text-gray-500">
               <a class="inline-flex items-center gap-2 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm" 
                 target="_blank" :href="wikipediaLink">
-                <img class="max-w-[24px]" src="https://upload.wikimedia.org/wikipedia/commons/7/77/Wikipedia_svg_logo.svg" />
-                <span class="ml-1">Wikipedia</span>
-              </a>            
+                <img class="max-w-[24px] rounded-full" src="https://upload.wikimedia.org/wikipedia/commons/7/77/Wikipedia_svg_logo.svg" />
+                <!-- <span class="ml-1">Wikipedia</span> -->
+              </a>
+              <a class="inline-flex bg-[#444A1E] h-[24px] w-[24px] rounded-md items-center justify-center gap-2 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm" 
+                target="_blank" :href="`/entity/${qid}`">
+                <img class="max-w-[16px]" src="/images/phl-logo.png" />
+                <!-- <span class="ml-1">Plant Humanities Lab Search</span> -->
+              </a>
             </div>
           </div>
         </div>

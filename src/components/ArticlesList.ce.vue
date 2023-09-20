@@ -7,14 +7,28 @@
           <div class="mr-2 text-right">{{ idx + 1 }}.</div>
           <div class="flex-col">
             <a class="text-lg font-medium text-blue-600 dark:text-blue-500 hover:underline" :href="article.url" target="_blank" v-html="article?.title || 'Untitled'"></a>
-            <div v-if="article.authors" v-html="article.authors.map(a => a.label).join(', ')"></div>
+            
+            <div v-if="article.authors">
+              <template v-for="(author, idx) in article.authors" :key="`author-${idx}`">
+                <template v-if="idx > 0">, </template>
+                <ve-entity-infobox v-if="author.id" :qid="author.id" v-html="author.label"></ve-entity-infobox>
+                <span v-else v-html="author.label"></span>
+              </template>
+              </div>
+            
             <div v-html="citation_line(article)"></div>
-            <div class="flex mt-2">
-              <a class="mr-[9px] " v-if="article.api === 'wikidata-articles'" :href="`https://www.wikidata.org/entity/${article.id}`" target="_blank" title="Open Wikidata entity page">
-                <img class="h-4" src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg">
-              </a>
-              <a class="h-4" href="javascript;;" @click="articleSelected(article, $event)" title="SHow details modal">
-                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg>         
+            
+            <div v-if="article.main_subjects" class="flex items-center flex-wrap space-x-2 mt-1">
+              <span class="text-md text-gray-600 dark:text-gray-400">Subjects:</span>
+              <template v-for="(subject, idx) in article.main_subjects" :key="subject.id">
+                <template v-if="idx > 0">, </template>
+                <ve-entity-infobox :qid="subject.id" v-html="subject.label"></ve-entity-infobox>
+              </template>
+            </div>
+
+            <div class="flex items-center mt-2">
+              <a class="h-4" href="javascript;;" @click="articleSelected(article, $event)" title="Show details modal">
+                <img v-if="article.logo" class="h-6 mr-[9px]" :src="article.logo" :alt="`${article.provider} logo`">
               </a>
             </div>
           </div>

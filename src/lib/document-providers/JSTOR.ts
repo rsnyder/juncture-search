@@ -74,7 +74,9 @@ export class JSTOR extends ArticleProviderBase {
       api: this.id,
       doi: item.doi,
       id: item.id,
-      url: `https://www.jstor.org/stable/${item.doi.replace(/10\.2307\//, '')}`,
+      logo: this.logo,
+      provider: this.name,
+      url: `https://www.jstor.org/stable/${item.doi.replace(/10\.2307\//, '')}`
     }
     if (item.author && item.author.length) article.authors = item.author.map(au => ({label: au}))
     if (item.citation_line) article.citation_line = item.citation_line
