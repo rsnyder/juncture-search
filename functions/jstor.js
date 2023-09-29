@@ -23,10 +23,13 @@ export async function handler(event, context, callback) {
       let iiifFragment = metadata.iiifUrls[0].split('/iiif/')[1]
       return getImageInfo(iiifFragment)
     })
+  console.log(resp)
+  let body = await resp.json()
+  console.log(body)
   if (resp.ok) {
     return {
       statusCode: resp.status, 
-      body: JSON.stringify(await resp.json()),
+      body: JSON.stringify(body),
       headers: {'Content-Type': 'application/json'}
     }
   } else

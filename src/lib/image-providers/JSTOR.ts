@@ -5,7 +5,7 @@ export class JSTOR extends ImageProvider {
 
   id: string = 'jstor'
   name: string = 'JSTOR'
-  logo: string = 'https://about.jstor.org/wp-content/themes/aboutjstor2017/static/JSTOR_Logo2017_90.png'
+  static logo: string = 'https://about.jstor.org/wp-content/themes/aboutjstor2017/static/JSTOR_Logo2017_90.png'
   
   _searchEndpoint = '/api/search/jstor/basic'
   _pager:string = ''
@@ -17,12 +17,14 @@ export class JSTOR extends ImageProvider {
   }
 
   async imageSelected(image: Image): Promise<string[]> {
+    console.log(`${this.id}.imageSelected: ${image.id} ${image.label} ${image.width} x ${image.height}`)
     if (image.width && image.height) return []
 
     // Fetch info.json file to get image dimensions
     return fetch(`/api/jstor/${image.id}`)
       .then((resp:any) => resp.json())
       .then((imageInfo:any) => {
+        console.log(imageInfo)
         image.width = imageInfo.width
         image.height = imageInfo.height
         return []
@@ -71,6 +73,7 @@ export class JSTOR extends ImageProvider {
     } else {
       this._hasMore = false
     }
+    console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} hasMore=${this._hasMore}`)
   
     this._filterAndSort()
     if (this._images?.length) this._cacheResults()
@@ -82,7 +85,7 @@ export class JSTOR extends ImageProvider {
       api: this.id,
       id: item.doi, 
       provider: this.name,
-      logo: this.logo,
+      logo: JSTOR.logo,
     }
     doc.url = `https://www.jstor.org/stable/${item.doi.indexOf('10.2307') === 0 ? item.doi.slice(8) : item.doi}`
     if (item.item_title) doc.label = item.item_title

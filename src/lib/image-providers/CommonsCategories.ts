@@ -7,7 +7,7 @@ export class CommonsCategoryImages extends ImageProvider {
 
   id: string = 'commons-category'
   name: string = 'Wikimedia Commons Category'
-  logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
+  static logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
   
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {
     super(entity, refresh, limit)
@@ -106,7 +106,7 @@ export class CommonsCategoryImages extends ImageProvider {
       pageid: ccPage.pageid,
       source: `https://commons.wikimedia.org/wiki/File:${file.replace(/ /g, '_').replace(/\?/g,'%3F')}`,
       provider: this.name,
-      logo: this.logo,
+      logo: CommonsCategoryImages.logo,
       file,
       license: emd.LicenseUrl?.value.replace(/http:/, 'https:').replace(/\/$/, '') || (emd.License ? licenseUrl(emd.License?.value) : ''),
       url: mwImage(file),

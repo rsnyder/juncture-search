@@ -27,6 +27,7 @@ import Articles from './components/Articles.ce.vue'
 import ArticlesList from './components/ArticlesList.ce.vue'
 import Auth from './components/Auth.ce.vue'
 import Claims from './components/Claims.ce.vue'
+import Drawer from './components/Drawer.ce.vue'
 import EntityCard from './components/EntityCard.ce.vue'
 import EntityCardStack from './components/EntityCardStack.ce.vue'
 import EntityGrid from './components/EntityGrid.ce.vue'
@@ -43,6 +44,7 @@ import Menu from './components/Menu.ce.vue'
 import Markdown from './components/Markdown.ce.vue'
 import Modal from './components/Modal.ce.vue'
 import ModalTWP from './components/ModalTWP.ce.vue'
+import Options from './components/Options.ce.vue'
 import Referencing from './components/Referencing.ce.vue'
 import Sites from './components/Sites.ce.vue'
 import Statements from './components/Statements.ce.vue'
@@ -56,6 +58,7 @@ customElements.define('ve-articles', defineCustomElement(Articles))
 customElements.define('ve-articles-list', defineCustomElement(ArticlesList))
 customElements.define('ve-auth', defineCustomElement(Auth))
 customElements.define('ve-claims', defineCustomElement(Claims))
+customElements.define('ve-drawer', defineCustomElement(Drawer))
 customElements.define('ve-entity-card', defineCustomElement(EntityCard))
 customElements.define('ve-entity-card-stack', defineCustomElement(EntityCardStack))
 customElements.define('ve-entity-grid', defineCustomElement(EntityGrid))
@@ -72,6 +75,7 @@ customElements.define('ve-mentioned-entities', defineCustomElement(MentionedEnti
 customElements.define('ve-menu', defineCustomElement(Menu))
 customElements.define('ve-modal', defineCustomElement(Modal))
 customElements.define('ve-modal-twp', defineCustomElement(ModalTWP))
+customElements.define('ve-options', defineCustomElement(Options))
 customElements.define('ve-pal', defineCustomElement(ArticlesList))
 customElements.define('ve-referencing', defineCustomElement(Referencing))
 customElements.define('ve-sites', defineCustomElement(Sites))

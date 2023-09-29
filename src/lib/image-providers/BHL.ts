@@ -5,8 +5,9 @@ export class BHL extends Openverse {
 
   id: string = 'bhl'
   name: string = 'Biodiversity Heritage Library'
-  logo: string = 'https://www.biodiversitylibrary.org/favicon.ico'
-
+  static logo: string = 'https://www.biodiversitylibrary.org/favicon.ico'
+  logo: string = BHL.logo
+  
   _source: string = 'bio_diversity'
 
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {

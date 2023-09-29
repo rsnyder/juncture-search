@@ -16,7 +16,8 @@
       </div>
 
       <div class="hs-dropdown relative inline-flex" data-hs-dropdown-auto-close="inside">
-        <button id="hs-dropdown-item-checkbox" type="button" class="hs-dropdown-toggle py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800">
+        <button id="hs-dropdown-item-checkbox" type="button" 
+          class="ml-1 hs-dropdown-toggle py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800">
           Content providers
           <svg class="hs-dropdown-open:rotate-180 w-2.5 h-2.5 text-gray-600" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -31,7 +32,7 @@
                 @click="setProviders"
                 class="border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" 
                 aria-describedby="hs-dropdown-item-checkbox-delete-description" 
-                :checked="providersEnabled.Wikidata ? '' : null"
+                :checked="providersEnabled.Wikidata ? true : false"
               >
             </div>
             <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg" class="ml-4 h-4 w-4">
@@ -46,7 +47,7 @@
                 @click="setProviders"
                 class="border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" 
                 aria-describedby="hs-dropdown-item-checkbox-delete-description" 
-                :checked="providersEnabled.JSTOR ? '' : null"
+                :checked="providersEnabled.JSTOR ? true : false"
               >
             </div>
             <img src="https://about.jstor.org/wp-content/themes/aboutjstor2017/static/JSTOR_Logo2017_90.png" class="ml-4 h-4 w-4">
@@ -127,7 +128,7 @@
 
   let articleProviders = [
     { class: Wikidata, tag: 'Wikidata', enabled: true},
-    { class: JSTOR, tag: 'JSTOR', enabled: true},
+    { class: JSTOR, tag: 'JSTOR', enabled: false},
   ]
   const providers = ref<any[]>([])
   const providersEnabled = ref<any>({})

@@ -4,6 +4,7 @@ import Home from './Home.vue';
 import Entities from './Entities.vue';
 import Entity from './Entity.vue';
 import Markdown from './Markdown.vue';
+import Options from './Options.vue';
 import Tailwind from './Tailwind.vue';
 
 const routes = [
@@ -12,6 +13,7 @@ const routes = [
   { name: 'entity', path: '/entity/:qid', component: Entity },
   { name: 'entities', path: '/entities/', component: Entities },
   { name: 'md', path: '/md/:owner/:repo/:path*', component: Markdown },
+  { name: 'options', path: '/options', component: Options },
   { name: 'tailwind', path: '/tailwind/:qid', component: Tailwind }
 ]
 

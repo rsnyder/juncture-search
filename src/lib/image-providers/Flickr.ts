@@ -5,7 +5,8 @@ export class Flickr extends Openverse {
 
   id: string = 'flickr'
   name: string = 'Flickr'
-  logo: string = 'https://combo.staticflickr.com/pw/favicon.ico'
+  static logo: string = 'https://combo.staticflickr.com/pw/favicon.ico'
+  logo: string = Flickr.logo
 
   _source: string = 'flickr'
 

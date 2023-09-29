@@ -5,7 +5,8 @@ export class Openverse extends ImageProvider {
 
   id: string = 'openverse'
   name: string = 'Openverse'
-  logo: string = 'https://openverse.org/openverse-logo.svg'
+  static logo: string = 'https://openverse.org/openverse-logo.svg'
+  logo: string = Openverse.logo
   
   _source: string = ''
 
@@ -25,11 +26,13 @@ export class Openverse extends ImageProvider {
       license_type: 'all-cc'
     }
     if (this._source) args['source'] = this._source
+    console.log(args)
     let qargs = Object.keys(args).map(k => `${k}=${args[k]}`).join('&')
 
     let resp:any = await fetch(`${this._searchEndpoint}/?${qargs}`)
     if (resp.ok) {
       resp = await resp.json()
+      console.log(resp)
       this._priorPage = resp.page
       this._images = [...this._images, ...resp.results.map((item: any) => this._transformItem(item))]
       if (resp.results.length < this._pageSize) this._hasMore = false

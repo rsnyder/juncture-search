@@ -7,7 +7,7 @@ export class Wikidata extends ImageProvider {
 
   id: string = 'wikidata-images'
   name: string = 'Wikidata'
-  logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
+  static logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
   
   _fetching: boolean = false
 
@@ -91,12 +91,12 @@ export class Wikidata extends ImageProvider {
           let id = b.item.value.split('/').pop()
           let file = decodeURIComponent(b.url.value.split('/').pop())
           if (!data[id]) data[id] = {
-            api: 'wikidata',
+            api: this.id,
             id,
             file,
             source: `https://commons.wikimedia.org/wiki/File:${file.replace(/ /g, '_').replace(/\?/g,'%3F')}`,
             provider: 'Wikimedia Commons',
-            logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png',
+            logo: Wikidata.logo,
             url: mwImage(file),
             thumbnail: mwImage(file, 400),
             iiif: b.iiif?.value || `https://iiif.juncture-digital.org/wc:${file.replace(/\s/g,'_')}/manifest.json`,

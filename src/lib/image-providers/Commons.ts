@@ -7,7 +7,7 @@ export class WikimediaCommons extends ImageProvider {
 
   id: string = 'commons'
   name: string = 'Wikimedia Commons'
-  logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
+  static logo: string = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/178px-Commons-logo.svg.png'
 
   constructor(entity:any, refresh: boolean = false, limit: number = -1) {
     super(entity, refresh, limit)
@@ -116,7 +116,7 @@ export class WikimediaCommons extends ImageProvider {
             pageid: page.pageid,
             source: `https://commons.wikimedia.org/wiki/File:${file.replace(/ /g, '_').replace(/\?/g,'%3F')}`,
             provider: this.name,
-            logo: this.logo,
+            logo: WikimediaCommons.logo,
             file,
             url: mwImage(file),
             thumbnail: mwImage(file, 400),

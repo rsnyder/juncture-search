@@ -85,10 +85,8 @@ export class HSDropdown extends Component {
       if (!$dropdownEl || !$dropdownEl.classList.contains('open')) this._closeOthers($dropdownEl);
 
       if ($menuEl) {
-        const autoClose = (window.getComputedStyle($dropdownEl).getPropertyValue('--auto-close') || '').replace(
-          ' ',
-          ''
-        );
+        const autoClose = $dropdownEl.dataset.hsDropdownAutoClose || '';
+        // const autoClose = (window.getComputedStyle($dropdownEl).getPropertyValue('--auto-close') || '').replace(' ','');
         if ((autoClose == 'false' || autoClose == 'inside') && !$dropdownEl.parentElement.closest(this.selector))
           return;
       }
