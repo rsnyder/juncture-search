@@ -31,6 +31,7 @@ export class ImageProvider {
   }
 
   reset() {
+    console.log(`${this.id}.reset`)
     this._cursor = this._cursor > 0 ? 0 : this._cursor
   }
 
@@ -46,12 +47,14 @@ export class ImageProvider {
       this._doQuery()
     }
     let next = this._filteredAndSorted.slice(this._cursor, this._cursor + howMany)
+    console.log(`${this.id}.next: qid=${this._qid} cursor=${this._cursor} howMany=${howMany} images=${this._images.length} from_cache=${!this._hasMore} next=${next.length}`)
     this._cursor += next.length
     return next
   }
 
-  async getDepicts() {
-    return this._depicts
+  async getDepicts(filter:string[] = []) {
+    let depictsFilter = new Set(filter)
+    return Object.fromEntries(Object.entries(this._depicts).filter(([qid, count]) => depictsFilter.size === 0 || depictsFilter.has(qid)))
   }
 
   async imageSelected(image: Image): Promise<string[]> {

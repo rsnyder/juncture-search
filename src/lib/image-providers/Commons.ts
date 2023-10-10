@@ -13,7 +13,7 @@ export class WikimediaCommons extends ImageProvider {
     super(entity, refresh, limit)
   }
 
-  async getDepicts() {
+  async getDepicts(filter:string[] = []) {
     if (this._cursor < 0) {
       this._cursor = 0
       await this._doQuery()
@@ -26,7 +26,8 @@ export class WikimediaCommons extends ImageProvider {
         else this._depicts[d.id] = 1
       })
     })
-    return this._depicts
+    let depictsFilter = new Set(filter)
+    return Object.fromEntries(Object.entries(this._depicts).filter(([qid, count]) => depictsFilter.size === 0 || depictsFilter.has(qid)))
   }
 
   async imageSelected(image: Image): Promise<string[]> {

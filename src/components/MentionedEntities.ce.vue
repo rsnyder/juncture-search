@@ -13,7 +13,7 @@
       class="flex items-center p-2 space-x-4 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
       @click="itemSelected(e)"
     >
-      <img v-if="e.images" :src="e.images.thumbnail" :alt="e.label" class="w-12 h-12 rounded-full">
+      <img v-if="e.images" :src="e.images.thumbnail" :alt="e.label" class="w-12 h-12 rounded-lg">
       <div v-else class="w-12 h-12 rounded-full bg-gray-200"></div>
       <div class="flex flex-col">
         <div class="flex items-center space-x-2">

@@ -2,7 +2,16 @@
 
 import { computed, onMounted, ref, watch } from 'vue'
 import '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
+import '@shoelace-style/shoelace/dist/components/option/option.js'
+import '@shoelace-style/shoelace/dist/components/select/select.js'
 import type SLDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
+import type SLOption from '@shoelace-style/shoelace/dist/components/option/option.js'
+import type SLSelect from '@shoelace-style/shoelace/dist/components/select/select.js'
+
+import { useEntitiesStore } from '../store/entities'
+import { storeToRefs } from 'pinia'
+const store = useEntitiesStore()
+const { labels } = storeToRefs(store)
 
 const emit = defineEmits(['options-updated'])
 
@@ -12,6 +21,9 @@ const drawer = computed(() => shadowRoot.value?.querySelector('.drawer') as SLDr
 watch (drawer, (drawer) => {
   shadowRoot.value.querySelector('#open-drawer')?.addEventListener('click', () => { drawer.open = !drawer.open })
 })
+
+const entitySelect = ref<HTMLElement | null>(null)
+watch(entitySelect, (entitySelect) => entitySelect?.addEventListener('sl-change', (e: any) => setEntities(e)) )
 
 const props = defineProps({
   label: { type: String, default: 'Options' },
@@ -26,10 +38,18 @@ const options = ref()
 const providers = computed(() => options.value?.providers || [])
 const providersEnabled = computed(() => Object.fromEntries((providers.value as any[])?.map((provider: any) => [provider.label, provider]) || []))
 
+const depicted = computed(() => Array.from(Object.entries(options.value?.depicts?.entities || {}).map(([qid, count]) => ({ qid, count, label: labels.value[qid] })) || []))
+
 function setProviders(e: any) {
   let _options = {...options.value}
   let provider = _options.providers.find((p: any) => p.label === e.target.dataset.provider)
   provider.enabled = !provider.enabled  
+  emit('options-updated', _options)
+}
+
+function setEntities(e: any) {
+  let _options = {...options.value}
+  _options.depicts.selected = (entitySelect.value as HTMLOptionElement)?.value
   emit('options-updated', _options)
 }
 
@@ -46,27 +66,35 @@ function setProviders(e: any) {
     <sl-drawer label="Options" contained placement="start" class="drawer" style="--size: 400px;">
       <template v-for="provider, idx) in providers">
             
-            <div class="relative flex items-center py-2 px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
-              <div class="flex items-center h-5">
-                <input 
-                  type="checkbox"
-                  :id="`hs-dropdown-item-checkbox-${idx}`" 
-                  :data-provider="(provider as any).label" 
-                  :name="`hs-dropdown-item-checkbox-checkbox-${idx}`"
-                  class="border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" 
-                  aria-describedby="hs-dropdown-item-checkbox-delete-description" 
-                  :data-enabled="providersEnabled[(provider as any).label]?.enabled ? true : false"
-                  :checked="providersEnabled[(provider as any).label]?.enabled"
-                  @click="setProviders"
-                >
-              </div>
-              <img :src="(provider as any).logo" class="ml-4 h-4 w-4">
-              <label :for="`hs-dropdown-item-checkbox-checkbox-${idx}`" class="ml-2">
-                <span class="text-sm font-semibold text-gray-800 dark:text-gray-300" v-html="(provider as any).label"></span>
-              </label>
-            </div>
+        <div class="relative flex items-center py-2 px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+          <div class="flex items-center h-5">
+            <input 
+              type="checkbox"
+              :id="`hs-dropdown-item-checkbox-${idx}`" 
+              :data-provider="(provider as any).label" 
+              :name="`hs-dropdown-item-checkbox-checkbox-${idx}`"
+              class="border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" 
+              aria-describedby="hs-dropdown-item-checkbox-delete-description" 
+              :data-enabled="providersEnabled[(provider as any).label]?.enabled ? true : false"
+              :checked="providersEnabled[(provider as any).label]?.enabled"
+              @click="setProviders"
+            >
+          </div>
+          <img :src="(provider as any).logo" class="ml-4 h-4 w-4">
+          <label :for="`hs-dropdown-item-checkbox-checkbox-${idx}`" class="ml-2">
+            <span class="text-sm font-semibold text-gray-800 dark:text-gray-300" v-html="(provider as any).label"></span>
+          </label>
+        </div>
 
-          </template>
+      </template>
+
+      <br/>
+      <div></div>
+      <sl-select ref="entitySelect" label="Select a Few" value="" multiple clearable>
+        <sl-option  v-for="d in depicted" :key="d.qid" :value="d.qid">{{ d.label }} ({{ d.count }})</sl-option>
+      </sl-select>
+
+      <div class="h-[400px]"></div>
 
     </sl-drawer>
 

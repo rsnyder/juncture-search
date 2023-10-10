@@ -17,20 +17,18 @@ export class JSTOR extends ImageProvider {
   }
 
   async imageSelected(image: Image): Promise<string[]> {
-    console.log(`${this.id}.imageSelected: ${image.id} ${image.label} ${image.width} x ${image.height}`)
     if (image.width && image.height) return []
 
     // Fetch info.json file to get image dimensions
-    return fetch(`/api/jstor/${image.id}`)
-      .then((resp:any) => resp.json())
-      .then((imageInfo:any) => {
-        console.log(imageInfo)
-        image.width = imageInfo.width
-        image.height = imageInfo.height
-        return []
-      })
-      // .catch(err => console.error(err))
-
+    let resp = await fetch(`/api/jstor/${image.id}`)
+    if (resp.ok) {
+      let imageInfo = await resp.json()
+      image.width = imageInfo.width
+      image.height = imageInfo.height
+    } else {
+      console.log(resp)
+    }
+    return []
   }
 
   async _doQuery() {

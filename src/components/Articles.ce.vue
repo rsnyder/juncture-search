@@ -28,6 +28,21 @@
           
           <div class="relative flex items-center py-2 px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
             <div class="flex items-center h-5">
+              <input id="hs-dropdown-item-checkbox-openalex" data-provider="OpenAlex" name="hs-dropdown-item-checkbox-openalex" type="checkbox"
+                @click="setProviders"
+                class="border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" 
+                aria-describedby="hs-dropdown-item-checkbox-delete-description" 
+                :checked="providersEnabled.OpenAlex ? true : false"
+              >
+            </div>
+            <img src="https://www.gitbook.com/cdn-cgi/image/width=24,dpr=2,height=24,fit=contain,format=auto/https%3A%2F%2F2520693015-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FpHVuV3Ib5KXeBKft4Kcl%252Ficon%252FogQFSOcLuYxWvYBhmDaU%252Fopenalex%2520logo%2520twitter.jpg%3Falt%3Dmedia%26token%3D5136a792-47d6-4d18-96eb-2012b55844d0" class="ml-4 h-4 w-4">
+            <label for="hs-dropdown-item-checkbox-openalex" class="ml-2">
+              <span class="text-sm font-semibold text-gray-800 dark:text-gray-300">OpenAlex</span>
+            </label>
+          </div>
+
+          <div class="relative flex items-center py-2 px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div class="flex items-center h-5">
               <input id="hs-dropdown-item-checkbox-wikidata" data-provider="Wikidata" name="hs-dropdown-item-checkbox-wikidata" type="checkbox"
                 @click="setProviders"
                 class="border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" 
@@ -101,6 +116,7 @@
 
   import { Wikidata } from '../lib/document-providers/Wikidata'
   import { JSTOR } from '../lib/document-providers/JSTOR'
+  import { OpenAlex } from '../lib/document-providers/OpenAlex'
 
   const store = useEntitiesStore()
   const { active, articlesMap, labels, qid } = storeToRefs(store)
@@ -127,8 +143,9 @@
   })
 
   let articleProviders = [
+    { class: OpenAlex, tag: 'OpenAlex', enabled: true},
     { class: Wikidata, tag: 'Wikidata', enabled: true},
-    { class: JSTOR, tag: 'JSTOR', enabled: false},
+    { class: JSTOR, tag: 'JSTOR', enabled: true},
   ]
   const providers = ref<any[]>([])
   const providersEnabled = ref<any>({})

@@ -71,15 +71,6 @@ function getMenuItems() {
     else if (props.auth === 'github') ghLogout()
   }
 
-  function toggleLogin(evt:Event) {
-    evt.preventDefault()
-    isLoggedIn.value = !isLoggedIn.value
-    let menu = shadowRoot.value.querySelector('.hs-dropdown.open')?.querySelector('.hs-dropdown-menu') as HTMLElement
-    menu.classList.remove('block')
-    menu.classList.add('hidden')
-  }
-
-
   /***************** Netlify auth *****************/
 
   let netlifyIdentityEndpoint = 'https://juncture-search.netlify.app/.netlify/identity'
@@ -180,18 +171,6 @@ function getMenuItems() {
     }).then(resp => resp.json())
     .then(info => store.setUser({provider: 'github', username: info.login, name: info.name, email: info.email, token}))
   }
-
-  /*
-  watch(githubClient, async () => {
-    if (isLoggedIn.value) {
-      let username = await githubClient.value?.user().then((userData:any) => userData.login)
-      await githubClient.value?.repos(username).then((repos:any[]) => {
-        if (!repos.find(repo => repo.name === 'essays')) githubClient.value?.createRepository({name:'essays', description:'Juncture visual essays'})
-        if (!repos.find(repo => repo.name === 'media')) githubClient.value?.createRepository({name:'media', description:'Juncture media'})
-      })
-    }
-  })
-  */
 
 </script>
 

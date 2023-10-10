@@ -66,13 +66,15 @@
   const options = ref<any>({})
   watch(options, () => {
     console.log('options', toRaw(options.value))
-    providers.value.forEach(p => p.instance.reset())
-    images.value = []
-    getNext()
+    // providers.value.forEach(p => p.instance.reset())
+    //images.value = []
+    //getNext()
   })
 
   function optionsUpdated(e: any) {
     options.value = e.detail[0]
+    console.log('optionsUpdated', options.value)
+    depictsFilter.value = options.value.depicts?.selected || []
   }
 
   let imageProviders = [
@@ -87,6 +89,15 @@
 
   const providers = ref<any[]>([])
   watch(providers, () => { if (isActive.value) getNext() })  
+
+  const depictsFilter = ref<string[]>([])
+  watch(depictsFilter, () => {
+    console.log('depictsFilter', depictsFilter.value)
+    // depicts.value = {}
+    images.value = []
+    providers.value.forEach(p => p.instance.reset())
+    getNext()
+  })
 
   function setOptions() {
     options.value = {
@@ -131,7 +142,9 @@
   const depictsProcessed = new Set()
   function getDepicts(provider: any) {
     if (depictsProcessed.has(provider.id)) return
-    provider.getDepicts().then((depicted: any) => {
+    // provider.getDepicts(depictsFilter.value).then((depicted: any) => {
+    provider.getDepicts([]).then((depicted: any) => {
+      console.log('getDepicts', provider.id, Object.keys(depicted).length)
       let updated = {...depicts.value}
       let qids = Object.keys(depicted)
       if (qids.length === 0) return
@@ -153,12 +166,21 @@
     fetching.value = true
     let toAdd = 0
     for (let provider of providers.value) {
-      console.log(`getNext ${provider.instance.id} enabled=${isEnabled(provider.tag)} hasMore=${provider.instance.hasMore()}`)
+      // console.log(`getNext ${provider.instance.id} enabled=${isEnabled(provider.tag)} hasMore=${provider.instance.hasMore()} filter=${depictsFilter.value.length}`)
       if (isEnabled(provider.tag)) {
         while (provider.instance.hasMore() && toAdd < 50) {
           let providerImages = await provider.instance.next()
+          if (depictsFilter.value.length > 0) {
+            let filter = new Set(depictsFilter.value)
+            providerImages = providerImages.filter((i: Image) => {
+              let matches = (i.depicts || []).filter((d: any) => filter.has(d.id));
+              // console.log('filter', i.id, matches.length)
+              return matches.length > 0
+            })
+          }
           // console.log('getNext', provider.instance.id, provider.instance.hasMore())
           if (initial) getDepicts(provider.instance)
+          console.log(`${provider.instance.id}: filter=${depictsFilter.value} selected=${providerImages.length}`)
           if (providerImages.length === 0) break
           images.value = [...images.value, ...providerImages]
           toAdd += providerImages.length
@@ -167,20 +189,23 @@
         if (toAdd >= 50 && !initial) break
       }
     }
-    initial = false
+    //initial = false
     fetching.value = false
   }
 
   const images = ref<Image[]>([])
   watch(images, () => {
     store.$state.imagesMap = {...imagesMap.value, ...Object.fromEntries(images.value.map((i:Image) => [i.id, i])) }
-    if (images.value.length === 0) depicts.value = {}
+    // if (images.value.length === 0) depicts.value = {}
   })
 
   const depicts = ref<any>({})
-  watch (depicts, () => {
-    // console.log('depicts', toRaw(depicts.value))
-    store.updateLabels(Object.keys(depicts.value))
+  watch (depicts, async () => { 
+    if (Object.keys(depicts.value).length > 0) console.log('depicts', toRaw(depicts.value))
+    await store.updateLabels(Object.keys(depicts.value))
+    let copy = {...options.value}
+    copy.depicts = {entities: depicts.value, selected: []}
+    options.value = copy
   })
 
   function itemSelected(e: any) {

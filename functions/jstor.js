@@ -7,6 +7,7 @@ async function getMetadata(id) {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${process.env.JSTOR_API_KEY}`}
   })
+  console.log(url, resp.status, resp.statusText)
   if (resp.ok) return resp.json()
 }
 
@@ -23,9 +24,8 @@ export async function handler(event, context, callback) {
       let iiifFragment = metadata.iiifUrls[0].split('/iiif/')[1]
       return getImageInfo(iiifFragment)
     })
-  console.log(resp)
+  console.log(resp.status, resp.statusText)
   let body = await resp.json()
-  console.log(body)
   if (resp.ok) {
     return {
       statusCode: resp.status, 

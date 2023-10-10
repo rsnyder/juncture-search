@@ -357,18 +357,14 @@
     return _claims && Object.keys(_claims).length > 0 && Object.keys(labels.value).length > 0
       ? Object.fromEntries(Object.keys(_claims)
         .filter(pid => !exclude.has(pid))
-        .filter((pid: string) => _claims[pid][0].mainsnak.datavalue?.type !== 'external-id')
+        .filter((pid: string) => _claims[pid][0].mainsnak.datatype !== 'external-id')
         .map((pid: string) => ( {pid, label: labels.value[pid] ? pid : pid } ))
         .sort((a: any, b: any) => (a.label.toLowerCase() > b.label.toLowerCase()) ? 1 : -1)
         .map((p: any) => p.pid)
         .map(pid => [pid, _claims[pid]]))
-      : []
+      : {}
   })
   // watch(claims, () => console.log('claims', toRaw(claims.value)))
-
-  function entitySelected(e: any) {
-    store.setQid(e.target.dataset.qid)
-  }
 
   function quantity(val: any): string {
     let amount = val.amount[0] === '+' ? val.amount.slice(1) : val.amount

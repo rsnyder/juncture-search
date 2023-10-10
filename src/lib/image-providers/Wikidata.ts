@@ -49,7 +49,7 @@ export class Wikidata extends ImageProvider {
     return this._cursor < this._images.length || this._hasMore
   }
 
-  async getDepicts() {
+  async getDepicts(filter:string[] = []) {
     if (this._cursor < 0) {
       await this._doQuery()
       this._cursor = 0
@@ -60,7 +60,8 @@ export class Wikidata extends ImageProvider {
         else this._depicts[d.id] = 1
       })
     })
-    return this._depicts
+    let depictsFilter = new Set(filter)
+    return Object.fromEntries(Object.entries(this._depicts).filter(([qid, count]) => depictsFilter.size === 0 || depictsFilter.has(qid)))
   }
 
   async _doQuery() {
