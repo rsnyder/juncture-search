@@ -1,11 +1,14 @@
 <template>
 
   <div ref="root" class="relative overflow-x-auto shadow-md sm:rounded-lg">
-    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <table class="w-full text-sm text-left dark:text-gray-400">
       <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
           <th scope="col" class="px-6 py-3">
             Web Site
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Description
           </th>
           <th scope="col" class="px-6 py-3">
             Link
@@ -17,9 +20,15 @@
             class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
             <th 
               scope="row" 
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              v-html="site.label"
-            ></th>
+              class="w-2/5 items-center px-6 py-2 font-medium text-gray-900 dark:text-white"
+            >
+              <img v-if="site.logo" :src="site.logo" class="w-6 h-6 mr-2 inline-block border shadow-md" />
+              <span class="text-base" v-html="site.label"></span>
+              <span v-if="site.country?.symbol" class="ml-2" v-html="site.country.symbol"></span>
+            </th>
+            <td class="px-6 py-4">
+              <span v-html="site.description"></span>
+            </td>
             <td class="px-6 py-4">
               <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <tbody>
@@ -48,6 +57,8 @@
   type Site = {
     id: string,
     label: string,
+    description?: string,
+    logo?: string,
     country?: {
       label: string,
       symbol: string
@@ -78,7 +89,7 @@
   watch(entity, () => doQuery() )
 
   function doQuery() {
-    let query = `SELECT DISTINCT ?site ?siteLabel ?itemId ?url ?countryLabel ?countryChar WHERE {
+    let query = `SELECT DISTINCT ?site ?siteLabel ?siteLogo ?siteDescription ?itemId ?url ?countryLabel ?countryChar WHERE {
       VALUES (?item) {(wd:${qid.value})}
       ?item ?a ?itemId .   
       ?prop wikibase:propertyType wikibase:ExternalId ;
@@ -87,7 +98,8 @@
             wdt:P1630 ?formatterurl .
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en" } 
       BIND(IRI(REPLACE(?itemId, '^(.+)$', ?formatterurl)) AS ?url).
-      
+      OPTIONAL { ?site wdt:P154 ?siteLogo . }
+      OPTIONAL { ?site schema:description ?siteDescription. FILTER (LANG(?siteDescription) = "en") . }
       OPTIONAL {
         ?prop p:P17 ?co .
         ?co ps:P17 ?country .
@@ -113,6 +125,8 @@
           _site = {
             id: siteId,
             label: b.siteLabel.value,
+            description: b.siteDescription?.value,
+            logo: b.siteLogo?.value,
             items: [ { id: b.itemId.value, url: b.url.value } ]
           }
           if (b.countryLabel) {
@@ -133,4 +147,9 @@
 
 <style>
   @import '../tailwind.css';
+
+  a {
+    @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600
+  }
+
 </style>
