@@ -43,10 +43,13 @@
                 <span class="label">Thumbnail</span> <a :href="image.thumbnail" v-html="image.thumbnail" target="_blank"></a>
               </li>
               <li>
-                <span class="label">IIIF</span> <a :href="image.iiif" v-html="image.iiif" target="_blank"></a>
+                <span class="label">IIIF</span>
+                <a :href="image.iiif" v-html="image.iiif" target="_blank"></a>
               </li>
             </ul>
           </div>
+
+          <img class="h-6 w-6 cursor-copy" src="https://upload.wikimedia.org/wikipedia/commons/e/e8/International_Image_Interoperability_Framework_logo.png" @click="copyTextToClipboard(image.iiif)">
 
           <div v-if="image.pageid">
             <span>ID</span>
@@ -177,9 +180,15 @@
     }
   }
 
+  function copyTextToClipboard(text: any) {
+    if (navigator.clipboard) navigator.clipboard.writeText(text)
+  }
+
 </script>
 
 <style>
+
+  @import '../tailwind.css';
 
   * { box-sizing: border-box; }
 

@@ -1542,6 +1542,10 @@ input:checked + .toggle-bg {
   cursor: pointer;
 }
 
+.cursor-copy {
+  cursor: copy;
+}
+
 .resize {
   resize: both;
 }
