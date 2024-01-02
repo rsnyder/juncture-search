@@ -28,6 +28,11 @@ Credentials used by the service include:
 
 #### Local development
 
+Prerequisites:
+
+- [Install the netlify CLI](https://docs.netlify.com/cli/get-started/).
+- Set up a `creds.env` file with the credentials the app needs to run (you can get these from the app environment variables in netlify).
+
 From the root directory.
 
 ```bash
