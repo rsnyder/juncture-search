@@ -7,10 +7,10 @@
  * Copyright 2023 Htmlstream
  */
 
-const plugin = require('tailwindcss/plugin');
+const plugin = require("tailwindcss/plugin");
 
 module.exports = plugin(function ({ addVariant, e }) {
-  addVariant('hs-overlay-open', [
+  addVariant("hs-overlay-open", [
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
         return `.open.${e(`hs-overlay-open${separator}${className}`)}`;
@@ -22,15 +22,19 @@ module.exports = plugin(function ({ addVariant, e }) {
       });
     },
   ]);
-  addVariant('hs-overlay-backdrop-open', [
+  addVariant("hs-overlay-backdrop-open", [
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-overlay-backdrop.${e(`hs-overlay-backdrop-open${separator}${className}`)}`;
+        return `.hs-overlay-backdrop.${e(
+          `hs-overlay-backdrop-open${separator}${className}`,
+        )}`;
       });
     },
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-overlay-backdrop .${e(`hs-overlay-backdrop-open${separator}${className}`)}`;
+        return `.hs-overlay-backdrop .${e(
+          `hs-overlay-backdrop-open${separator}${className}`,
+        )}`;
       });
     },
   ]);

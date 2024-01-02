@@ -7,18 +7,22 @@
  * Copyright 2023 Htmlstream
  */
 
-const plugin = require('tailwindcss/plugin');
+const plugin = require("tailwindcss/plugin");
 
 module.exports = plugin(function ({ addVariant, e }) {
-  addVariant('hs-tab-active', [
+  addVariant("hs-tab-active", [
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `[data-hs-tab].active.${e(`hs-tab-active${separator}${className}`)}`;
+        return `[data-hs-tab].active.${e(
+          `hs-tab-active${separator}${className}`,
+        )}`;
       });
     },
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `[data-hs-tab].active .${e(`hs-tab-active${separator}${className}`)}`;
+        return `[data-hs-tab].active .${e(
+          `hs-tab-active${separator}${className}`,
+        )}`;
       });
     },
   ]);

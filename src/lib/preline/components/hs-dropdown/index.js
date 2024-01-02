@@ -7,57 +7,71 @@
  * Copyright 2023 Htmlstream
  */
 
-import { createPopper } from '@popperjs/core';
-import Component from '../../core/Component';
-import MenuSearchHistory from '../../core/utils/MenuSearchHistory';
+import { createPopper } from "@popperjs/core";
+import Component from "../../core/Component";
+import MenuSearchHistory from "../../core/utils/MenuSearchHistory";
 
 const isIOS = () => {
   if (/iPad|iPhone|iPod/.test(navigator.platform)) {
     return true;
   } else {
-    return navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform);
+    return (
+      navigator.maxTouchPoints &&
+      navigator.maxTouchPoints > 2 &&
+      /MacIntel/.test(navigator.platform)
+    );
   }
 };
 
 const isIpadOS = () => {
-  return navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform);
+  return (
+    navigator.maxTouchPoints &&
+    navigator.maxTouchPoints > 2 &&
+    /MacIntel/.test(navigator.platform)
+  );
 };
 
 export class HSDropdown extends Component {
-  root
+  root;
   constructor(root) {
-    super('.hs-dropdown');
-    this.root = root
+    super(".hs-dropdown");
+    this.root = root;
 
     this.positions = {
-      top: 'top',
-      'top-left': 'top-start',
-      'top-right': 'top-end',
-      bottom: 'bottom',
-      'bottom-left': 'bottom-start',
-      'bottom-right': 'bottom-end',
-      right: 'right',
-      'right-top': 'right-start',
-      'right-bottom': 'right-end',
-      left: 'left',
-      'left-top': 'left-start',
-      'left-bottom': 'left-end',
+      top: "top",
+      "top-left": "top-start",
+      "top-right": "top-end",
+      bottom: "bottom",
+      "bottom-left": "bottom-start",
+      "bottom-right": "bottom-end",
+      right: "right",
+      "right-top": "right-start",
+      "right-bottom": "right-end",
+      left: "left",
+      "left-top": "left-start",
+      "left-bottom": "left-end",
     };
     this.absoluteStrategyModifiers = ($dropdownEl) => {
       return [
         {
-          name: 'applyStyles',
+          name: "applyStyles",
           fn: (data) => {
             const strategy = (
-              window.getComputedStyle($dropdownEl).getPropertyValue('--strategy') || 'absolute'
-            ).replace(' ', '');
+              window
+                .getComputedStyle($dropdownEl)
+                .getPropertyValue("--strategy") || "absolute"
+            ).replace(" ", "");
             const adaptive = (
-              window.getComputedStyle($dropdownEl).getPropertyValue('--adaptive') || 'adaptive'
-            ).replace(' ', '');
+              window
+                .getComputedStyle($dropdownEl)
+                .getPropertyValue("--adaptive") || "adaptive"
+            ).replace(" ", "");
 
             data.state.elements.popper.style.position = strategy;
             data.state.elements.popper.style.transform =
-              adaptive === 'adaptive' ? data.state.styles.popper.transform : null;
+              adaptive === "adaptive"
+                ? data.state.styles.popper.transform
+                : null;
             data.state.elements.popper.style.top = null;
             data.state.elements.popper.style.bottom = null;
             data.state.elements.popper.style.left = null;
@@ -66,7 +80,7 @@ export class HSDropdown extends Component {
           },
         },
         {
-          name: 'computeStyles',
+          name: "computeStyles",
           options: {
             adaptive: false,
           },
@@ -77,47 +91,59 @@ export class HSDropdown extends Component {
   }
 
   init() {
-    this.root.addEventListener('click', (e) => {
+    this.root.addEventListener("click", (e) => {
       const $targetEl = e.target;
       const $dropdownEl = $targetEl.closest(this.selector);
-      const $menuEl = $targetEl.closest('.hs-dropdown-menu');
+      const $menuEl = $targetEl.closest(".hs-dropdown-menu");
 
-      if (!$dropdownEl || !$dropdownEl.classList.contains('open')) this._closeOthers($dropdownEl);
+      if (!$dropdownEl || !$dropdownEl.classList.contains("open"))
+        this._closeOthers($dropdownEl);
 
       if ($menuEl) {
-        const autoClose = $dropdownEl.dataset.hsDropdownAutoClose || '';
+        const autoClose = $dropdownEl.dataset.hsDropdownAutoClose || "";
         // const autoClose = (window.getComputedStyle($dropdownEl).getPropertyValue('--auto-close') || '').replace(' ','');
-        if ((autoClose == 'false' || autoClose == 'inside') && !$dropdownEl.parentElement.closest(this.selector))
+        if (
+          (autoClose == "false" || autoClose == "inside") &&
+          !$dropdownEl.parentElement.closest(this.selector)
+        )
           return;
       }
 
       if ($dropdownEl) {
-        !$dropdownEl.classList.contains('open') ? this.open($dropdownEl) : this.close($dropdownEl);
+        !$dropdownEl.classList.contains("open")
+          ? this.open($dropdownEl)
+          : this.close($dropdownEl);
       }
     });
 
-    this.root.addEventListener('mousemove', (e) => {
+    this.root.addEventListener("mousemove", (e) => {
       const $targetEl = e.target;
       const $dropdownEl = $targetEl.closest(this.selector);
-      const $menuEl = $targetEl.closest('.hs-dropdown-menu');
+      const $menuEl = $targetEl.closest(".hs-dropdown-menu");
 
       if ($dropdownEl) {
-        const trigger = (window.getComputedStyle($dropdownEl).getPropertyValue('--trigger') || 'click').replace(
-          ' ',
-          ''
-        );
-        if (trigger !== 'hover') return;
+        const trigger = (
+          window.getComputedStyle($dropdownEl).getPropertyValue("--trigger") ||
+          "click"
+        ).replace(" ", "");
+        if (trigger !== "hover") return;
 
-        if (!$dropdownEl || !$dropdownEl.classList.contains('open')) this._closeOthers($dropdownEl);
-        if (trigger === 'hover' && !$dropdownEl.classList.contains('open') && !isIOS() && !isIpadOS())
+        if (!$dropdownEl || !$dropdownEl.classList.contains("open"))
+          this._closeOthers($dropdownEl);
+        if (
+          trigger === "hover" &&
+          !$dropdownEl.classList.contains("open") &&
+          !isIOS() &&
+          !isIpadOS()
+        )
           this._hover($targetEl);
       }
     });
 
-    this.root.addEventListener('keydown', this._keyboardSupport.bind(this));
+    this.root.addEventListener("keydown", this._keyboardSupport.bind(this));
 
-    window.addEventListener('resize', () => {
-      const dropdownEls = this.root.querySelectorAll('.hs-dropdown.open');
+    window.addEventListener("resize", () => {
+      const dropdownEls = this.root.querySelectorAll(".hs-dropdown.open");
       dropdownEls.forEach(($dropdownEl) => {
         this.close($dropdownEl, true);
       });
@@ -127,10 +153,17 @@ export class HSDropdown extends Component {
   _closeOthers($currentDropdownEl = null) {
     const $collection = this.root.querySelectorAll(`${this.selector}.open`);
     $collection.forEach(($dropdownEl) => {
-      if ($currentDropdownEl && $currentDropdownEl.closest('.hs-dropdown.open') === $dropdownEl) return;
+      if (
+        $currentDropdownEl &&
+        $currentDropdownEl.closest(".hs-dropdown.open") === $dropdownEl
+      )
+        return;
 
-      const autoClose = (window.getComputedStyle($dropdownEl).getPropertyValue('--auto-close') || '').replace(' ', '');
-      if (autoClose == 'false' || autoClose == 'outside') return;
+      const autoClose = (
+        window.getComputedStyle($dropdownEl).getPropertyValue("--auto-close") ||
+        ""
+      ).replace(" ", "");
+      if (autoClose == "false" || autoClose == "outside") return;
 
       this.close($dropdownEl);
     });
@@ -144,23 +177,24 @@ export class HSDropdown extends Component {
     const handleMousmove = (e) => {
       if (
         !e.target.closest(this.selector) ||
-        e.target.closest(this.selector) === $dropdownEl.parentElement.closest(this.selector)
+        e.target.closest(this.selector) ===
+          $dropdownEl.parentElement.closest(this.selector)
       ) {
         this.close($dropdownEl);
-        this.root.removeEventListener('mousemove', handleMousmove, true);
+        this.root.removeEventListener("mousemove", handleMousmove, true);
       }
     };
 
-    this.root.addEventListener('mousemove', handleMousmove, true);
+    this.root.addEventListener("mousemove", handleMousmove, true);
   }
 
   close($dropdownEl, noAnimation = false) {
-    const $menuEl = $dropdownEl.querySelector('.hs-dropdown-menu');
+    const $menuEl = $dropdownEl.querySelector(".hs-dropdown-menu");
 
     const destroy = () => {
-      if ($dropdownEl.classList.contains('open')) return;
-      $menuEl.classList.remove('block');
-      $menuEl.classList.add('hidden');
+      if ($dropdownEl.classList.contains("open")) return;
+      $menuEl.classList.remove("block");
+      $menuEl.classList.add("hidden");
       $menuEl.style.inset = null;
       $menuEl.style.position = null;
 
@@ -170,51 +204,64 @@ export class HSDropdown extends Component {
     };
 
     if (!noAnimation) {
-      this.afterTransition($dropdownEl.querySelector('[data-hs-dropdown-transition]') || $menuEl, () => {
-        destroy();
-      });
+      this.afterTransition(
+        $dropdownEl.querySelector("[data-hs-dropdown-transition]") || $menuEl,
+        () => {
+          destroy();
+        },
+      );
     }
 
     $menuEl.style.margin = null;
-    $dropdownEl.classList.remove('open');
+    $dropdownEl.classList.remove("open");
 
     if (noAnimation) {
       destroy();
     }
 
-    this._fireEvent('close', $dropdownEl);
-    this._dispatch('close.hs.dropdown', $dropdownEl, $dropdownEl);
+    this._fireEvent("close", $dropdownEl);
+    this._dispatch("close.hs.dropdown", $dropdownEl, $dropdownEl);
 
-    const dropdownEls = $menuEl.querySelectorAll('.hs-dropdown.open');
+    const dropdownEls = $menuEl.querySelectorAll(".hs-dropdown.open");
     dropdownEls.forEach(($dropdownEl) => {
       this.close($dropdownEl, true);
     });
   }
 
   open($dropdownEl) {
-    const $menuEl = $dropdownEl.querySelector('.hs-dropdown-menu');
-    const placement = (window.getComputedStyle($dropdownEl).getPropertyValue('--placement') || '').replace(' ', '');
-    const strategy = (window.getComputedStyle($dropdownEl).getPropertyValue('--strategy') || 'fixed').replace(' ', '');
-    const adaptive = (window.getComputedStyle($dropdownEl).getPropertyValue('--adaptive') || 'adaptive').replace(
-      ' ',
-      ''
-    );
+    const $menuEl = $dropdownEl.querySelector(".hs-dropdown-menu");
+    const placement = (
+      window.getComputedStyle($dropdownEl).getPropertyValue("--placement") || ""
+    ).replace(" ", "");
+    const strategy = (
+      window.getComputedStyle($dropdownEl).getPropertyValue("--strategy") ||
+      "fixed"
+    ).replace(" ", "");
+    const adaptive = (
+      window.getComputedStyle($dropdownEl).getPropertyValue("--adaptive") ||
+      "adaptive"
+    ).replace(" ", "");
     const offset = parseInt(
-      (window.getComputedStyle($dropdownEl).getPropertyValue('--offset') || '10').replace(' ', '')
+      (
+        window.getComputedStyle($dropdownEl).getPropertyValue("--offset") ||
+        "10"
+      ).replace(" ", ""),
     );
 
-    if (strategy !== 'static') {
+    if (strategy !== "static") {
       if ($dropdownEl._popper) {
         $dropdownEl._popper.destroy();
       }
 
       const $popper = createPopper($dropdownEl, $menuEl, {
-        placement: this.positions[placement] || 'bottom-start',
+        placement: this.positions[placement] || "bottom-start",
         strategy: strategy,
         modifiers: [
-          ...(strategy !== 'fixed' ? this.absoluteStrategyModifiers($dropdownEl) : []),
+          ...(strategy !== "fixed"
+            ? this.absoluteStrategyModifiers($dropdownEl)
+            : []),
           {
-            name: 'offset',
+            name: "offset",
             options: {
               offset: [0, offset],
             },
@@ -226,19 +273,19 @@ export class HSDropdown extends Component {
     }
 
     $menuEl.style.margin = null;
-    $menuEl.classList.add('block');
-    $menuEl.classList.remove('hidden');
+    $menuEl.classList.add("block");
+    $menuEl.classList.remove("hidden");
 
     setTimeout(() => {
-      $dropdownEl.classList.add('open');
+      $dropdownEl.classList.add("open");
     });
 
-    this._fireEvent('open', $dropdownEl);
-    this._dispatch('open.hs.dropdown', $dropdownEl, $dropdownEl);
+    this._fireEvent("open", $dropdownEl);
+    this._dispatch("open.hs.dropdown", $dropdownEl, $dropdownEl);
   }
 
   _keyboardSupport(e) {
-    const $dropdownEl = this.root.querySelector('.hs-dropdown.open');
+    const $dropdownEl = this.root.querySelector(".hs-dropdown.open");
     if (!$dropdownEl) return;
 
     if (e.keyCode === 27) {
@@ -272,9 +319,11 @@ export class HSDropdown extends Component {
   }
 
   _up($dropdownEl) {
-    const $menuEl = $dropdownEl.querySelector('.hs-dropdown-menu');
-    const links = [...$menuEl.querySelectorAll('a')].reverse().filter(($linkEl) => !$linkEl.disabled);
-    const $activeLinkEl = $menuEl.querySelector('a:focus');
+    const $menuEl = $dropdownEl.querySelector(".hs-dropdown-menu");
+    const links = [...$menuEl.querySelectorAll("a")]
+      .reverse()
+      .filter(($linkEl) => !$linkEl.disabled);
+    const $activeLinkEl = $menuEl.querySelector("a:focus");
     let acitveIndex = links.findIndex(($linkEl) => $linkEl === $activeLinkEl);
 
     if (acitveIndex + 1 < links.length) {
@@ -285,9 +334,11 @@ export class HSDropdown extends Component {
   }
 
   _down($dropdownEl) {
-    const $menuEl = $dropdownEl.querySelector('.hs-dropdown-menu');
-    const links = [...$menuEl.querySelectorAll('a')].filter(($linkEl) => !$linkEl.disabled);
-    const $activeLinkEl = $menuEl.querySelector('a:focus');
+    const $menuEl = $dropdownEl.querySelector(".hs-dropdown-menu");
+    const links = [...$menuEl.querySelectorAll("a")].filter(
+      ($linkEl) => !$linkEl.disabled,
+    );
+    const $activeLinkEl = $menuEl.querySelector("a:focus");
     let acitveIndex = links.findIndex(($linkEl) => $linkEl === $activeLinkEl);
 
     if (acitveIndex + 1 < links.length) {
@@ -298,8 +349,10 @@ export class HSDropdown extends Component {
   }
 
   _start($dropdownEl) {
-    const $menuEl = $dropdownEl.querySelector('.hs-dropdown-menu');
-    const links = [...$menuEl.querySelectorAll('a')].filter(($linkEl) => !$linkEl.disabled);
+    const $menuEl = $dropdownEl.querySelector(".hs-dropdown-menu");
+    const links = [...$menuEl.querySelectorAll("a")].filter(
+      ($linkEl) => !$linkEl.disabled,
+    );
 
     if (links.length) {
       links[0].focus();
@@ -307,8 +360,10 @@ export class HSDropdown extends Component {
   }
 
   _end($dropdownEl) {
-    const $menuEl = $dropdownEl.querySelector('.hs-dropdown-menu');
-    const links = [...$menuEl.querySelectorAll('a')].reverse().filter(($linkEl) => !$linkEl.disabled);
+    const $menuEl = $dropdownEl.querySelector(".hs-dropdown-menu");
+    const links = [...$menuEl.querySelectorAll("a")]
+      .reverse()
+      .filter(($linkEl) => !$linkEl.disabled);
 
     if (links.length) {
       links[0].focus();
@@ -316,12 +371,13 @@ export class HSDropdown extends Component {
   }
 
   _byChar($dropdownEl, char) {
-    const $menuEl = $dropdownEl.querySelector('.hs-dropdown-menu');
-    const links = [...$menuEl.querySelectorAll('a')];
+    const $menuEl = $dropdownEl.querySelector(".hs-dropdown-menu");
+    const links = [...$menuEl.querySelectorAll("a")];
     const getActiveIndex = () => {
       return links.findIndex(
         ($linkEl, index) =>
-          $linkEl.innerText.toLowerCase().charAt(0) === char.toLowerCase() && this._history.existsInHistory(index)
+          $linkEl.innerText.toLowerCase().charAt(0) === char.toLowerCase() &&
+          this._history.existsInHistory(index),
       );
     };
 
@@ -339,6 +395,8 @@ export class HSDropdown extends Component {
   }
 
   toggle($dropdownEl) {
-    $dropdownEl.classList.contains('open') ? this.close($dropdownEl) : this.open($dropdownEl);
+    $dropdownEl.classList.contains("open")
+      ? this.close($dropdownEl)
+      : this.open($dropdownEl);
   }
 }

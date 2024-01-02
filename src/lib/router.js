@@ -1,4 +1,4 @@
-import { createWebHistory } from 'vue-router'
-import createRouter from '../pages/routes.js'
+import { createWebHistory } from "vue-router";
+import createRouter from "../pages/routes.js";
 
-export default createRouter(createWebHistory())
+export default createRouter(createWebHistory());

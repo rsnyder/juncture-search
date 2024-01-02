@@ -6,29 +6,35 @@
  * Copyright 2023 Htmlstream
  */
 
-import Component from '../../core/Component';
+import Component from "../../core/Component";
 
 export class HSOverlay extends Component {
-  root
+  root;
   constructor(root) {
-    super('[data-hs-overlay]');
-    this.root = root
+    super("[data-hs-overlay]");
+    this.root = root;
     this.openNextOverlay = false;
   }
 
   init() {
-    this.root.addEventListener('click', (e) => {
+    this.root.addEventListener("click", (e) => {
       const $targetEl = e.target;
       const $overlayToggleEl = $targetEl.closest(this.selector);
-      const $closeOverlayTriggerEl = e.target.closest('[data-hs-overlay-close]');
-      const $openedOverlayEl = e.target.getAttribute('aria-overlay') === 'true';
+      const $closeOverlayTriggerEl = e.target.closest(
+        "[data-hs-overlay-close]",
+      );
+      const $openedOverlayEl = e.target.getAttribute("aria-overlay") === "true";
 
       if ($closeOverlayTriggerEl) {
-        return this.close($closeOverlayTriggerEl.closest('.hs-overlay.open'));
+        return this.close($closeOverlayTriggerEl.closest(".hs-overlay.open"));
       }
 
       if ($overlayToggleEl) {
-        return this.toggle(this.root.querySelector($overlayToggleEl.getAttribute('data-hs-overlay')));
+        return this.toggle(
+          this.root.querySelector(
+            $overlayToggleEl.getAttribute("data-hs-overlay"),
+          ),
+        );
       }
 
       if ($openedOverlayEl) {
@@ -36,29 +42,33 @@ export class HSOverlay extends Component {
       }
     });
 
-    this.root.addEventListener('keydown', (e) => {
+    this.root.addEventListener("keydown", (e) => {
       if (e.keyCode === 27) {
-        const $openedOverlayEl = this.root.querySelector('.hs-overlay.open');
+        const $openedOverlayEl = this.root.querySelector(".hs-overlay.open");
         if (!$openedOverlayEl) return;
 
         setTimeout(() => {
-          $openedOverlayEl.getAttribute('data-hs-overlay-keyboard') !== 'false' ? this.close($openedOverlayEl) : null;
+          $openedOverlayEl.getAttribute("data-hs-overlay-keyboard") !== "false"
+            ? this.close($openedOverlayEl)
+            : null;
         });
       }
     });
   }
 
   toggle($overlayEl) {
-
     if (!$overlayEl) return;
 
-    $overlayEl.classList.contains('hidden') ? this.open($overlayEl) : this.close($overlayEl);
+    $overlayEl.classList.contains("hidden")
+      ? this.open($overlayEl)
+      : this.close($overlayEl);
   }
 
   open($overlayEl) {
     if (!$overlayEl) return;
-    const $openedOverlayEl = this.root.querySelector('.hs-overlay.open');
-    const disabledScroll = this.getClassProperty($overlayEl, '--body-scroll', 'false') !== 'true';
+    const $openedOverlayEl = this.root.querySelector(".hs-overlay.open");
+    const disabledScroll =
+      this.getClassProperty($overlayEl, "--body-scroll", "false") !== "true";
 
     if ($openedOverlayEl) {
       this.openNextOverlay = true;
@@ -69,23 +79,23 @@ export class HSOverlay extends Component {
     }
 
     if (disabledScroll) {
-      console.log(this.root)
-      this.root.style.overflow = 'hidden';
+      console.log(this.root);
+      this.root.style.overflow = "hidden";
     }
 
     this._buildBackdrop($overlayEl);
     this._checkTimer($overlayEl);
     this._autoHide($overlayEl);
 
-    $overlayEl.classList.remove('hidden');
-    $overlayEl.setAttribute('aria-overlay', 'true');
-    $overlayEl.setAttribute('tabindex', '-1');
+    $overlayEl.classList.remove("hidden");
+    $overlayEl.setAttribute("aria-overlay", "true");
+    $overlayEl.setAttribute("tabindex", "-1");
 
     setTimeout(() => {
-      if ($overlayEl.classList.contains('hidden')) return;
-      $overlayEl.classList.add('open');
-      this._fireEvent('open', $overlayEl);
-      this._dispatch('open.hs.overlay', $overlayEl, $overlayEl);
+      if ($overlayEl.classList.contains("hidden")) return;
+      $overlayEl.classList.add("open");
+      this._fireEvent("open", $overlayEl);
+      this._dispatch("open.hs.overlay", $overlayEl, $overlayEl);
       this._focusInput($overlayEl);
     }, 50);
   }
@@ -94,24 +104,26 @@ export class HSOverlay extends Component {
     return new Promise((resolve) => {
       if (!$overlayEl) return;
 
-      $overlayEl.classList.remove('open');
-      $overlayEl.removeAttribute('aria-overlay');
-      $overlayEl.removeAttribute('tabindex', '-1');
+      $overlayEl.classList.remove("open");
+      $overlayEl.removeAttribute("aria-overlay");
+      $overlayEl.removeAttribute("tabindex", "-1");
 
       this.afterTransition($overlayEl, () => {
-        if ($overlayEl.classList.contains('open')) return;
-        $overlayEl.classList.add('hidden');
+        if ($overlayEl.classList.contains("open")) return;
+        $overlayEl.classList.add("hidden");
         this._destroyBackdrop();
-        this._fireEvent('close', $overlayEl);
-        this._dispatch('close.hs.overlay', $overlayEl, $overlayEl);
-        this.root.style.overflow = '';
+        this._fireEvent("close", $overlayEl);
+        this._dispatch("close.hs.overlay", $overlayEl, $overlayEl);
+        this.root.style.overflow = "";
         resolve($overlayEl);
       });
     });
   }
 
   _autoHide($overlayEl) {
-    const time = parseInt(this.getClassProperty($overlayEl, '--auto-hide', '0'));
+    const time = parseInt(
+      this.getClassProperty($overlayEl, "--auto-hide", "0"),
+    );
 
     if (time) {
       $overlayEl.autoHide = setTimeout(() => {
@@ -128,7 +140,9 @@ export class HSOverlay extends Component {
   }
 
   _onBackdropClick($overlayEl) {
-    const closeOnBackdrop = this.getClassProperty($overlayEl, '--overlay-backdrop', 'true') !== 'static';
+    const closeOnBackdrop =
+      this.getClassProperty($overlayEl, "--overlay-backdrop", "true") !==
+      "static";
 
     if (closeOnBackdrop) {
       this.close($overlayEl);
@@ -136,34 +150,39 @@ export class HSOverlay extends Component {
   }
 
   _buildBackdrop($overlayEl) {
-    const backdropSelector = $overlayEl.getAttribute('data-hs-overlay-backdrop-container') || false;
-    let $backdropEl = document.createElement('div');
+    const backdropSelector =
+      $overlayEl.getAttribute("data-hs-overlay-backdrop-container") || false;
+    let $backdropEl = document.createElement("div");
     let backdropClasses =
-      'transition duration fixed inset-0 z-50 bg-gray-900 bg-opacity-50 dark:bg-opacity-80 hs-overlay-backdrop';
+      "transition duration fixed inset-0 z-50 bg-gray-900 bg-opacity-50 dark:bg-opacity-80 hs-overlay-backdrop";
 
     for (const value of $overlayEl.classList.values()) {
-      if (value.startsWith('hs-overlay-backdrop-open:')) {
+      if (value.startsWith("hs-overlay-backdrop-open:")) {
         backdropClasses += ` ${value}`;
       }
     }
 
-    const closeOnBackdrop = this.getClassProperty($overlayEl, '--overlay-backdrop', 'true') !== 'static';
-    const disableBackdrop = this.getClassProperty($overlayEl, '--overlay-backdrop', 'true') === 'false';
+    const closeOnBackdrop =
+      this.getClassProperty($overlayEl, "--overlay-backdrop", "true") !==
+      "static";
+    const disableBackdrop =
+      this.getClassProperty($overlayEl, "--overlay-backdrop", "true") ===
+      "false";
 
     if (disableBackdrop) return;
 
     if (backdropSelector) {
       $backdropEl = this.root.querySelector(backdropSelector).cloneNode(true);
-      $backdropEl.classList.remove('hidden');
+      $backdropEl.classList.remove("hidden");
       backdropClasses = $backdropEl.classList;
-      $backdropEl.classList = '';
+      $backdropEl.classList = "";
     }
 
     if (closeOnBackdrop) {
-      $backdropEl.addEventListener('click', () => this.close($overlayEl), true);
+      $backdropEl.addEventListener("click", () => this.close($overlayEl), true);
     }
 
-    $backdropEl.setAttribute('data-hs-overlay-backdrop-template', '');
+    $backdropEl.setAttribute("data-hs-overlay-backdrop-template", "");
     this.root.appendChild($backdropEl);
 
     setTimeout(() => {
@@ -172,17 +191,23 @@ export class HSOverlay extends Component {
   }
 
   _destroyBackdrop() {
-    const $backdropEl = this.root.querySelector('[data-hs-overlay-backdrop-template]');
+    const $backdropEl = this.root.querySelector(
+      "[data-hs-overlay-backdrop-template]",
+    );
 
     if (!$backdropEl) return;
 
     if (this.openNextOverlay) {
       $backdropEl.style.transitionDuration = `${
-        parseFloat(window.getComputedStyle($backdropEl).transitionDuration.replace(/[^\d.-]/g, '')) * 1.8
+        parseFloat(
+          window
+            .getComputedStyle($backdropEl)
+            .transitionDuration.replace(/[^\d.-]/g, ""),
+        ) * 1.8
       }s`;
     }
 
-    $backdropEl.classList.add('opacity-0');
+    $backdropEl.classList.add("opacity-0");
 
     this.afterTransition($backdropEl, () => {
       $backdropEl.remove();
@@ -190,7 +215,7 @@ export class HSOverlay extends Component {
   }
 
   _focusInput($overlayEl) {
-    const $inputWithAutoFocusEl = $overlayEl.querySelector('[autofocus]');
+    const $inputWithAutoFocusEl = $overlayEl.querySelector("[autofocus]");
     if ($inputWithAutoFocusEl) $inputWithAutoFocusEl.focus();
   }
 }

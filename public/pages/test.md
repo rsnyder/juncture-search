@@ -1,6 +1,4 @@
-.ve-header title="Tailwind Prototype" logo=public/Labs_logo_knockout.png color=#990001
-    - [Home](/)
-    - [About](/about)
+.ve-header title="Tailwind Prototype" logo=public/Labs_logo_knockout.png color=#990001 - [Home](/) - [About](/about)
 
 # Section
 

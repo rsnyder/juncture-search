@@ -1,27 +1,40 @@
 <template>
-
-    <div v-if="entity" class="card">
-      
-      <div class="text">
-        <div class="label">
-          <span class="label" v-html="entity.label"></span>
-          <!--<span class="wikidata-link">(<a target="_blank" :href="wikidataUrl" v-html="entity.id"></a>)</span>-->
+  <div v-if="entity" class="card">
+    <div class="text">
+      <div class="label">
+        <span class="label" v-html="entity.label"></span>
+        <!--<span class="wikidata-link">(<a target="_blank" :href="wikidataUrl" v-html="entity.id"></a>)</span>-->
+      </div>
+      <div
+        v-if="entity.aliases"
+        class="aliases"
+        v-html="entity.aliases.join(' | ')"
+      ></div>
+      <div
+        v-if="entity.description"
+        class="description"
+        v-html="entity.description"
+      ></div>
+      <div v-if="summaryText" class="summary-text">
+        <div v-html="summaryText"></div>
+        <div class="flex items-center gap-2">
+          Source:
+          <a target="_blank" :href="wikidataUrl">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg"
+              class="h-8 w-8"
+            />
+          </a>
+          <a :href="wikipedia.url" class="flex items-center space-x-2">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/7/77/Wikipedia_svg_logo.svg"
+              class="h-8 w-8"
+            />
+            <span v-html="wikipedia.title"></span>
+          </a>
         </div>
-        <div v-if="entity.aliases" class="aliases" v-html="entity.aliases.join(' | ')"></div>
-        <div v-if="entity.description" class="description" v-html="entity.description"></div>
-        <div v-if="summaryText" class="summary-text">
-          <div v-html="summaryText"></div>
-          <div class="flex items-center gap-2">Source:
-            <a target="_blank" :href="wikidataUrl">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg" class="h-8 w-8">
-            </a>
-            <a :href="wikipedia.url" class="flex items-center space-x-2">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Wikipedia_svg_logo.svg" class="h-8 w-8">
-              <span v-html="wikipedia.title"></span>
-            </a>
-        </div>
-        </div>
-        <!--
+      </div>
+      <!--
         <div class="links">
           <span v-if="wikipedia" class="wikipedia link" title="Wikipedia"><a target="_blank" :href="wikipedia.url"><img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Wikipedia_svg_logo.svg"></a></span>
           <span class="wikimedia link" title="Wikidata"><a target="_blank" :href="wikidataUrl"><img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Wikidata-logo.svg"></a></span>
@@ -30,113 +43,124 @@
           <span v-if="wikivoyageUrl" class="wikimedia link" title="Wikivoyage"><a target="_blank" :href="wikivoyageUrl"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Wikivoyage-logo.svg"></a></span>
         </div>
         -->
-      </div>
-      
-      <div v-if="backgroundImage" class="image" :style="{backgroundImage}"></div>
+    </div>
 
-    </div> <!-- card -->
-
+    <div
+      v-if="backgroundImage"
+      class="image"
+      :style="{ backgroundImage }"
+    ></div>
+  </div>
+  <!-- card -->
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, ref, toRaw, watch } from "vue";
 
-  import { computed, onMounted, ref, toRaw, watch } from 'vue'
+import { useEntitiesStore } from "../store/entities";
+import { storeToRefs } from "pinia";
 
-  import { useEntitiesStore } from '../store/entities'
-  import { storeToRefs } from 'pinia'
+const store = useEntitiesStore();
+const { qid } = storeToRefs(store);
 
-  const store = useEntitiesStore()
-  const { qid } = storeToRefs(store)
+const entity = ref<any>();
 
-  const entity = ref<any>()
+const wikipedia = computed(() => entity.value.sitelinks);
+const wikidataUrl = computed(
+  () => `https://www.wikidata.org/entity/${entity.value.id}`,
+);
+const commonsCategoryUrl = computed(() => "");
+const wikiquoteUrl = computed(() => "");
+const wikivoyageUrl = computed(() => "");
+const summaryText = computed(() => entity.value.summaryText);
+const backgroundImage = ref<string>();
 
-  const wikipedia = computed(() => entity.value.sitelinks )
-  const wikidataUrl = computed(() =>  `https://www.wikidata.org/entity/${entity.value.id}` )
-  const commonsCategoryUrl = computed(() =>  '' )
-  const wikiquoteUrl = computed(() =>  '' )
-  const wikivoyageUrl = computed(() =>  '' )
-  const summaryText = computed(() => entity.value.summaryText)
-  const backgroundImage = ref<string>()
+onMounted(async () => (entity.value = await store.fetch(qid.value, true)));
+watch(qid, async () => {
+  if (qid.value) entity.value = await store.fetch(qid.value, true);
+});
 
-  onMounted(async () => entity.value = await store.fetch(qid.value, true))
-  watch(qid, async () => { if (qid.value) entity.value = await store.fetch(qid.value, true) })
+watch(entity, () => setBackgroundImage());
 
-  watch(entity, () => setBackgroundImage())
+function setBackgroundImage() {
+  let commonsImageFile = entity.value.claims?.P18
+    ? entity.value.claims.P18[0].mainsnak.datavalue.value
+    : null;
+  if (commonsImageFile)
+    backgroundImage.value = `url('${encodeUrl(
+      store.mwImage(commonsImageFile, 500),
+    )}')`;
+}
 
-  function setBackgroundImage() {
-    let commonsImageFile = entity.value.claims?.P18 ? entity.value.claims.P18[0].mainsnak.datavalue.value : null
-    if (commonsImageFile) backgroundImage.value = `url('${encodeUrl(store.mwImage(commonsImageFile, 500))}')`
-  }
-
-  function encodeUrl(url:string) {
-    let parts = url.split('/')
-    let encoded = `${parts.slice(0,-1).join('/')}/${encodeURIComponent(parts[parts.length-1])}`
-    return encoded
-  }
-
+function encodeUrl(url: string) {
+  let parts = url.split("/");
+  let encoded = `${parts.slice(0, -1).join("/")}/${encodeURIComponent(
+    parts[parts.length - 1],
+  )}`;
+  return encoded;
+}
 </script>
 
 <style>
+@import "../tailwind.css";
 
-  @import '../tailwind.css';
+a {
+  @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600;
+}
 
-  a {
-    @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600
-  }
-  
-  .card {
-    display: grid;
-    grid-template-columns: 1fr minmax(0, 40%);
-    grid-template-areas: "text image";
-    padding: 12px;
-    min-height: 300px;
-    gap: 12px;
-  }
+.card {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 40%);
+  grid-template-areas: "text image";
+  padding: 12px;
+  min-height: 300px;
+  gap: 12px;
+}
 
-  .text {
-    grid-area: text;
-    display: flex;
-    flex-direction: column;
-  }
+.text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+}
 
-  .image {
-    grid-area: image;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
+.image {
+  grid-area: image;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
-  .label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.5em;
-    font-weight: bold;
-  }
+.label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5em;
+  font-weight: bold;
+}
 
-  .aliases {
-    font-size: 1.2em;
-    font-style: italic;
-    margin-bottom: 12px;
-  }
+.aliases {
+  font-size: 1.2em;
+  font-style: italic;
+  margin-bottom: 12px;
+}
 
-  .description, .summary-text {
-    font-size: 1.2em;
-    margin: 0 0 12px 0;
-  }
+.description,
+.summary-text {
+  font-size: 1.2em;
+  margin: 0 0 12px 0;
+}
 
-  .summary-text p {
-    margin: 0 0 9px 0
-  }
+.summary-text p {
+  margin: 0 0 9px 0;
+}
 
-  .links {
-    display: flex;
-    gap: 12px;
-    margin-top: auto;
-  }
+.links {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+}
 
-  .links img {
-    height: 30px;
-  }
-
+.links img {
+  height: 30px;
+}
 </style>
