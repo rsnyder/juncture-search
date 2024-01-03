@@ -7,28 +7,36 @@
  * Copyright 2023 Htmlstream
  */
 
-const plugin = require('tailwindcss/plugin');
+const plugin = require("tailwindcss/plugin");
 
 module.exports = plugin(function ({ addVariant, e }) {
-  addVariant('hs-collapse-open', [
+  addVariant("hs-collapse-open", [
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-collapse.open .${e(`hs-collapse-open${separator}${className}`)}`;
+        return `.hs-collapse.open .${e(
+          `hs-collapse-open${separator}${className}`,
+        )}`;
       });
     },
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-collapse.open.${e(`hs-collapse-open${separator}${className}`)}`;
+        return `.hs-collapse.open.${e(
+          `hs-collapse-open${separator}${className}`,
+        )}`;
       });
     },
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-collapse-toggle.open .${e(`hs-collapse-open${separator}${className}`)}`;
+        return `.hs-collapse-toggle.open .${e(
+          `hs-collapse-open${separator}${className}`,
+        )}`;
       });
     },
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-collapse-toggle.open.${e(`hs-collapse-open${separator}${className}`)}`;
+        return `.hs-collapse-toggle.open.${e(
+          `hs-collapse-open${separator}${className}`,
+        )}`;
       });
     },
   ]);

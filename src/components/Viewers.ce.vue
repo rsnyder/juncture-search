@@ -1,17 +1,36 @@
 <template>
-
   <div ref="root">
     <sl-tab-group name="root">
-      <sl-tab slot="nav" panel="data" :active="active.indexOf('data') === 0">Data</sl-tab>
-      <sl-tab slot="nav" panel="images" :active="active === 'images'">Images</sl-tab>
-      <sl-tab slot="nav" panel="documents" :active="active === 'documents'">Documents</sl-tab>
-      <sl-tab slot="nav" panel="sites" :active="active === 'sites'">Resource Web Sites</sl-tab>
-      <sl-tab slot="nav" panel="referenced" :active="active === 'referenced'">Referenced Entities</sl-tab>
+      <sl-tab slot="nav" panel="data" :active="active.indexOf('data') === 0"
+        >Data</sl-tab
+      >
+      <sl-tab slot="nav" panel="images" :active="active === 'images'"
+        >Images</sl-tab
+      >
+      <sl-tab slot="nav" panel="documents" :active="active === 'documents'"
+        >Documents</sl-tab
+      >
+      <sl-tab slot="nav" panel="sites" :active="active === 'sites'"
+        >Resource Web Sites</sl-tab
+      >
+      <sl-tab slot="nav" panel="referenced" :active="active === 'referenced'"
+        >Referenced Entities</sl-tab
+      >
 
       <sl-tab-panel name="data">
         <sl-tab-group placement="start">
-          <sl-tab slot="nav" panel="data-statements" :active="active === 'data-statements'">Entity Properties</sl-tab>
-          <sl-tab slot="nav" panel="data-referencing" :active="active === 'data-referencing'">Referencing Entities</sl-tab>
+          <sl-tab
+            slot="nav"
+            panel="data-statements"
+            :active="active === 'data-statements'"
+            >Entity Properties</sl-tab
+          >
+          <sl-tab
+            slot="nav"
+            panel="data-referencing"
+            :active="active === 'data-referencing'"
+            >Referencing Entities</sl-tab
+          >
           <sl-tab-panel name="data-statements">
             <ve-statements></ve-statements>
           </sl-tab-panel>
@@ -55,49 +74,45 @@
         </sl-tab-group>
       </sl-tab-panel>
       -->
-
     </sl-tab-group>
   </div>
-
 </template>
 
 <script setup lang="ts">
+import "@shoelace-style/shoelace/dist/components/tab/tab.js";
+import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
+import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
 
-  import '@shoelace-style/shoelace/dist/components/tab/tab.js'
-  import '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js'
-  import '@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js'
+import { computed, ref, toRaw, watch } from "vue";
 
-  import { computed, ref, toRaw, watch } from 'vue'
+import { useEntitiesStore } from "../store/entities";
+import { storeToRefs } from "pinia";
+const store = useEntitiesStore();
+const { active } = storeToRefs(store);
 
-  import { useEntitiesStore } from '../store/entities'
-  import { storeToRefs } from 'pinia'
-  const store = useEntitiesStore()
-  const { active } = storeToRefs(store)
+const root = ref<HTMLElement | null>(null);
+const shadowRoot = computed(() => root?.value?.parentNode);
 
-  const root = ref<HTMLElement | null>(null)
-  const shadowRoot = computed(() => root?.value?.parentNode)
+let observer: any;
 
-  let observer: any
+watch(shadowRoot, () => {
+  let tabs = shadowRoot.value?.querySelector("sl-tab-group");
+  if (tabs) init(tabs);
+});
 
-  watch(shadowRoot, () => {
-    let tabs = shadowRoot.value?.querySelector('sl-tab-group')
-    if (tabs) init(tabs)
-  })
-
-  function init(root: HTMLElement) {
-    observer = new MutationObserver((mutationsList) => {
-      mutationsList
-        .filter(rec => rec.attributeName === 'active')
-        .map(rec => rec.target as HTMLElement)
-        .filter(el => el.getAttribute('active') !== null)
-        .forEach(el => {
-          if (el?.nodeName === 'SL-TAB') store.setActive(el.getAttribute('panel') || 'images')
-        })
-    })
-    observer.observe(root, { attributes: true, childList: true, subtree: true })
-  }
-
+function init(root: HTMLElement) {
+  observer = new MutationObserver((mutationsList) => {
+    mutationsList
+      .filter((rec) => rec.attributeName === "active")
+      .map((rec) => rec.target as HTMLElement)
+      .filter((el) => el.getAttribute("active") !== null)
+      .forEach((el) => {
+        if (el?.nodeName === "SL-TAB")
+          store.setActive(el.getAttribute("panel") || "images");
+      });
+  });
+  observer.observe(root, { attributes: true, childList: true, subtree: true });
+}
 </script>
 
-<style>
-</style>
+<style></style>

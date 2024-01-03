@@ -37,18 +37,24 @@ export default class Component {
   afterTransition($element, callback) {
     const handleEvent = () => {
       callback();
-      $element.removeEventListener('transitionend', handleEvent, true);
+      $element.removeEventListener("transitionend", handleEvent, true);
     };
 
-    if (window.getComputedStyle($element, null).getPropertyValue('transition') !== 'all 0s ease 0s') {
-      $element.addEventListener('transitionend', handleEvent, true);
+    if (
+      window.getComputedStyle($element, null).getPropertyValue("transition") !==
+      "all 0s ease 0s"
+    ) {
+      $element.addEventListener("transitionend", handleEvent, true);
     } else {
       callback();
     }
   }
 
-  getClassProperty($element, propertyName, defaultValue = '') {
-    const value = (window.getComputedStyle($element).getPropertyValue(propertyName) || defaultValue).replace(' ', '');
+  getClassProperty($element, propertyName, defaultValue = "") {
+    const value = (
+      window.getComputedStyle($element).getPropertyValue(propertyName) ||
+      defaultValue
+    ).replace(" ", "");
 
     return value;
   }

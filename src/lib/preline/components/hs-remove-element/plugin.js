@@ -7,10 +7,10 @@
  * Copyright 2023 Htmlstream
  */
 
-const plugin = require('tailwindcss/plugin');
+const plugin = require("tailwindcss/plugin");
 
 module.exports = plugin(function ({ addVariant, e }) {
-  addVariant('hs-removing', ({ modifySelectors, separator }) => {
+  addVariant("hs-removing", ({ modifySelectors, separator }) => {
     modifySelectors(({ className }) => {
       return `.hs-removing.${e(`hs-removing${separator}${className}`)}`;
     });

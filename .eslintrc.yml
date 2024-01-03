@@ -1,0 +1,36 @@
+env:
+  browser: true
+  es2021: true
+  node: true
+extends:
+  - eslint:recommended
+  - plugin:@typescript-eslint/recommended
+  - plugin:vue/vue3-essential
+  - "plugin:node/recommended"
+  - "prettier"
+parserOptions:
+  ecmaVersion: latest
+  parser: "@typescript-eslint/parser"
+  sourceType: module
+plugins:
+  - "@typescript-eslint"
+  - vue
+  - node
+  - prettier
+rules:
+  node/no-missing-import: off
+  "@typescript-eslint/no-var-requires": "off"
+  quotes:
+    - error
+    - double
+  node/no-unsupported-features/es-syntax:
+    - error
+    - ignores:
+        - modules
+# https://github.com/typescript-eslint/typescript-eslint/blob/1cf9243/docs/getting-started/linting/FAQ.md#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+overrides:
+  - files:
+      - "*.ts"
+      - "*.vue"
+    rules:
+      no-undef: "off"

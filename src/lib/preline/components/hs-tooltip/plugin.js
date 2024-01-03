@@ -7,12 +7,14 @@
  * Copyright 2023 Htmlstream
  */
 
-const plugin = require('tailwindcss/plugin');
+const plugin = require("tailwindcss/plugin");
 
 module.exports = plugin(function ({ addVariant, e }) {
-  addVariant('hs-tooltip-shown', ({ modifySelectors, separator }) => {
+  addVariant("hs-tooltip-shown", ({ modifySelectors, separator }) => {
     modifySelectors(({ className }) => {
-      return `.hs-tooltip.show .${e(`hs-tooltip-shown${separator}${className}`)}`;
+      return `.hs-tooltip.show .${e(
+        `hs-tooltip-shown${separator}${className}`,
+      )}`;
     });
   });
 });

@@ -7,18 +7,22 @@
  * Copyright 2023 Htmlstream
  */
 
-const plugin = require('tailwindcss/plugin');
+const plugin = require("tailwindcss/plugin");
 
 module.exports = plugin(function ({ addVariant, e }) {
-  addVariant('hs-dropdown-open', [
+  addVariant("hs-dropdown-open", [
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-dropdown.open > .${e(`hs-dropdown-open${separator}${className}`)}`;
+        return `.hs-dropdown.open > .${e(
+          `hs-dropdown-open${separator}${className}`,
+        )}`;
       });
     },
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-dropdown.open > .hs-dropdown-menu > .${e(`hs-dropdown-open${separator}${className}`)}`;
+        return `.hs-dropdown.open > .hs-dropdown-menu > .${e(
+          `hs-dropdown-open${separator}${className}`,
+        )}`;
       });
     },
   ]);

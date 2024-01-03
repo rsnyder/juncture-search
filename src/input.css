@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 body {
-  padding: 1rem
+  padding: 1rem;
 }
 
-ve-header ul, 
-ve-menu-twp ul { 
-    display: none;
+ve-header ul,
+ve-menu-twp ul {
+  display: none;
 }

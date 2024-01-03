@@ -6,19 +6,19 @@
  * Copyright 2023 Htmlstream
  */
 
-import Component from '../../core/Component';
+import Component from "../../core/Component";
 
 export class HSTabs extends Component {
-  root
+  root;
   constructor(root) {
-    super('[data-hs-tab]');
-    this.root = root
+    super("[data-hs-tab]");
+    this.root = root;
   }
 
   init() {
-    this.root.addEventListener('keydown', this._keyboardSupport.bind(this));
+    this.root.addEventListener("keydown", this._keyboardSupport.bind(this));
 
-    this.root.addEventListener('click', (e) => {
+    this.root.addEventListener("click", (e) => {
       const $targetEl = e.target;
       const $tabToggleEl = $targetEl.closest(this.selector);
 
@@ -27,38 +27,46 @@ export class HSTabs extends Component {
       }
     });
 
-    this.root.querySelectorAll('[hs-data-tab-select]').forEach(($tabNavWithSelectEl) => {
-      const $selectEl = this.root.querySelector($tabNavWithSelectEl.getAttribute('hs-data-tab-select'));
-      if (!$selectEl) return;
+    this.root
+      .querySelectorAll("[hs-data-tab-select]")
+      .forEach(($tabNavWithSelectEl) => {
+        const $selectEl = this.root.querySelector(
+          $tabNavWithSelectEl.getAttribute("hs-data-tab-select"),
+        );
+        if (!$selectEl) return;
 
-      $selectEl.addEventListener('change', (e) => {
-        const $tabToggleEl = this.root.querySelector(`[data-hs-tab="${e.target.value}"]`);
-        if (!$tabToggleEl) return;
-        this.open($tabToggleEl);
+        $selectEl.addEventListener("change", (e) => {
+          const $tabToggleEl = this.root.querySelector(
+            `[data-hs-tab="${e.target.value}"]`,
+          );
+          if (!$tabToggleEl) return;
+          this.open($tabToggleEl);
+        });
       });
-    });
   }
 
   open($tabToggleEl) {
-    const $tabEl = this.root.querySelector($tabToggleEl.getAttribute('data-hs-tab'));
+    const $tabEl = this.root.querySelector(
+      $tabToggleEl.getAttribute("data-hs-tab"),
+    );
     const $tabToggleEls = [...$tabToggleEl.parentElement.children];
     const $tabEls = [...$tabEl.parentElement.children];
-    const $tabNavWithSelectEl = $tabToggleEl.closest('[hs-data-tab-select]');
+    const $tabNavWithSelectEl = $tabToggleEl.closest("[hs-data-tab-select]");
     const $selectEl = $tabNavWithSelectEl
-      ? this.root.querySelector($tabNavWithSelectEl.getAttribute('data-hs-tab'))
+      ? this.root.querySelector($tabNavWithSelectEl.getAttribute("data-hs-tab"))
       : null;
 
-    $tabToggleEls.forEach(($tab) => $tab.classList.remove('active'));
-    $tabEls.forEach(($tab) => $tab.classList.add('hidden'));
+    $tabToggleEls.forEach(($tab) => $tab.classList.remove("active"));
+    $tabEls.forEach(($tab) => $tab.classList.add("hidden"));
 
-    $tabToggleEl.classList.add('active');
-    $tabEl.classList.remove('hidden');
+    $tabToggleEl.classList.add("active");
+    $tabEl.classList.remove("hidden");
 
-    this._fireEvent('change', $tabToggleEl);
-    this._dispatch('change.hs.tab', $tabToggleEl, $tabToggleEl);
+    this._fireEvent("change", $tabToggleEl);
+    this._dispatch("change.hs.tab", $tabToggleEl, $tabToggleEl);
 
     if ($selectEl) {
-      $selectEl.value = $tabToggleEl.getAttribute('data-hs-tab');
+      $selectEl.value = $tabToggleEl.getAttribute("data-hs-tab");
     }
   }
 
@@ -67,7 +75,7 @@ export class HSTabs extends Component {
     if (!$tabButtonEl) return;
 
     const $navEl = $tabButtonEl.closest('[role="tablist"]');
-    const vertical = $navEl.getAttribute('data-hs-tabs-vertical') === 'true';
+    const vertical = $navEl.getAttribute("data-hs-tabs-vertical") === "true";
 
     if (vertical ? e.keyCode === 38 : e.keyCode === 37) {
       e.preventDefault();
@@ -94,9 +102,13 @@ export class HSTabs extends Component {
     const $navEl = $tabButtonEl.closest('[role="tablist"]');
     if (!$navEl) return;
 
-    const buttons = [...$navEl.querySelectorAll(this.selector)].filter(($buttonEl) => !$buttonEl.disabled);
-    const $activeButtonEl = $navEl.querySelector('button:focus');
-    let acitveIndex = buttons.findIndex(($buttonEl) => $buttonEl === $activeButtonEl);
+    const buttons = [...$navEl.querySelectorAll(this.selector)].filter(
+      ($buttonEl) => !$buttonEl.disabled,
+    );
+    const $activeButtonEl = $navEl.querySelector("button:focus");
+    let acitveIndex = buttons.findIndex(
+      ($buttonEl) => $buttonEl === $activeButtonEl,
+    );
 
     if (acitveIndex + 1 < buttons.length) {
       acitveIndex++;
@@ -112,9 +124,13 @@ export class HSTabs extends Component {
     const $navEl = $tabButtonEl.closest('[role="tablist"]');
     if (!$navEl) return;
 
-    const buttons = [...$navEl.querySelectorAll(this.selector)].filter(($buttonEl) => !$buttonEl.disabled).reverse();
-    const $activeButtonEl = $navEl.querySelector('button:focus');
-    let acitveIndex = buttons.findIndex(($buttonEl) => $buttonEl === $activeButtonEl);
+    const buttons = [...$navEl.querySelectorAll(this.selector)]
+      .filter(($buttonEl) => !$buttonEl.disabled)
+      .reverse();
+    const $activeButtonEl = $navEl.querySelector("button:focus");
+    let acitveIndex = buttons.findIndex(
+      ($buttonEl) => $buttonEl === $activeButtonEl,
+    );
 
     if (acitveIndex + 1 < buttons.length) {
       acitveIndex++;
@@ -130,7 +146,9 @@ export class HSTabs extends Component {
     const $navEl = $tabButtonEl.closest('[role="tablist"]');
     if (!$navEl) return;
 
-    const buttons = [...$navEl.querySelectorAll(this.selector)].filter(($buttonEl) => !$buttonEl.disabled);
+    const buttons = [...$navEl.querySelectorAll(this.selector)].filter(
+      ($buttonEl) => !$buttonEl.disabled,
+    );
 
     if (buttons.length) {
       buttons[0].focus();
@@ -142,7 +160,9 @@ export class HSTabs extends Component {
     const $navEl = $tabButtonEl.closest('[role="tablist"]');
     if (!$navEl) return;
 
-    const buttons = [...$navEl.querySelectorAll(this.selector)].reverse().filter(($buttonEl) => !$buttonEl.disabled);
+    const buttons = [...$navEl.querySelectorAll(this.selector)]
+      .reverse()
+      .filter(($buttonEl) => !$buttonEl.disabled);
 
     if (buttons.length) {
       buttons[0].focus();

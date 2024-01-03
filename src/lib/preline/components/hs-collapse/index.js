@@ -6,24 +6,25 @@
  * Copyright 2023 Htmlstream
  */
 
-import Component from '../../core/Component';
+import Component from "../../core/Component";
 
 export class HSCollapse extends Component {
-
-  root
+  root;
 
   constructor(root) {
-    super('[data-hs-collapse]');
-    this.root = root
+    super("[data-hs-collapse]");
+    this.root = root;
   }
 
   init() {
-    this.root.addEventListener('click', (e) => {
+    this.root.addEventListener("click", (e) => {
       const $targetEl = e.target;
       const $collapseToggleEl = $targetEl.closest(this.selector);
 
       if ($collapseToggleEl) {
-        const collapseEls = this.root.querySelectorAll($collapseToggleEl.getAttribute('data-hs-collapse'));
+        const collapseEls = this.root.querySelectorAll(
+          $collapseToggleEl.getAttribute("data-hs-collapse"),
+        );
 
         this.toggle(collapseEls);
       }
@@ -34,30 +35,32 @@ export class HSCollapse extends Component {
     if (!$collapseEls.length) return;
 
     [...$collapseEls].forEach(($collapseEl) => {
-      $collapseEl.classList.contains('hidden') ? this.show($collapseEl) : this.hide($collapseEl);
+      $collapseEl.classList.contains("hidden")
+        ? this.show($collapseEl)
+        : this.hide($collapseEl);
     });
   }
 
   show($collapseEl) {
-    $collapseEl.classList.add('open');
-    $collapseEl.classList.remove('hidden');
+    $collapseEl.classList.add("open");
+    $collapseEl.classList.remove("hidden");
     $collapseEl.style.height = 0;
 
     this.root.querySelectorAll(this.selector).forEach(($toggleEl) => {
-      if ($collapseEl.closest($toggleEl.getAttribute('data-hs-collapse'))) {
-        $toggleEl.classList.add('open');
+      if ($collapseEl.closest($toggleEl.getAttribute("data-hs-collapse"))) {
+        $toggleEl.classList.add("open");
       }
     });
 
     $collapseEl.style.height = `${$collapseEl.scrollHeight}px`;
 
     this.afterTransition($collapseEl, () => {
-      if (!$collapseEl.classList.contains('open')) return;
+      if (!$collapseEl.classList.contains("open")) return;
 
-      $collapseEl.style.height = '';
+      $collapseEl.style.height = "";
 
-      this._fireEvent('open', $collapseEl);
-      this._dispatch('open.hs.collapse', $collapseEl, $collapseEl);
+      this._fireEvent("open", $collapseEl);
+      this._dispatch("open.hs.collapse", $collapseEl, $collapseEl);
     });
   }
 
@@ -68,25 +71,27 @@ export class HSCollapse extends Component {
       $collapseEl.style.height = 0;
     });
 
-    $collapseEl.classList.remove('open');
+    $collapseEl.classList.remove("open");
 
     this.afterTransition($collapseEl, () => {
-      if ($collapseEl.classList.contains('open')) return;
-      $collapseEl.classList.add('hidden');
+      if ($collapseEl.classList.contains("open")) return;
+      $collapseEl.classList.add("hidden");
       $collapseEl.style.height = null;
 
-      this._fireEvent('hide', $collapseEl);
-      this._dispatch('hide.hs.collapse', $collapseEl, $collapseEl);
+      this._fireEvent("hide", $collapseEl);
+      this._dispatch("hide.hs.collapse", $collapseEl, $collapseEl);
 
-      $collapseEl.querySelectorAll('.hs-mega-menu-content.block').forEach(($megaMenuEl) => {
-        $megaMenuEl.classList.remove('block');
-        $megaMenuEl.classList.add('hidden');
-      });
+      $collapseEl
+        .querySelectorAll(".hs-mega-menu-content.block")
+        .forEach(($megaMenuEl) => {
+          $megaMenuEl.classList.remove("block");
+          $megaMenuEl.classList.add("hidden");
+        });
     });
 
     this.root.querySelectorAll(this.selector).forEach(($toggleEl) => {
-      if ($collapseEl.closest($toggleEl.getAttribute('data-hs-collapse'))) {
-        $toggleEl.classList.remove('open');
+      if ($collapseEl.closest($toggleEl.getAttribute("data-hs-collapse"))) {
+        $toggleEl.classList.remove("open");
       }
     });
   }

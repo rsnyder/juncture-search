@@ -7,23 +7,29 @@
  * Copyright 2023 Htmlstream
  */
 
-const plugin = require('tailwindcss/plugin');
+const plugin = require("tailwindcss/plugin");
 
 module.exports = plugin(function ({ addVariant, e }) {
-  addVariant('hs-accordion-active', [
+  addVariant("hs-accordion-active", [
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-accordion.active.${e(`hs-accordion-active${separator}${className}`)}`;
+        return `.hs-accordion.active.${e(
+          `hs-accordion-active${separator}${className}`,
+        )}`;
       });
     },
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-accordion.active > .hs-accordion-toggle .${e(`hs-accordion-active${separator}${className}`)}`;
+        return `.hs-accordion.active > .hs-accordion-toggle .${e(
+          `hs-accordion-active${separator}${className}`,
+        )}`;
       });
     },
     ({ modifySelectors, separator }) => {
       modifySelectors(({ className }) => {
-        return `.hs-accordion.active > .hs-accordion-toggle.${e(`hs-accordion-active${separator}${className}`)}`;
+        return `.hs-accordion.active > .hs-accordion-toggle.${e(
+          `hs-accordion-active${separator}${className}`,
+        )}`;
       });
     },
   ]);
