@@ -219,8 +219,8 @@ function imageSelected(index: number) {
 }
 
 function onDragStart(index:number, event: DragEvent) {
-  console.log('onDragStart', index, imageData.value[index])
-  event.dataTransfer?.setData('text/plain', imageData.value[index].id)
+  console.log('onDragStart', index, toRaw(imageData.value[index]))
+  event.dataTransfer?.setData('text/plain', imageData.value[index].iiif)
 }
 
 onMounted(() => {
