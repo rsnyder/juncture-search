@@ -219,6 +219,7 @@ function imageSelected(index: number) {
 }
 
 function onDragStart(index:number, event: DragEvent) {
+  console.log('onDragStart', index, imageData.value[index])
   event.dataTransfer?.setData('text/plain', imageData.value[index].id)
 }
 
