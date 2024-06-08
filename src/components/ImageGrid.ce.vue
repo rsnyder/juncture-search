@@ -19,6 +19,8 @@
           onload="this.style.opacity = 1"
           :src="imageData[idx].thumbnail"
           @click="imageSelected(idx)"
+          @dragstart="onDragStart(idx, $event)"
+          draggable
         />
       </sl-tooltip>
 
@@ -214,6 +216,10 @@ const layout = ref<any[]>([]);
 function imageSelected(index: number) {
   selectedImage.value = imageData.value[index] as Image;
   emit("item-selected", selectedImage.value);
+}
+
+function onDragStart(index:number, event: DragEvent) {
+  event.dataTransfer?.setData('text/plain', imageData.value[index].id)
 }
 
 onMounted(() => {
