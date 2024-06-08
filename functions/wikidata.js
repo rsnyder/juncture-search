@@ -71,7 +71,7 @@ async function getWikidataImages(qid) {
           thumbnail: mwImage(file, 400),
           iiif:
             b.iiif?.value ||
-            `https://iiif.juncture-digital.org/wc:${file.replace(
+            `https://iiif.mdpress.io/wc:${file.replace(
               /\s/g,
               "_",
             )}/manifest.json`,
@@ -186,7 +186,7 @@ async function getWikidataImagesFederated(qid) {
           ),
           iiif:
             b.iiif?.value ||
-            `https://iiif.juncture-digital.org/wc:${file.replace(
+            `https://iiif.mdpress.io/wc:${file.replace(
               /\s/g,
               "_",
             )}/manifest.json`,

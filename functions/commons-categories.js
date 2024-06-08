@@ -115,7 +115,7 @@ export async function handler(event) {
             file,
             aspect_ratio >= 1 ? 400 : Number(400 * aspect_ratio).toFixed(0),
           ),
-          iiif: `https://iiif.juncture-digital.org/wc:${file.replace(
+          iiif: `https://iiif.mdpress.io/wc:${file.replace(
             /\s/g,
             "_",
           )}/manifest.json`,

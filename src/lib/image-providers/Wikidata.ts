@@ -112,7 +112,7 @@ export class Wikidata extends ImageProvider {
               thumbnail: mwImage(file, 400),
               iiif:
                 b.iiif?.value ||
-                `https://iiif.juncture-digital.org/wc:${file.replace(
+                `https://iiif.mdpress.io/wc:${file.replace(
                   /\s/g,
                   "_",
                 )}/manifest.json`,
