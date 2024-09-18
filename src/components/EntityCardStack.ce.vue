@@ -174,6 +174,7 @@ async function getEntityData() {
       });
       return qids.value
         .map((qid) => parsed[qid])
+        .filter((item: any) => item)
         .map((item: any) => {
           item.thumbnail = mwImage(item.images[0], 500);
           return item;
