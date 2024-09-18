@@ -178,11 +178,7 @@ export const useEntitiesStore = defineStore("entities", {
             // console.log(`updateLabels: ${toUpdate.length} -> ${Object.keys(this.allLabels).length}`)
           }
           this.labelsFetching = false;
-          console.log(
-            `updateLabels: ${toUpdate.length} -> ${
-              Object.keys(this.allLabels).length
-            }`,
-          );
+          // console.log(`updateLabels: ${toUpdate.length} -> ${Object.keys(this.allLabels).length}`);
         }
         this.labels = langLabels(this.allLabels, this.language);
         return this.labels;

@@ -79,7 +79,6 @@ export class HSOverlay extends Component {
     }
 
     if (disabledScroll) {
-      console.log(this.root);
       this.root.style.overflow = "hidden";
     }
 

@@ -58,6 +58,5 @@ import { computed, h, onMounted, ref, watch } from "vue";
 
 function onSubmit(evt: any) {
   evt.preventDefault();
-  console.log("onSubmit");
 }
 </script>

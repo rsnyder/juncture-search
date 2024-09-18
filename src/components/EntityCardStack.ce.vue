@@ -133,7 +133,7 @@ watch(host, () => {
 });
 
 function onClick() {
-  console.log("onClick");
+  // console.log("onClick");
   // showDialog.value = true
   let modal = shadowRoot.value?.querySelector("ve-modal-twp");
   let isOpen = modal?.getAttribute("open") !== null;

@@ -296,13 +296,11 @@ async function getNext() {
 }
 
 function setProviders(e: any) {
-  console.log("setProviders", e.target.id);
+  // console.log("setProviders", e.target.id);
   e.preventDefault();
   e.stopPropagation();
   let providerTag = e.target.dataset.provider;
-  console.log(
-    shadowRoot.value?.querySelectorAll(`[data-provider="${providerTag}"]`),
-  );
+  // console.log(shadowRoot.value?.querySelectorAll(`[data-provider="${providerTag}"]`));
   shadowRoot.value
     ?.querySelectorAll(`[data-provider="${providerTag}"]`)
     .forEach((el: any) => (el.checked = !el.checked));
@@ -314,7 +312,7 @@ function setProviders(e: any) {
   providers.value.forEach((p) => p.instance.reset());
   let copy = { ...providersEnabled.value };
   copy[providerTag] = !copy[providerTag];
-  console.log("setProviders", copy);
+  // console.log("setProviders", copy);
   providersEnabled.value = copy;
   articles.value = [];
   getNext();

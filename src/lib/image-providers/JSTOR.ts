@@ -89,9 +89,7 @@ export class JSTOR extends ImageProvider {
     } else {
       this._hasMore = false;
     }
-    console.log(
-      `${this.id}.doQuery: qid=${this._qid} images=${this._images.length} hasMore=${this._hasMore}`,
-    );
+    // console.log(`${this.id}.doQuery: qid=${this._qid} images=${this._images.length} hasMore=${this._hasMore}`,);
 
     this._filterAndSort();
     if (this._images?.length) this._cacheResults();

@@ -126,7 +126,7 @@ function validateNetlifyUser() {
     })
       .then((x) => x.json())
       .then((newToken: any) => {
-        console.log("validateNetlifyUser: newToken", newToken);
+        // ("validateNetlifyUser: newToken", newToken);
         _user.token.access_token = newToken.access_token;
         _user.token.refresh_token = newToken.refresh_token;
         _user.token.expires_at =

@@ -1,9 +1,6 @@
 import fetch from "node-fetch";
 
-console.log(
-  process.env.OPENVERSE_CLIENT_ID,
-  process.env.OPENVERSE_CLIENT_SECRET,
-);
+// console.log(process.env.OPENVERSE_CLIENT_ID, process.env.OPENVERSE_CLIENT_SECRET);
 let access_token;
 async function get_access_token() {
   let resp = await fetch(
@@ -45,7 +42,7 @@ export async function handler(event, context, callback) {
   ).catch((err) => {
     console.log(err);
   });
-  console.log(resp.status, resp.statusText);
+  // console.log(resp.status, resp.statusText);
   if (resp.ok) {
     resp = await resp.json();
     return { statusCode: 200, body: JSON.stringify(resp) };

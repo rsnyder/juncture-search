@@ -36,7 +36,7 @@ const { isLoggedIn, user, userid } = storeToRefs(store);
 const root = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
-  console.log("auth.onMounted");
+  // console.log("auth.onMounted");
   netlifyIdentity.on("init", (_user) => store.setUser(_user));
   netlifyIdentity.on("error", (err) => console.error("Error", err));
   netlifyIdentity.on("login", (_user) => {
@@ -50,7 +50,7 @@ onMounted(async () => {
 });
 
 watch(user, () => {
-  console.log("auth.watch.user", user.value);
+  // console.log("auth.watch.user", user.value);
   if (user.value) localStorage.setItem("user", JSON.stringify(user.value));
   else if (localStorage.getItem("user")) localStorage.removeItem("user");
 });
@@ -65,7 +65,7 @@ function logout() {
 }
 
 function validate() {
-  console.log("auth.validate");
+  // console.log("auth.validate");
   let _user: any =
     localStorage.getItem("user") &&
     JSON.parse(localStorage.getItem("user") || "{}");

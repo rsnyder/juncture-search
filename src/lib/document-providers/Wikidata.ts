@@ -235,7 +235,7 @@ export class Wikidata extends ArticleProviderBase {
         else this._mainSubjects[ms.id] = 1;
       });
     });
-    console.log(this._mainSubjects);
+    // console.log(this._mainSubjects);
     return this._mainSubjects;
   }
 

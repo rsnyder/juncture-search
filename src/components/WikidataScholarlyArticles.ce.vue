@@ -283,7 +283,7 @@ function getItems() {
   let qids = ids.value.slice(items.value.length, end.value);
   if (fetching || qids.length === 0) return;
   fetching = true;
-  console.log("getItems", items.value.length, end.value, qids.length);
+  // console.log("getItems", items.value.length, end.value, qids.length);
   let query = ITEMS_SPARQL.replace(
     /{{qids}}/g,
     qids.map((q) => `wd:${q}`).join(") ("),
@@ -330,7 +330,7 @@ function getItems() {
 
 async function itemSelected(evt: CustomEvent) {
   let id = evt.detail[0].id;
-  console.log("itemSelected", id);
+  // console.log("itemSelected", id);
 }
 </script>
 

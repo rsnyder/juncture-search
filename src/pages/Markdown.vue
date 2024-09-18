@@ -23,9 +23,7 @@ marked.use({
     code(code, language) {
       // Use custom juncture renderer.
       if (language === "juncture") {
-        console.log(
-          marked.parse("<h1>Title</h1>", { mangle: false, headerIds: false }),
-        );
+        // console.log(marked.parse("<h1>Title</h1>", { mangle: false, headerIds: false }),);
         // return `<div class="juncture">${code}</div>`;
         return `<ve-header title="Test" color="#990001">
               <ul>
@@ -53,7 +51,6 @@ watch([markdown], () => {
   });
   let tmp = new DOMParser().parseFromString(html.value, "text/html").children[0]
     .children[1];
-  console.log(tmp);
 });
 
 watch(route, () => {
@@ -77,7 +74,7 @@ function getMarkdown() {
     ? route.params.path.join("/")
     : route.params.path;
   path = path ? (/\.md$/.test(path) ? path : `${path}.md`) : "README.md";
-  console.log(owner, repo, path);
+  // console.log(owner, repo, path);
   fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`)
     .then((response) => response.text())
     .then((md) => (markdown.value = md));

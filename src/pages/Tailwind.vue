@@ -10,7 +10,7 @@ import EntityCard from "../components/EntityCard.vue";
 const route = useRoute();
 
 const qid = ref<string>();
-watch(qid, () => console.log(qid.value));
+// watch(qid, () => console.log(qid.value));
 
 watch(route, () => {
   qid.value = Array.isArray(route.params.qid)

@@ -20,7 +20,7 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 
 const qid = ref<string>();
-watch(qid, () => console.log(qid.value));
+// watch(qid, () => console.log(qid.value));
 
 watch(route, () => {
   qid.value = Array.isArray(route.params.qid)

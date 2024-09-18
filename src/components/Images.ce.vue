@@ -66,7 +66,7 @@ watch(entity, () => {
 
 const options = ref<any>({});
 watch(options, () => {
-  console.log("options", toRaw(options.value));
+  // console.log("options", toRaw(options.value));
   // providers.value.forEach(p => p.instance.reset())
   //images.value = []
   //getNext()
@@ -74,7 +74,7 @@ watch(options, () => {
 
 function optionsUpdated(e: any) {
   options.value = e.detail[0];
-  console.log("optionsUpdated", options.value);
+  // console.log("optionsUpdated", options.value);
   depictsFilter.value = options.value.depicts?.selected || [];
 }
 
@@ -95,7 +95,7 @@ watch(providers, () => {
 
 const depictsFilter = ref<string[]>([]);
 watch(depictsFilter, () => {
-  console.log("depictsFilter", depictsFilter.value);
+  // console.log("depictsFilter", depictsFilter.value);
   // depicts.value = {}
   images.value = [];
   providers.value.forEach((p) => p.instance.reset());
@@ -141,7 +141,7 @@ watch(isActive, async () => {
 });
 
 watch(qid, async () => {
-  console.log(`Images.watch.qid: isActive=${isActive.value} qid=${qid.value}`);
+  // console.log(`Images.watch.qid: isActive=${isActive.value} qid=${qid.value}`);
   images.value = [];
   if (isActive.value) entity.value = await store.fetch(qid.value);
 });
@@ -156,7 +156,7 @@ function getDepicts(provider: any) {
   if (depictsProcessed.has(provider.id)) return;
   // provider.getDepicts(depictsFilter.value).then((depicted: any) => {
   provider.getDepicts([]).then((depicted: any) => {
-    console.log("getDepicts", provider.id, Object.keys(depicted).length);
+    // console.log("getDepicts", provider.id, Object.keys(depicted).length);
     let updated = { ...depicts.value };
     let qids = Object.keys(depicted);
     if (qids.length === 0) return;
@@ -195,9 +195,7 @@ async function getNext() {
         }
         // console.log('getNext', provider.instance.id, provider.instance.hasMore())
         if (initial) getDepicts(provider.instance);
-        console.log(
-          `${provider.instance.id}: filter=${depictsFilter.value} selected=${providerImages.length}`,
-        );
+        // console.log(`${provider.instance.id}: filter=${depictsFilter.value} selected=${providerImages.length}`,);
         if (providerImages.length === 0) break;
         images.value = [...images.value, ...providerImages];
         toAdd += providerImages.length;
@@ -221,8 +219,7 @@ watch(images, () => {
 
 const depicts = ref<any>({});
 watch(depicts, async () => {
-  if (Object.keys(depicts.value).length > 0)
-    console.log("depicts", toRaw(depicts.value));
+  // if (Object.keys(depicts.value).length > 0) console.log("depicts", toRaw(depicts.value));
   await store.updateLabels(Object.keys(depicts.value));
   let copy = { ...options.value };
   copy.depicts = { entities: depicts.value, selected: [] };

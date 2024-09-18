@@ -32,7 +32,6 @@ watch(entity, () => {
 
 function init() {
   // Do expensive processing
-  console.log(`init ${props.id}`);
   qid.value = entity.value.id;
   ++initCtr.value;
 }

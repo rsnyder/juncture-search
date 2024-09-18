@@ -45,7 +45,7 @@ const options = ref<any>({
 });
 
 function optionsUpdated(e: any) {
-  console.log("optionsUpdated", toRaw(e.detail));
+  // console.log("optionsUpdated", toRaw(e.detail));
 }
 </script>
 

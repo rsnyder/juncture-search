@@ -108,7 +108,7 @@ async function getWikidataImages(qid) {
     }
   });
 
-  console.log("wikidata", resp.status, Object.keys(data).length);
+  // console.log("wikidata", resp.status, Object.keys(data).length);
 
   return { statusCode: 200, body: JSON.stringify(Object.values(data)) };
 }
@@ -224,7 +224,7 @@ async function getWikidataImagesFederated(qid) {
     }
   });
 
-  console.log("wikidata", resp.status, Object.keys(data).length);
+  // console.log("wikidata", resp.status, Object.keys(data).length);
 
   return { statusCode: 200, body: JSON.stringify(Object.values(data)) };
 }

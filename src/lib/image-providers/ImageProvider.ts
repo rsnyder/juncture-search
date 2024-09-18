@@ -31,7 +31,7 @@ export class ImageProvider {
   }
 
   reset() {
-    console.log(`${this.id}.reset`);
+    // (`${this.id}.reset`);
     this._cursor = this._cursor > 0 ? 0 : this._cursor;
   }
 
@@ -53,12 +53,7 @@ export class ImageProvider {
       this._cursor,
       this._cursor + howMany,
     );
-    console.log(
-      `${this.id}.next: qid=${this._qid} cursor=${
-        this._cursor
-      } howMany=${howMany} images=${this._images.length} from_cache=${!this
-        ._hasMore} next=${next.length}`,
-    );
+    // console.log(`${this.id}.next: qid=${this._qid} cursor=${this._cursor} howMany=${howMany} images=${this._images.length} from_cache=${!this._hasMore} next=${next.length}`);
     this._cursor += next.length;
     return next;
   }

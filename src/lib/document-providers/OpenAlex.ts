@@ -28,7 +28,7 @@ export class OpenAlex extends ArticleProviderBase {
     let resp: any = await fetch(`${this._searchEndpoint}/works?${qargs}`);
     if (resp.ok) {
       resp = await resp.json();
-      console.log(resp);
+      // console.log(resp);
       this._hasMore = resp.meta.count > resp.meta.page * this._pageSize;
       this._articles = [
         ...this._articles,
@@ -44,7 +44,7 @@ export class OpenAlex extends ArticleProviderBase {
   }
 
   _transformItem(item: any): any {
-    console.log(item);
+    // console.log(item);
     let article: Article = {
       api: this.id,
       doi: item.doi.split("/").slice(3).join("/"),
